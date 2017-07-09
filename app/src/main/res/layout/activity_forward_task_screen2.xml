@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Name: "
+        android:textColor="#000000"
+        android:textSize="20dp"
+        android:layout_marginTop="10dp"
+        android:id="@+id/textView" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textCapCharacters"
+        android:id="@+id/name"
+        android:enabled="false"
+        android:layout_below="@+id/textView"
+         />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Designation: "
+        android:textColor="#000000"
+        android:textSize="20dp"
+        android:layout_marginTop="10dp"
+        android:id="@+id/textView2"
+        android:layout_below="@+id/name"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/designation"
+        android:enabled="false"
+        android:layout_below="@+id/textView2"
+         />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Start Date: "
+        android:textColor="#000000"
+        android:textSize="20dp"
+        android:layout_marginTop="10dp"
+        android:id="@+id/textView0"
+        android:layout_below="@+id/num"/>
+
+    <EditText
+        android:id="@+id/startDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView3"
+        android:hint="DD/MM/YYYY"
+        android:enabled="false"
+        android:inputType="date" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Deadline: "
+        android:textColor="#000000"
+        android:textSize="20dp"
+        android:layout_marginTop="10dp"
+        android:id="@+id/textView3"
+        android:layout_below="@+id/num"/>
+
+    <EditText
+        android:id="@+id/deadline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView3"
+        android:hint="DD/MM/YYYY"
+        android:inputType="date" />
+
+    <TextView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="Coordinator Note: "
+    android:textColor="#000000"
+    android:textSize="20dp"
+    android:layout_marginTop="10dp"
+    android:id="@+id/textView4"
+    android:layout_below="@+id/num"/>
+
+    <EditText
+        android:id="@+id/note"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView3"
+         />
+
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="submit"
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/submit"
+        android:layout_below="@+id/add"
+        android:layout_marginTop="10dp"
+        android:layout_centerHorizontal="true" />
+
+
+</LinearLayout>
