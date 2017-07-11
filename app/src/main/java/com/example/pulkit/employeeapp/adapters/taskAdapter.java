@@ -63,7 +63,7 @@ public class taskAdapter extends RecyclerView.Adapter<taskAdapter.MyViewHolder> 
         holder.imgProfile.setImageResource(R.drawable.bg_circle);
         holder.imgProfile.setColorFilter(task.getColor());
         holder.timestamp.setText(task.getStartDate());
-//        holder.taskname.setText(iconText);
+        holder.taskname.setText(iconText);
 
         DatabaseReference dbCustomerName = FirebaseDatabase.getInstance().getReference().child("MeChat").child("Customer").child(task.getCustomerId()).getRef();
         dbCustomerName.addListenerForSingleValueEvent(new ValueEventListener() {

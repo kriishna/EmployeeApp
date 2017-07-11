@@ -52,7 +52,10 @@ public class TaskHome extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new QuotationGroups(), "Groups");
+        if(desig.toLowerCase().equals("quotation"))
+            adapter.addFragment(new QuotationGroups(), "Groups");
+        else
+            adapter.addFragment(new taskFrag(), "Tasks");
         adapter.addFragment(new chatFrag(), "Chat");
         viewPager.setAdapter(adapter);
     }

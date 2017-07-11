@@ -52,7 +52,8 @@
         <activity
             android:name=".measurement.dialogue"
             android:windowSoftInputMode="stateHidden" />
-        <activity android:name=".Quotation.QuotaionTasks" />
+        <activity android:name=".Quotation.QuotaionTasks"
+            android:windowSoftInputMode="stateHidden"/>
     </application>
 
 </manifest>
