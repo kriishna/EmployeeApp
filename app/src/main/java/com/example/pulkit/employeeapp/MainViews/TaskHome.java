@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.WindowManager;
 
+import com.example.pulkit.employeeapp.Quotation.QuotationGroups;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.chat.chatFrag;
 
@@ -51,7 +52,7 @@ public class TaskHome extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new taskFrag(), "Tasks");
+        adapter.addFragment(new QuotationGroups(), "Groups");
         adapter.addFragment(new chatFrag(), "Chat");
         viewPager.setAdapter(adapter);
     }
