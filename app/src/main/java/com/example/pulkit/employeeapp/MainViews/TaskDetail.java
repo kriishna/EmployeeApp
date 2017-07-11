@@ -2,13 +2,10 @@ package com.example.pulkit.employeeapp.MainViews;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,12 +29,9 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.pulkit.employeeapp.ForwardTask.forwardTask;
 import com.example.pulkit.employeeapp.R;
-import com.example.pulkit.employeeapp.adapters.assignedto_adapter;
 import com.example.pulkit.employeeapp.adapters.measurement_adapter;
 import com.example.pulkit.employeeapp.measurement.MeasureList;
-import com.example.pulkit.employeeapp.model.CompletedBy;
 import com.example.pulkit.employeeapp.model.Quotation;
 import com.example.pulkit.employeeapp.model.Task;
 import com.example.pulkit.employeeapp.model.measurement;
@@ -58,9 +52,6 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-
-import static android.R.attr.bitmap;
 
 public class TaskDetail extends AppCompatActivity {
 
@@ -148,8 +139,8 @@ public class TaskDetail extends AppCompatActivity {
                             scroll.fullScroll(ScrollView.FOCUS_DOWN);
                         }
                     });
-    //                open_measurement.setCompoundDrawablesRelative(null,null, R.mipmap.ic_up,null);
                 }
+
 
                 else
                     rec_measurement.setVisibility(View.GONE);

@@ -35,7 +35,7 @@
         <activity
             android:name=".MainViews.TaskHome"
             android:screenOrientation="portrait"
-            android:theme="@style/tabs"></activity>
+            android:theme="@style/tabs" />
         <activity
             android:name=".MainViews.TaskDetail"
             android:windowSoftInputMode="stateHidden" />
@@ -48,9 +48,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".measurement.MeasureList"></activity>
-        <activity android:name=".measurement.dialogue"
-            android:windowSoftInputMode="stateHidden"></activity>
+        <activity android:name=".measurement.MeasureList" />
+        <activity
+            android:name=".measurement.dialogue"
+            android:windowSoftInputMode="stateHidden" />
+        <activity android:name=".Quotation.QuotaionTasks"
+            android:windowSoftInputMode="stateHidden"/>
     </application>
 
 </manifest>
