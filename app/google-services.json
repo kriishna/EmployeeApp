@@ -259,6 +259,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "916235673487-q6uhcgg6lg5ajr38vi6of6maui6gcuu1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.pulkit.employeeapp",
+            "certificate_hash": "53f07998ce5059cef18d91184819c3eeecf8844e"
+          }
+        },
+        {
           "client_id": "916235673487-s1791sfuk0ndc1k4fvqgst5fc1vmde3k.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

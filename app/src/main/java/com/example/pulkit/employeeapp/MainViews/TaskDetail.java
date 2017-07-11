@@ -129,8 +129,6 @@ public class TaskDetail extends AppCompatActivity {
         dbAssigned = dbTask.child("AssignedTo").getRef();
         dbMeasurement = dbTask.child("measurement").getRef();
 
-
-
         rec_measurement.setLayoutManager(new LinearLayoutManager(this));
         rec_measurement.setItemAnimator(new DefaultItemAnimator());
         rec_measurement.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
@@ -219,8 +217,6 @@ public class TaskDetail extends AppCompatActivity {
                                         Toast.makeText(TaskDetail.this,"Task Returned",Toast.LENGTH_SHORT).show();
                                     }
                                 });
-
-
 
                     }
                 }).setNegativeButton("No", new DialogInterface.OnClickListener() {
