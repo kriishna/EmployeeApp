@@ -66,6 +66,7 @@ public class QAdapter extends RecyclerView.Adapter<QAdapter.MyViewHolder> {
         holder.imgProfile.setColorFilter(batch.getColor());
         holder.timestamp.setText(batch.getStartDate());
         holder.taskname.setText(iconText);
+        holder.customername.setText("");
 
         DatabaseReference dbCustomerName = FirebaseDatabase.getInstance().getReference().child("MeChat").child("Customer").child(batch.getId()).getRef();
         dbCustomerName.addListenerForSingleValueEvent(new ValueEventListener() {
