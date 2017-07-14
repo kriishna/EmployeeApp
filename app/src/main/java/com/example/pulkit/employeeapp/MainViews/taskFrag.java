@@ -32,7 +32,6 @@ import java.util.List;
 
 public class taskFrag extends Fragment implements taskAdapter.TaskAdapterListener{
 
-
     RecyclerView task_list;
     DatabaseReference dbTask, db;
     LinearLayoutManager linearLayoutManager;
@@ -60,8 +59,7 @@ public class taskFrag extends Fragment implements taskAdapter.TaskAdapterListene
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.chatfrag, container, false);
 
-
-
+        pDialog = new ProgressDialog(getContext());
         emp_id = TaskHome.emp_id;
         task_list = (RecyclerView) rootView.findViewById(R.id.recycler);
 
@@ -73,8 +71,6 @@ public class taskFrag extends Fragment implements taskAdapter.TaskAdapterListene
         task_list.setItemAnimator(new DefaultItemAnimator());
         task_list.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
         task_list.setAdapter(mAdapter);
-
-
 
         new Handler().postDelayed(new Runnable() {
             public void run() {
@@ -94,8 +90,6 @@ public class taskFrag extends Fragment implements taskAdapter.TaskAdapterListene
         startActivity(intent);
     }
 
-
-
     void LoadData() {
         db = FirebaseDatabase.getInstance().getReference().child("MeChat").child("Task").child(list.get(i));
 
@@ -106,7 +100,6 @@ public class taskFrag extends Fragment implements taskAdapter.TaskAdapterListene
                 Task task = dataSnapshot.getValue(Task.class);
                 TaskList.add(task);
                 mAdapter.notifyDataSetChanged();
-
             }
 
             @Override
@@ -124,7 +117,6 @@ public class taskFrag extends Fragment implements taskAdapter.TaskAdapterListene
         protected void onPreExecute() {
             super.onPreExecute();
             // Showing progress dialog
-            pDialog = new ProgressDialog(getContext());
             pDialog.setMessage("Please wait...");
             pDialog.setCancelable(true);
             pDialog.show();
@@ -137,18 +129,13 @@ public class taskFrag extends Fragment implements taskAdapter.TaskAdapterListene
             ch = dbTask.addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
-
                     if (dataSnapshot.getValue().toString().equals("pending")) {
                         list.add(dataSnapshot.getKey());
                         LoadData();
                         i++;
-
-
                         if (pDialog.isShowing())
                             pDialog.dismiss();
                     }
-
                 }
 
                 @Override
@@ -172,7 +159,6 @@ public class taskFrag extends Fragment implements taskAdapter.TaskAdapterListene
                 }
             });
             return null;
-
         }
     }
 
@@ -187,7 +173,6 @@ public class taskFrag extends Fragment implements taskAdapter.TaskAdapterListene
     @Override
     public void onResume() {
         super.onResume();
-
         i = 0;
         list.clear();
         TaskList.clear();
