@@ -164,7 +164,9 @@ public class taskFrag extends Fragment implements taskAdapter.TaskAdapterListene
     @Override
     public void onPause() {
         super.onPause();
+        if(ch!=null)
         dbTask.removeEventListener(ch);
+        if(vl!=null)
         db.removeEventListener(vl);
     }
 
