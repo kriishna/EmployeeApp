@@ -58,15 +58,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         holder.unit.setText(m.getUnit());
 
         if (!m.getFleximage().equals(""))
-            Picasso.with(context).load(m.getFleximage()).into(holder.fleximage);
+            Picasso.with(context).load(m.getFleximage()).placeholder(R.drawable.wait).into(holder.fleximage);
 
-        holder.view.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-
-                return false;
-            }
-        });
     }
 
     @Override

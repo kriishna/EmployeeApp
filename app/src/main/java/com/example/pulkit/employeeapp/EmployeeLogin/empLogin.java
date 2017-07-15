@@ -104,6 +104,7 @@ public class empLogin extends AppCompatActivity {
                             session.create_oldusersession(Username);
                             Intent intent = new Intent(empLogin.this, TaskHome.class);
                             intent.putExtra("emp_id",Username);
+                            intent.putExtra("desig",employee.getDesignation());
                             startActivity(intent);
                             finish();
                         }

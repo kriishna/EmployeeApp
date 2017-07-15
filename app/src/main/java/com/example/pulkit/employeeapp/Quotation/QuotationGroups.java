@@ -1,8 +1,7 @@
-package com.example.pulkit.employeeapp.MainViews;
+package com.example.pulkit.employeeapp.Quotation;
 
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -18,8 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.pulkit.employeeapp.R;
-import com.example.pulkit.employeeapp.adapters.taskAdapter;
-import com.example.pulkit.employeeapp.model.Task;
+import com.example.pulkit.employeeapp.model.QuotationBatch;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -30,47 +28,38 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class taskFrag extends Fragment implements taskAdapter.TaskAdapterListener{
+public class QuotationGroups extends Fragment implements QAdapter.QAdapterListener {
 
-    RecyclerView task_list;
+    RecyclerView recycler;
     DatabaseReference dbTask, db;
     LinearLayoutManager linearLayoutManager;
-    private ArrayList<Task> TaskList = new ArrayList<>();
-    private List<String> list = new ArrayList<>();
+    private List<QuotationBatch> list = new ArrayList<>();
     private RecyclerView.Adapter mAdapter;
     ProgressDialog pDialog;
     int i = 0;
     public static String emp_id;
     ChildEventListener ch;
-    ValueEventListener vl;
 
-    public taskFrag() {
-    }
-
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+    public QuotationGroups() {
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.chatfrag, container, false);
+        View rootView = inflater.inflate(R.layout.quotationfrag, container, false);
 
-        pDialog = new ProgressDialog(getContext());
-        emp_id = TaskHome.emp_id;
-        task_list = (RecyclerView) rootView.findViewById(R.id.recycler);
 
-        dbTask = FirebaseDatabase.getInstance().getReference().child("MeChat").child("Employee").child(emp_id).child("AssignedTask").getRef();
+        recycler = (RecyclerView) rootView.findViewById(R.id.recycler);
 
-        mAdapter = new taskAdapter(TaskList, getActivity(), this);
+        dbTask = FirebaseDatabase.getInstance().getReference().child("MeChat").child("Quotation").getRef();
+
+        mAdapter = new QAdapter(list, getActivity(), (QAdapter.QAdapterListener) this);
         linearLayoutManager = new LinearLayoutManager(getActivity());
-        task_list.setLayoutManager(linearLayoutManager);
-        task_list.setItemAnimator(new DefaultItemAnimator());
-        task_list.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
-        task_list.setAdapter(mAdapter);
+        recycler.setLayoutManager(linearLayoutManager);
+        recycler.setItemAnimator(new DefaultItemAnimator());
+        recycler.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
+        recycler.setAdapter(mAdapter);
+
 
         new Handler().postDelayed(new Runnable() {
             public void run() {
@@ -82,32 +71,16 @@ public class taskFrag extends Fragment implements taskAdapter.TaskAdapterListene
         return rootView;
     }
 
+
     @Override
     public void onTaskRowClicked(int position) {
-        Intent intent = new Intent(getContext(),TaskDetail.class);
-        Task task = TaskList.get(position);
-        intent.putExtra("task_id",task.getTaskId());
+        Intent intent = new Intent(getContext(), QuotaionTasks.class);
+        QuotationBatch batch = list.get(position);
+        intent.putExtra("id", batch.getId());
+        intent.putExtra("note",batch.getNote());
+        intent.putExtra("end",batch.getEndDate());
+        intent.putExtra("start",batch.getStartDate());
         startActivity(intent);
-    }
-
-    void LoadData() {
-        db = FirebaseDatabase.getInstance().getReference().child("MeChat").child("Task").child(list.get(i));
-
-
-        vl = db.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Task task = dataSnapshot.getValue(Task.class);
-                TaskList.add(task);
-                mAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
 
     }
 
@@ -117,6 +90,7 @@ public class taskFrag extends Fragment implements taskAdapter.TaskAdapterListene
         protected void onPreExecute() {
             super.onPreExecute();
             // Showing progress dialog
+            pDialog = new ProgressDialog(getContext());
             pDialog.setMessage("Please wait...");
             pDialog.setCancelable(true);
             pDialog.show();
@@ -129,13 +103,17 @@ public class taskFrag extends Fragment implements taskAdapter.TaskAdapterListene
             ch = dbTask.addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    if (dataSnapshot.getValue().toString().equals("pending")) {
-                        list.add(dataSnapshot.getKey());
-                        LoadData();
-                        i++;
-                        if (pDialog.isShowing())
-                            pDialog.dismiss();
-                    }
+
+
+                    QuotationBatch batch = dataSnapshot.getValue(QuotationBatch.class);
+                    list.add(batch);
+                    mAdapter.notifyDataSetChanged();
+
+
+                    if (pDialog.isShowing())
+                        pDialog.dismiss();
+
+
                 }
 
                 @Override
@@ -159,6 +137,7 @@ public class taskFrag extends Fragment implements taskAdapter.TaskAdapterListene
                 }
             });
             return null;
+
         }
     }
 
@@ -166,20 +145,19 @@ public class taskFrag extends Fragment implements taskAdapter.TaskAdapterListene
     @Override
     public void onPause() {
         super.onPause();
-        if(ch!=null)
-        dbTask.removeEventListener(ch);
-        if(vl!=null)
-        db.removeEventListener(vl);
+        if (!dbTask.equals(null))
+            dbTask.removeEventListener(ch);
     }
 
     @Override
     public void onResume() {
         super.onResume();
+
         i = 0;
         list.clear();
-        TaskList.clear();
         mAdapter.notifyDataSetChanged();
         new net().execute();
 
     }
 }
+

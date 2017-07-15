@@ -1,4 +1,4 @@
-package com.example.pulkit.employeeapp.adapters;
+package com.example.pulkit.employeeapp.Quotation;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -10,7 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.pulkit.employeeapp.R;
-import com.example.pulkit.employeeapp.model.Task;
+import com.example.pulkit.employeeapp.model.QuotationBatch;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -18,16 +18,18 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class taskAdapter extends RecyclerView.Adapter<taskAdapter.MyViewHolder> {
-    ArrayList<Task> list = new ArrayList<>();
+public class QAdapter extends RecyclerView.Adapter<QAdapter.MyViewHolder> {
+    List<QuotationBatch> list = new ArrayList<>();
     private Context context;
-    private TaskAdapterListener listener;
+    private QAdapterListener listener;
 
 
-    public taskAdapter(ArrayList<Task> list, Context context, TaskAdapterListener listener) {
+    public QAdapter(List<QuotationBatch> list, Context context, QAdapterListener listener) {
         this.list = list;
         this.listener = listener;
+        this.context=context;
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -55,17 +57,18 @@ public class taskAdapter extends RecyclerView.Adapter<taskAdapter.MyViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(final taskAdapter.MyViewHolder holder, int position) {
-        Task task = list.get(position);
-        String iconText = task.getName().toUpperCase();
+    public void onBindViewHolder(final QAdapter.MyViewHolder holder, int position) {
+        QuotationBatch batch = list.get(position);
+        String iconText = batch.getId();
 
         holder.icon_text.setText(iconText.charAt(0) + "");
         holder.imgProfile.setImageResource(R.drawable.bg_circle);
-        holder.imgProfile.setColorFilter(task.getColor());
-        holder.timestamp.setText(task.getStartDate());
+        holder.imgProfile.setColorFilter(batch.getColor());
+        holder.timestamp.setText(batch.getStartDate());
         holder.taskname.setText(iconText);
+        holder.customername.setText("");
 
-        DatabaseReference dbCustomerName = FirebaseDatabase.getInstance().getReference().child("MeChat").child("Customer").child(task.getCustomerId()).getRef();
+        DatabaseReference dbCustomerName = FirebaseDatabase.getInstance().getReference().child("MeChat").child("Customer").child(batch.getId()).getRef();
         dbCustomerName.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -87,7 +90,7 @@ public class taskAdapter extends RecyclerView.Adapter<taskAdapter.MyViewHolder> 
         return list.size();
     }
 
-    public interface TaskAdapterListener {
+    public interface QAdapterListener {
         void onTaskRowClicked(int position);
     }
 

@@ -56,7 +56,7 @@ public class measurement_adapter extends RecyclerView.Adapter<measurement_adapte
         holder.height.setText(msr.getHeight());
         holder.unit.setText(msr.getUnit());
         if(!msr.getFleximage().equals(""))
-            Picasso.with(context).load(msr.getFleximage()).into(holder.fleximage);
+            Picasso.with(context).load(msr.getFleximage()).placeholder(R.drawable.wait).into(holder.fleximage);
 
     }
 

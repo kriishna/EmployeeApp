@@ -8,10 +8,9 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-feature android:name="android.hardware.camera" />
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:name=".EmployeeApp"
@@ -35,7 +34,7 @@
         <activity
             android:name=".MainViews.TaskHome"
             android:screenOrientation="portrait"
-            android:theme="@style/tabs"></activity>
+            android:theme="@style/tabs" />
         <activity
             android:name=".MainViews.TaskDetail"
             android:windowSoftInputMode="stateHidden" />
@@ -48,9 +47,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".measurement.MeasureList"></activity>
-        <activity android:name=".measurement.dialogue"
-            android:windowSoftInputMode="stateHidden"></activity>
+        <activity android:name=".measurement.MeasureList" />
+        <activity
+            android:name=".measurement.dialogue"
+            android:windowSoftInputMode="stateHidden" />
+        <activity android:name=".Quotation.QuotaionTasks"
+            android:windowSoftInputMode="stateHidden"/>
     </application>
+
+    <service android:name="services.UploadFileService" />
 
 </manifest>

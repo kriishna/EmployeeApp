@@ -19,62 +19,66 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class NetWatcher extends BroadcastReceiver {
-    DatabaseReference db,per,non;
-    NotificationManager mNotificationManager;
-    String text,title,task_id,type;
-    Handler mHandler = new Handler();
 
-    @Override
-    public void onReceive(final Context context, Intent arg1) {
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+    public static ConnectivityReceiverListener connectivityReceiverListener;
 
-        db = FirebaseDatabase.getInstance().getReference().child("MeChat").child("Employee").child("abcd").child("notifications");
-
-
-        mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.cancelAll();
-
-
-
-        db.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-/*
-                String sum = dataSnapshot.toString();
-                text = dataSnapshot.child("text").getValue().toString();
-                title = dataSnapshot.child("title").getValue().toString();
-                type = dataSnapshot.child("type").getValue().toString();
-                mHandler.post(new DisplayNotification(context,type,title,text));
-
-*/
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-
-
-
+    public NetWatcher() {
+        super();
     }
 
+    @Override
+    public void onReceive(Context context, Intent arg1) {
+        ConnectivityManager cm = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
 
+        if (activeNetwork != null) {
+
+            if (activeNetwork.isConnected()) {
+
+            } else {
+
+            }
+        }
+        boolean isConnected = activeNetwork != null
+                && activeNetwork.isConnectedOrConnecting();
+
+        if (connectivityReceiverListener != null) {
+            connectivityReceiverListener.onNetworkConnectionChanged(isConnected);
+        }
+    }
+
+    public static boolean isConnected(Context context) {
+        ConnectivityManager
+                cm = (ConnectivityManager) EmployeeApp.getInstance().getApplicationContext()
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+        if (activeNetwork != null) {
+
+            if (activeNetwork.isConnected()) {
+                // Intent intent1 = new Intent(context, SetReminderAlarmService.class);
+                //Intent intent2 = new Intent(context, MarkedBookReminderService.class);
+                // context.startService(intent1);
+                //context.startService(intent2);
+
+            }
+            else {
+             /*   Intent intent1 = new Intent(context, SetReminderAlarmService.class);
+                context.stopService(intent1);
+                Intent intent2 = new Intent(context, MarkedBookReminderService.class);
+                context.stopService(intent2);
+           */
+
+            }
+        }
+
+        boolean status = activeNetwork != null
+                && activeNetwork.isConnectedOrConnecting();
+        return status;
+    }
+
+    public interface ConnectivityReceiverListener {
+        void onNetworkConnectionChanged(boolean isConnected);
+    }
 }
