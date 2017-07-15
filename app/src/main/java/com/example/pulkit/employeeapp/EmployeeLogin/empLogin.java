@@ -1,6 +1,7 @@
 package com.example.pulkit.employeeapp.EmployeeLogin;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -10,7 +11,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
+import com.example.pulkit.employeeapp.EmployeeApp;
 import com.example.pulkit.employeeapp.MainViews.TaskHome;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.model.Employee;
@@ -19,6 +20,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+
+import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 
 public class empLogin extends AppCompatActivity {
 
@@ -28,6 +32,8 @@ public class empLogin extends AppCompatActivity {
     DatabaseReference database;
     EmployeeSession session;
     TextInputLayout input_email, input_password;
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
 
 
     @Override
@@ -35,6 +41,14 @@ public class empLogin extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.emp_login);
+
+        sharedPreferences = getSharedPreferences("myFCMToken",MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+        if(FirebaseInstanceId.getInstance().getToken()!=null)
+        {
+            editor.putString("myFCMToken",FirebaseInstanceId.getInstance().getToken());
+            editor.commit();
+        }
 
         session = new EmployeeSession(getApplicationContext());
 
@@ -102,12 +116,27 @@ public class empLogin extends AppCompatActivity {
                         } else
                         {
                             session.create_oldusersession(Username);
-                            Intent intent = new Intent(empLogin.this, TaskHome.class);
-                            intent.putExtra("emp_id",Username);
-                            intent.putExtra("desig",employee.getDesignation());
-                            startActivity(intent);
-                            finish();
-                        }
+                            EmployeeApp.setOnlineStatus(Username);
+                            String myFCMToken;
+                            if(FirebaseInstanceId.getInstance().getToken()==null)
+                                myFCMToken =sharedPreferences.getString("myFCMToken","");
+
+                            else
+                                myFCMToken = FirebaseInstanceId.getInstance().getToken();
+
+                            if(!myFCMToken.equals("")) {
+                                DBREF.child("Fcmtokens").child(Username).child("token").setValue(myFCMToken);
+                                Intent intent = new Intent(empLogin.this, TaskHome.class);
+                                intent.putExtra("emp_id",Username);
+                                intent.putExtra("desig",employee.getDesignation());
+                                startActivity(intent);
+                                finish();
+
+                            }
+                                else
+                                Toast.makeText(empLogin.this,"You will need to clear the app data or reinstall the app to make it work properly",Toast.LENGTH_LONG).show();
+
+                            }
                     }
                     else
                     {
