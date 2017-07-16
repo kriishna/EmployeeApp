@@ -7,9 +7,9 @@ package com.example.pulkit.employeeapp.model;
 public class NameAndStatus {
     private String id;
     private String name;
-    private String online;
+    private Boolean online;
 
-    public NameAndStatus(String id, String name, String online) {
+    public NameAndStatus(String id, String name, Boolean online) {
         this.id = id;
         this.name = name;
         this.online = online;
@@ -34,11 +34,11 @@ public class NameAndStatus {
         this.name = name;
     }
 
-    public String getOnline() {
+    public Boolean getOnline() {
         return online;
     }
 
-    public void setOnline(String online) {
+    public void setOnline(Boolean online) {
         this.online = online;
     }
 }
