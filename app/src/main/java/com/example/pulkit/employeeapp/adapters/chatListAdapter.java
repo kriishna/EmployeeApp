@@ -107,11 +107,11 @@ public class chatListAdapter extends RecyclerView.Adapter<chatListAdapter.MyView
 
     private void applyProfilePicture(MyViewHolder holder, ChatListModel message) {
 
-            holder.imgProfile.setImageResource(R.drawable.bg_circle);
-            holder.imgProfile.setColorFilter(message.getColor());
-            char icontext = message.getName().toUpperCase().charAt(0);
-            holder.icon_text.setText(icontext + "");
-            holder.icon_text.setVisibility(View.VISIBLE);
+        holder.imgProfile.setImageResource(R.drawable.bg_circle);
+        holder.imgProfile.setColorFilter(message.getColor());
+        char icontext = message.getName().toUpperCase().charAt(0);
+        holder.icon_text.setText(icontext + "");
+        holder.icon_text.setVisibility(View.VISIBLE);
 
     }
 
@@ -139,7 +139,7 @@ public class chatListAdapter extends RecyclerView.Adapter<chatListAdapter.MyView
                     String timestamp = formatter.format(Calendar.getInstance().getTime());
                     String senderTimestamp = chatMessage.getSendertimestamp().substring(0,11);
                     if(timestamp.equals(senderTimestamp))
-                       senderTimestamp = chatMessage.getSendertimestamp().substring(12).trim();
+                        senderTimestamp = chatMessage.getSendertimestamp().substring(12).trim();
 
                     holder.timestamp.setText(senderTimestamp);
                 }
@@ -147,18 +147,6 @@ public class chatListAdapter extends RecyclerView.Adapter<chatListAdapter.MyView
             }
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                if (dataSnapshot.exists()) {
-                    ChatMessage chatMessage = dataSnapshot.getValue(ChatMessage.class);
-                    if (chatMessage.getCommentString() != null) {
-                        if(!chatMessage.getType().equals("text")) {
-                            holder.message.setText(chatMessage.getCommentString());
-
-                        }
-                        else
-                        holder.message.setText(chatMessage.getCommentString());
-                    }
-                    holder.timestamp.setText(chatMessage.getSendertimestamp());
-                }
 
             }
 
@@ -183,7 +171,7 @@ public class chatListAdapter extends RecyclerView.Adapter<chatListAdapter.MyView
     private void applyOnlineStatus(final MyViewHolder holder, ChatListModel chatListModel)
     {
 
-        DatabaseReference dbOnlineStatus = DBREF.child("Usersessions").child(chatListModel.getUserkey()).child("online").getRef();
+        DatabaseReference dbOnlineStatus = DBREF.child("Users").child("Usersessions").child(chatListModel.getUserkey()).child("online").getRef();
         ValueEventListener valueEventListener = dbOnlineStatus.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -222,8 +210,8 @@ public class chatListAdapter extends RecyclerView.Adapter<chatListAdapter.MyView
 
                     holder.relunread.setVisibility(View.VISIBLE);
 
-                System.out.println(dataSnapshot.getChildrenCount()+" unreadmsgs " + dataSnapshot.getValue());
-                holder.tvunread.setText(String.valueOf(dataSnapshot.getChildrenCount()));
+                    System.out.println(dataSnapshot.getChildrenCount()+" unreadmsgs " + dataSnapshot.getValue());
+                    holder.tvunread.setText(String.valueOf(dataSnapshot.getChildrenCount()));
                 }
                 else
                 {
@@ -248,7 +236,7 @@ public class chatListAdapter extends RecyclerView.Adapter<chatListAdapter.MyView
                 entry.getKey().removeEventListener(entry.getValue());
         }
         Iterator<HashMap.Entry<DatabaseReference,ValueEventListener>> iterator2 = hashMapVLE.entrySet().iterator();
-        while (iterator.hasNext()) {
+        while (iterator2.hasNext()) {
             HashMap.Entry<DatabaseReference,ValueEventListener> entry = (HashMap.Entry<DatabaseReference,ValueEventListener>) iterator2.next();
             if(entry.getValue()!=null) entry.getKey().removeEventListener(entry.getValue());
         }

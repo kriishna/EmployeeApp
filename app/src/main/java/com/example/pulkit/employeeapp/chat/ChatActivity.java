@@ -41,6 +41,7 @@ import com.example.pulkit.employeeapp.helper.TouchImageView;
 import com.example.pulkit.employeeapp.listener.ClickListener;
 import com.example.pulkit.employeeapp.listener.RecyclerTouchListener;
 import com.example.pulkit.employeeapp.model.ChatMessage;
+import com.example.pulkit.employeeapp.model.NameAndStatus;
 import com.example.pulkit.employeeapp.services.UploadFileService;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -70,7 +71,8 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
     private ImageButton sendButton;
     Intent intent;
     private RecyclerView recyclerView;
-    DatabaseReference dbChat;
+    DatabaseReference dbChat,dbOnlineStatus;
+    ValueEventListener dbOnlineStatusVle;
     private String otheruserkey, mykey;
     LinearLayoutManager linearLayoutManager;
     private MarshmallowPermissions marshmallowPermissions;
@@ -108,6 +110,31 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
         dbTableKey = intent.getStringExtra("dbTableKey");
         otheruserkey = intent.getStringExtra("otheruserkey");
 
+        dbOnlineStatus = DBREF.child("Users").child("Usersessions").child(otheruserkey).getRef();
+        dbOnlineStatusVle = dbOnlineStatus.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists())
+                {
+                    NameAndStatus nameAndStatus = dataSnapshot.getValue(NameAndStatus.class);
+                    getSupportActionBar().setTitle(nameAndStatus.getName());
+                    if(nameAndStatus.getOnline())
+                    {
+                        getSupportActionBar().setSubtitle("Online");
+                    }
+                    else
+                    {
+                        getSupportActionBar().setSubtitle("Offline");
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
         System.out.println("recevier token chat act oncreate"+getRecivertoken(otheruserkey));
 
         session = new EmployeeSession(this);
@@ -133,6 +160,7 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
         recyclerView.setAdapter(mAdapter);
         sendButton.setOnClickListener(this);
         loadData();
+
     }
 
     private String getRecivertoken(String otheruserkey) {
@@ -141,7 +169,7 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
-                receiverToken = dataSnapshot.getValue().toString();
+                    receiverToken = dataSnapshot.getValue().toString();
                     System.out.println(dataSnapshot.getValue()+"recd token in chat act "+receiverToken);
                 }
                 else{
@@ -156,12 +184,15 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
         });
         return  receiverToken;
     }
+
+
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode)
         {
-          case FilePickerConst.REQUEST_CODE_PHOTO:
+            case FilePickerConst.REQUEST_CODE_PHOTO:
                 if(resultCode== Activity.RESULT_OK && data!=null)
                 {
                     photoPaths = new ArrayList<>();
@@ -179,13 +210,14 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
                         Button okdone = (Button)viewSelectedImages.findViewById(R.id.okdone);
                         RecyclerView rv = (RecyclerView) viewSelectedImages.findViewById(R.id.viewImages);
 
-                        linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL,false);
+                        linearLayoutManager = new LinearLayoutManager(getApplicationContext(),LinearLayoutManager.HORIZONTAL,false);
                         rv.setLayoutManager(linearLayoutManager);
                         rv.setItemAnimator(new DefaultItemAnimator());
                         rv.addItemDecoration(new DividerItemDecoration(getApplicationContext(), LinearLayoutManager.HORIZONTAL));
 
                         adapter = new ViewImageAdapter(photoPaths, this);
                         rv.setAdapter(adapter);
+
 
                         final String[] item = {photoPaths.get(0)};
                         ImageViewlarge.setImageURI(Uri.parse(item[0]));
@@ -273,6 +305,7 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
         uploadFileService.uploadFile(filePath,type,mykey, otheruserkey, receiverToken, dbTableKey,dbChat,timestamp,id);
     }
 
+
     public void loadData()
     {
 
@@ -292,7 +325,7 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
                     else {
                         if (comment.getStatus().equals("0"))
                             dbChat.child(comment.getId()).child("status").setValue("1");
-                            comment.setStatus("1");  // all message status set to read
+                        comment.setStatus("1");  // all message status set to read
                     }
 
                     chatList.add(comment);
@@ -332,7 +365,7 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
 
     @Override
     public void onBackPressed() {
-            super.onBackPressed();
+        super.onBackPressed();
 
     }
 
@@ -341,12 +374,12 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
         super.onStop();
         if (mServiceBound) {
             if(mServiceConnection!=null)
-            unbindService(mServiceConnection);
+                unbindService(mServiceConnection);
             mServiceBound = false;
         }
         Intent intent = new Intent(ChatActivity.this,
                 UploadFileService.class);
-                stopService(intent);
+        stopService(intent);
     }
 
     @Override
@@ -354,9 +387,12 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
         super.onDestroy();
         if(dbChatlistener!=null)
             dbChat.removeEventListener(dbChatlistener);
+        if(dbOnlineStatusVle!=null)
+            dbOnlineStatus.removeEventListener(dbOnlineStatusVle);
+        mAdapter.removeListeners();
     }
 
-////maintain all the clicks on buttons on this page
+    ////maintain all the clicks on buttons on this page
     @Override
     public void onClick(View v) {
         switch (v.getId())
@@ -393,7 +429,7 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
                     FilePickerBuilder.getInstance().setMaxCount(10)
                             .setActivityTheme(R.style.AppTheme)
                             .pickPhoto(this);
-                    }
+                }
                 break;
 
             case R.id.docattach:
@@ -409,7 +445,7 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
                 }
                 break;
 
-           }
+        }
     }
 
     @Override
@@ -418,9 +454,10 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
         Intent intent = new Intent(this, UploadFileService.class);
         startService(intent);
         bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+
     }
 
-////////////////////binding the service
+    ////////////////////binding the service
     private ServiceConnection mServiceConnection = new ServiceConnection() {
 
         @Override
@@ -437,7 +474,7 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
     };
 
 
-///////////Everything below is for action mode
+    ///////////Everything below is for action mode
     private class ActionModeCallback implements ActionMode.Callback {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -580,18 +617,18 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
         StorageReference str = FirebaseStorage.getInstance().getReferenceFromUrl(comment.getImgurl());
         String type = comment.getType();
 
-            switch (type)
-            {
-                case "photo":
-                    File rootPath = new File(Environment.getExternalStorageDirectory(), "MeChat/Images");
-                    if (!rootPath.exists()) {
-                        rootPath.mkdirs();
-                    }
-                    String uriSting = System.currentTimeMillis() + ".jpg";
+        switch (type)
+        {
+            case "photo":
+                File rootPath = new File(Environment.getExternalStorageDirectory(), "MeChat/Images");
+                if (!rootPath.exists()) {
+                    rootPath.mkdirs();
+                }
+                String uriSting = System.currentTimeMillis() + ".jpg";
 
-                    final File localFile = new File(rootPath, uriSting);
-                    final String localuri = (rootPath.getAbsolutePath() + "/" + System.currentTimeMillis() + ".jpg");
-                    str.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                final File localFile = new File(rootPath, uriSting);
+                final String localuri = (rootPath.getAbsolutePath() + "/" + System.currentTimeMillis() + ".jpg");
+                str.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                         Log.e("firebase ", ";local tem file created  created " + localFile.toString());
@@ -607,30 +644,30 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
                     }
                 });
                 break;
-                case "doc":
-                    rootPath = new File(Environment.getExternalStorageDirectory(), "MeChat/Docs");
-                    if (!rootPath.exists()) {
-                        rootPath.mkdirs();
-                    }
-                    uriSting = System.currentTimeMillis() + ".jpg";
+            case "doc":
+                rootPath = new File(Environment.getExternalStorageDirectory(), "MeChat/Docs");
+                if (!rootPath.exists()) {
+                    rootPath.mkdirs();
+                }
+                uriSting = System.currentTimeMillis() + ".jpg";
 
-                    final File localdocFile = new File(rootPath, uriSting);
-                    final String localdocuri = (rootPath.getAbsolutePath() + "/" + System.currentTimeMillis() + ".jpg");
-                    str.getFile(localdocFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                            dbChat = DBREF.child("Chats").child(dbTableKey).child("ChatMessages").getRef();
-                            dbChat.child(comment.getId()).child("othersenderlocal_storage").setValue(localdocuri);
-                            mAdapter.dismissProgressBar(holder);
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            mAdapter.dismissProgressBar(holder);
-                            Log.e("firebase ", ";local tem file not created  created " + exception.toString());
-                        }
-                    });
-                    break;
-            }
+                final File localdocFile = new File(rootPath, uriSting);
+                final String localdocuri = (rootPath.getAbsolutePath() + "/" + System.currentTimeMillis() + ".jpg");
+                str.getFile(localdocFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                        dbChat = DBREF.child("Chats").child(dbTableKey).child("ChatMessages").getRef();
+                        dbChat.child(comment.getId()).child("othersenderlocal_storage").setValue(localdocuri);
+                        mAdapter.dismissProgressBar(holder);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        mAdapter.dismissProgressBar(holder);
+                        Log.e("firebase ", ";local tem file not created  created " + exception.toString());
+                    }
+                });
+                break;
         }
+    }
 }
