@@ -35,10 +35,11 @@
             android:name=".MainViews.TaskHome"
             android:screenOrientation="portrait"
             android:theme="@style/tabs" />
+        <activity android:name=".chat.ChatActivity"/>
+        <activity android:name=".ForwardTask.forwardTask"></activity>
         <activity
             android:name=".MainViews.TaskDetail"
             android:windowSoftInputMode="stateHidden" />
-        <activity android:name=".ForwardTask.forwardTask" />
         <activity android:name=".ForwardTask.forwardTaskScreen2" />
         <activity android:name=".EmployeeLogin.empLogin">
             <intent-filter>

@@ -92,8 +92,6 @@ public class taskFrag extends Fragment implements taskAdapter.TaskAdapterListene
 
     void LoadData() {
         db = FirebaseDatabase.getInstance().getReference().child("MeChat").child("Task").child(list.get(i));
-
-
         vl = db.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -166,7 +164,9 @@ public class taskFrag extends Fragment implements taskAdapter.TaskAdapterListene
     @Override
     public void onPause() {
         super.onPause();
+        if(ch!=null)
         dbTask.removeEventListener(ch);
+        if(vl!=null)
         db.removeEventListener(vl);
     }
 
