@@ -37,7 +37,7 @@ public class EmployeeSession {
                 editor.putString("designation",employee.getDesignation().toLowerCase());
                 editor.putString(is_loggedin,"true");
                 editor.putString(username,employee.getUsername());
-                editor.putString(designation,employee.getDesignation());
+                editor.putString("name",employee.getName());
                 editor.commit();
 
             }
@@ -64,6 +64,11 @@ public class EmployeeSession {
     {
 
         return pref.getString(designation,"");
+    }
+    public String getName()
+    {
+
+        return pref.getString("name","");
     }
 
     public void clearoldusersession()
