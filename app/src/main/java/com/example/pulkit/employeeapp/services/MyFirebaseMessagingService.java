@@ -10,6 +10,15 @@ import android.support.v4.app.NotificationCompat;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.chat.ChatActivity;
 import com.example.pulkit.employeeapp.model.NameAndStatus;
+import android.graphics.Bitmap;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.Build;
+import android.provider.Telephony;
+import android.support.v4.app.NotificationCompat;
+import android.util.Log;
+import com.example.pulkit.employeeapp.R;
+import com.example.pulkit.employeeapp.chat.ChatActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -17,7 +26,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
-
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
@@ -145,7 +153,4 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             }
         });
     }
-
-
-
 }

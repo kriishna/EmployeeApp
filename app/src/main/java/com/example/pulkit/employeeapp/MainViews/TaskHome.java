@@ -1,5 +1,6 @@
 package com.example.pulkit.employeeapp.MainViews;
 
+import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -8,8 +9,12 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.WindowManager;
 
+import com.example.pulkit.employeeapp.EmployeeLogin.EmployeeSession;
+import com.example.pulkit.employeeapp.Notification.NotificationActivity;
 import com.example.pulkit.employeeapp.Quotation.QuotationGroups;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.chat.chatFrag;
@@ -18,10 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TaskHome extends AppCompatActivity {
-    private Toolbar toolbar;
     private TabLayout tabLayout;
     private ViewPager viewPager;
     public static String emp_id,desig;
+    EmployeeSession session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,18 +34,9 @@ public class TaskHome extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_home);
 
+        session = new EmployeeSession(getApplicationContext());
         emp_id = getIntent().getStringExtra("emp_id");
         desig = getIntent().getStringExtra("desig");
-
-
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-    //    toolbar.setTitleTextColor(getResources().getColor(R.color.transparent));
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
@@ -50,6 +46,23 @@ public class TaskHome extends AppCompatActivity {
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.tabsmenu,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.notif:
+                Intent intent = new Intent(getApplicationContext(), NotificationActivity.class);
+                intent.putExtra("Username",session.getUsername());
+                startActivity(intent);
+                break;
+        }
+        return true;
+    }
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         if(desig.toLowerCase().equals("quotation"))
