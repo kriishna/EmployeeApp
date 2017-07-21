@@ -27,27 +27,15 @@ public class EmployeeSession {
         editor = pref.edit();
     }
 
-    public void create_oldusersession(final String username_get)
+    public void create_oldusersession(final String username_get,String designation,String name)
     {
-        DatabaseReference dbRef = dbEmp.child(username_get).getRef();
-        dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Employee employee = dataSnapshot.getValue(Employee.class);
-                editor.putString("designation",employee.getDesignation().toLowerCase());
+                editor.putString("designation",designation.toLowerCase());
                 editor.putString(is_loggedin,"true");
-                editor.putString(username,employee.getUsername());
-                editor.putString("name",employee.getName());
+                editor.putString(username,username_get);
+                editor.putString("name",name);
                 editor.commit();
 
             }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        }
 
     public String isolduser()
     {
