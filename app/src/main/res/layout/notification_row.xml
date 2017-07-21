@@ -4,7 +4,7 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="4dp"
+    android:padding="16dp"
     android:id="@+id/row">
 
     <RelativeLayout
@@ -17,7 +17,7 @@
             android:id="@+id/icon_profile"
             android:layout_width="@dimen/icon_width_height"
             android:layout_height="@dimen/icon_width_height"
-            android:src="@color/bg_circle_default"/>
+            android:src="@drawable/bg_circle"/>
 
         <TextView
             android:id="@+id/icon_text"
