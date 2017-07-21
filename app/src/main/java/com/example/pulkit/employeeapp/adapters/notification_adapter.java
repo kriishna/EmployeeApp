@@ -62,7 +62,7 @@ public class notification_adapter extends  RecyclerView.Adapter<notification_ada
         holder.notif_message.setText(notif.getContent());
         holder.notif_timestamp.setText(notif.getTimestamp());
         Character caps = notif.getSenderId().toUpperCase().charAt(0);
-        holder.icon_text.setText(caps);
+        holder.icon_text.setText(caps.toString());
         applyClickEvents(holder,position);
     }
 
