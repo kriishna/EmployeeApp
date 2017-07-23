@@ -1,5 +1,6 @@
 package com.example.pulkit.employeeapp.Notification;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -7,6 +8,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import com.example.pulkit.employeeapp.MainViews.TaskDetail;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.adapters.notification_adapter;
 import com.example.pulkit.employeeapp.model.Notif;
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
+import static java.security.AccessController.getContext;
 
 public class NotificationActivity extends AppCompatActivity implements notification_adapter.NotificationAdapterListener{
 
@@ -85,5 +88,9 @@ public class NotificationActivity extends AppCompatActivity implements notificat
     @Override
     public void onNotificationRowClicked(int position) {
 
+        Intent intent = new Intent(getApplicationContext(),TaskDetail.class);
+        Notif notif = list.get(position);
+        intent.putExtra("task_id", notif.getId());
+        startActivity(intent);
     }
 }

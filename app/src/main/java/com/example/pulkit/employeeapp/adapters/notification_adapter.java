@@ -46,7 +46,6 @@ public class notification_adapter extends  RecyclerView.Adapter<notification_ada
             notif_sender = (TextView) itemView.findViewById(R.id.notification_sender);
             row = (LinearLayout)itemView.findViewById(R.id.row);
         }
-
     }
 
     @Override
