@@ -90,7 +90,7 @@ public class NotificationActivity extends AppCompatActivity implements notificat
 
         Intent intent = new Intent(getApplicationContext(),TaskDetail.class);
         Notif notif = list.get(position);
-        intent.putExtra("task_id", notif.getId());
+        intent.putExtra("task_id", notif.getTaskId());
         startActivity(intent);
     }
 }
