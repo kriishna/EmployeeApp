@@ -90,7 +90,6 @@ public class EmployeeApp extends android.support.multidex.MultiDexApplication {
                 String receiverFCMToken=dataSnapshot.getValue(String.class);
                 Notif newNotif = new Notif(id,timestamp,type,senderId,receiverId,receiverFCMToken,content,taskId);
                 DBREF.child("Notification").child(receiverId).child(id).setValue(newNotif);
-
             }
 
             @Override
