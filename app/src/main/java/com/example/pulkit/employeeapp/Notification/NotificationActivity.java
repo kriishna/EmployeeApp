@@ -30,13 +30,15 @@ public class NotificationActivity extends AppCompatActivity implements notificat
     List<Notif> list = new ArrayList<>();
     Notif notif  = new Notif();
     String Username;
+    EmployeeSession session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification2);
 
-        Username = getIntent().getStringExtra("Username");
+        session = new EmployeeSession(getApplicationContext());
+        Username = session.getUsername();
 
         recview = (RecyclerView) findViewById(R.id.notification_list);
         recview.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
