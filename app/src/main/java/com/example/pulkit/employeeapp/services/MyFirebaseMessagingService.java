@@ -1,5 +1,6 @@
 package com.example.pulkit.employeeapp.services;
 
+import android.app.ActivityManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -10,48 +11,42 @@ import android.support.v4.app.NotificationCompat;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.chat.ChatActivity;
 import com.example.pulkit.employeeapp.model.NameAndStatus;
-import android.graphics.Bitmap;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.os.Build;
-import android.provider.Telephony;
-import android.support.v4.app.NotificationCompat;
-import android.util.Log;
-import com.example.pulkit.employeeapp.R;
-import com.example.pulkit.employeeapp.chat.ChatActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
-
+    private ArrayList<String> chatnotifList = new ArrayList<>();
     private static final String TAG1 = "MyFireMesgService";
+
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         //TODO get the type of notifiction handle separately for chats, quotation and normal assigned tasks
         String type = remoteMessage.getData().get("type");
-        if(type.equals("chat")||type==null){
+        if (type.equals("chat") || type == null) {
             String msg = remoteMessage.getData().get("body");
             String senderuid = remoteMessage.getData().get("senderuid");
             String chatref = remoteMessage.getData().get("chatref");
             String msgid = remoteMessage.getData().get("msgid");
             if (msg != null && chatref != null && msgid != null)
-                sendChatNotification(msg,chatref, msgid,senderuid);
+                sendChatNotification(msg, chatref, msgid, senderuid);
 
-        }
-        else
-        {
+        } else {
             String body = remoteMessage.getData().get("body");
             String senderuid = remoteMessage.getData().get("senderuid");
             String taskId = remoteMessage.getData().get("taskId");
             String id = remoteMessage.getData().get("id");
-            if(body!=null&&taskId!=null&&senderuid!=null)
-                sendGeneralNotification(body,senderuid,taskId,id);
+            if (body != null && taskId != null && senderuid != null)
+                sendGeneralNotification(body, senderuid, taskId, id);
         }
     }
 
@@ -95,12 +90,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
 
-    private void sendChatNotification(final String msg, String chatref, final String msgid, String senderuid) throws NullPointerException {
+    private void sendChatNotification(final String msg, String chatref, final String msgid, final String senderuid) throws NullPointerException {
         final DatabaseReference dbr = DBREF.child("Chats").child(chatref).child("ChatMessages").child(msgid).child("status");
         Intent intent = new Intent(this, ChatActivity.class);
 
-        intent.putExtra("otheruserkey",senderuid);
-        intent.putExtra("dbTableKey",chatref);
+        intent.putExtra("otheruserkey", senderuid);
+        intent.putExtra("dbTableKey", chatref);
 
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         final PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
@@ -124,33 +119,47 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
             }
         });
+        if (isAppIsInForeground(this) == false&& !chatnotifList.contains(msgid)) {
+            DatabaseReference dbOnlineStatus = DBREF.child("Users").child("Usersessions").child(senderuid).getRef();
+            dbOnlineStatus.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        NameAndStatus nameAndStatus = dataSnapshot.getValue(NameAndStatus.class);
+                        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(MyFirebaseMessagingService.this)
+                                .setSmallIcon(R.mipmap.ic_chat_white)
+                                .setContentTitle("New Message from " + nameAndStatus.getName())
+                                .setContentText(msg)
+                                .setAutoCancel(true)
+                                .setSound(defaultSoundUri)
+                                .setContentIntent(pendingIntent);
+                        NotificationManager notificationManager =
+                                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                        String notifid = msgid.substring(8);
+                        notificationManager.notify(senderuid.hashCode() /* ID of notification */, notificationBuilder.build());
+                        chatnotifList.add(msgid);
+                    }
+                }
 
-        DatabaseReference dbOnlineStatus = DBREF.child("Users").child("Usersessions").child(senderuid).getRef();
-        dbOnlineStatus.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    NameAndStatus nameAndStatus = dataSnapshot.getValue(NameAndStatus.class);
-                    NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(MyFirebaseMessagingService.this)
-                            .setSmallIcon(R.mipmap.ic_chat_white)
-                            .setContentTitle("New Message from " + nameAndStatus.getName())
-                            .setContentText(msg)
-                            .setAutoCancel(true)
-                            .setSound(defaultSoundUri)
-                            .setContentIntent(pendingIntent);
-                    NotificationManager notificationManager =
-                            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                    String notifid = msgid.substring(8);
-                    notificationManager.notify(Integer.parseInt(notifid) /* ID of notification */, notificationBuilder.build());
-
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
                 }
+            });
+        }
+    }
+
+
+    private boolean isAppIsInForeground(Context context) {
+        boolean isInForeground = false;
+        ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
+        for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
+            if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                isInForeground = true;
             }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+        }
+        return isInForeground;
     }
 }
