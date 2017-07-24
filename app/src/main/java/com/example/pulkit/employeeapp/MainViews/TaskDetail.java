@@ -29,6 +29,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.pulkit.employeeapp.EmployeeLogin.EmployeeSession;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.adapters.bigimage_adapter;
 import com.example.pulkit.employeeapp.adapters.measurement_adapter;
@@ -62,7 +63,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     public static String task_id, emp_id, desig;
     private Task task;
     private String customername;
-    EditText startDate, endDate, custId, taskName, quantity, description;
+    EditText startDate, endDate, custId, taskName, quantity, description, coordinators_message;
     private static final int PICK_FILE_REQUEST = 1;
     RecyclerView rec_measurement,rec_DescImages;
     FloatingActionButton forward;
@@ -81,6 +82,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     private AlertDialog viewSelectedImages ;
     ArrayList<String> DescImages = new ArrayList<>();
     LinearLayoutManager linearLayoutManager;
+    EmployeeSession session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +99,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         measure = (Button) findViewById(R.id.measure);
         forward = (FloatingActionButton) findViewById(R.id.forward);
         taskName = (EditText) findViewById(R.id.taskName);
+        coordinators_message = (EditText) findViewById(R.id.coordinators_message);
         startDate = (EditText) findViewById(R.id.startDate);
         endDate = (EditText) findViewById(R.id.endDate);
         quantity = (EditText) findViewById(R.id.quantity);
@@ -105,6 +108,8 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         rec_measurement = (RecyclerView) findViewById(R.id.rec_measurement);
         rec_DescImages = (RecyclerView)findViewById(R.id.rec_DescImages);
         open_measurement = (TextView) findViewById(R.id.open_measurement);
+
+        session = new EmployeeSession(getApplicationContext());
 
         text = (TextView) findViewById(R.id.textView6);
         ll = (LinearLayout) findViewById(R.id.quotation_container);
@@ -388,6 +393,19 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         taskName.setText(task.getName());
         quantity.setText(task.getQty());
         description.setText(task.getDesc());
+
+        dbAssigned.child(session.getUsername()).child("note").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String note = dataSnapshot.getValue(String.class);
+                coordinators_message.setText(note);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
         dbQuotation.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
