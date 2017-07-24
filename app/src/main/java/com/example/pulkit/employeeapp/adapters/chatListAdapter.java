@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.example.pulkit.employeeapp.EmployeeLogin.EmployeeSession;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.model.ChatListModel;
 import com.example.pulkit.employeeapp.model.ChatMessage;
@@ -33,7 +34,9 @@ public class chatListAdapter extends RecyclerView.Adapter<chatListAdapter.MyView
     private chatListAdapterListener listener;
     private HashMap<DatabaseReference,ChildEventListener> hashMapCHE;
     private HashMap<DatabaseReference,ValueEventListener> hashMapVLE;
-    SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
+    private SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
+    private EmployeeSession employeeSession;
+    private String mykey;
 
 
     public chatListAdapter(ArrayList<ChatListModel> list, Context context, chatListAdapterListener listener) {
@@ -42,6 +45,8 @@ public class chatListAdapter extends RecyclerView.Adapter<chatListAdapter.MyView
         this.listener = listener;
         hashMapCHE = new HashMap<>();
         hashMapVLE = new HashMap<>();
+        employeeSession = new EmployeeSession(context);
+        mykey = employeeSession.getUsername();
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -199,11 +204,9 @@ public class chatListAdapter extends RecyclerView.Adapter<chatListAdapter.MyView
 
 
     private void findunreadmsgs(final MyViewHolder holder, final ChatListModel topic) {
-        String a="nil";
-        DatabaseReference dbTopicLastComment = DBREF.child("Chats").child(topic.getDbTableKey()).child("ChatMessages").getRef();
-        System.out.println(topic.getDbTableKey()+" unreadmsgs called " + dbTopicLastComment);
+        DatabaseReference dbTopicLastComment = DBREF.child("Chats").child(topic.getDbTableKey()).child("ChatMessages").orderByChild("status").equalTo("2").getRef();
 
-        ValueEventListener valueEventListener = dbTopicLastComment.orderByChild("status").equalTo("2").addValueEventListener(new ValueEventListener() {
+        ValueEventListener valueEventListener = dbTopicLastComment.orderByChild("receiverUId").equalTo(mykey).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
