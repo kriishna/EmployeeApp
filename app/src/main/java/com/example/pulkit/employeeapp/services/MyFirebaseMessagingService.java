@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
+
+import com.example.pulkit.employeeapp.Notification.NotificationActivity;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.chat.ChatActivity;
 import com.example.pulkit.employeeapp.model.NameAndStatus;
@@ -44,14 +46,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             String body = remoteMessage.getData().get("body");
             String senderuid = remoteMessage.getData().get("senderuid");
             String taskId = remoteMessage.getData().get("taskId");
-            String id = remoteMessage.getData().get("id");
+            String id = remoteMessage.getData().get("msgid");
             if (body != null && taskId != null && senderuid != null)
                 sendGeneralNotification(body, senderuid, taskId, id);
         }
     }
 
     private void sendGeneralNotification(final String body, String senderuid, String taskId, final String id) {
-        Intent intent = new Intent(this, ChatActivity.class); //TODO set the Intent to notification activity
+        Intent intent = new Intent(this, NotificationActivity.class); //TODO set the Intent to notification activity
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         final PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);

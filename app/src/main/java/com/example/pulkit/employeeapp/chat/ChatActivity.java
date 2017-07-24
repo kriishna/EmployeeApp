@@ -420,12 +420,12 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
 
             case R.id.photoattach:
                 mResults = new ArrayList<>();
-                if(!marshmallowPermissions.checkPermissionForCamera())
+                if (!marshmallowPermissions.checkPermissionForCamera())
                     marshmallowPermissions.requestPermissionForCamera();
-                if(!marshmallowPermissions.checkPermissionForExternalStorage())
+                if (!marshmallowPermissions.checkPermissionForExternalStorage())
                     marshmallowPermissions.requestPermissionForExternalStorage();
 
-                if(marshmallowPermissions.checkPermissionForCamera()&&marshmallowPermissions.checkPermissionForExternalStorage()) {
+                if (marshmallowPermissions.checkPermissionForCamera() && marshmallowPermissions.checkPermissionForExternalStorage()) {
                     FilePickerBuilder.getInstance().setMaxCount(10)
                             .setActivityTheme(R.style.AppTheme)
                             .pickPhoto(this);
@@ -634,6 +634,7 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
                         Log.e("firebase ", ";local tem file created  created " + localFile.toString());
                         dbChat = DBREF.child("Chats").child(dbTableKey).child("ChatMessages").getRef();
                         dbChat.child(comment.getId()).child("othersenderlocal_storage").setValue(localuri);
+                        comment.setOthersenderlocal_storage(localuri);
                         mAdapter.dismissProgressBar(holder);
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -658,6 +659,7 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
                     public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                         dbChat = DBREF.child("Chats").child(dbTableKey).child("ChatMessages").getRef();
                         dbChat.child(comment.getId()).child("othersenderlocal_storage").setValue(localdocuri);
+                        comment.setOthersenderlocal_storage(localdocuri);
                         mAdapter.dismissProgressBar(holder);
                     }
                 }).addOnFailureListener(new OnFailureListener() {

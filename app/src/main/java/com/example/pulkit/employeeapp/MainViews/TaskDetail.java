@@ -30,7 +30,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.pulkit.employeeapp.R;
+import com.example.pulkit.employeeapp.adapters.bigimage_adapter;
 import com.example.pulkit.employeeapp.adapters.measurement_adapter;
+import com.example.pulkit.employeeapp.adapters.taskdetailDescImageAdapter;
 import com.example.pulkit.employeeapp.measurement.MeasureList;
 import com.example.pulkit.employeeapp.model.Quotation;
 import com.example.pulkit.employeeapp.model.Task;
@@ -53,16 +55,16 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class TaskDetail extends AppCompatActivity {
+public class TaskDetail extends AppCompatActivity implements taskdetailDescImageAdapter.ImageAdapterListener,bigimage_adapter.bigimage_adapterListener{
 
-    DatabaseReference dbRef, dbTask, dbCompleted, dbAssigned, dbMeasurement;
-    ImageButton upload, download;
+    DatabaseReference dbRef, dbTask, dbCompleted, dbAssigned, dbMeasurement, dbDescImages;
+    ImageButton download;
     public static String task_id, emp_id, desig;
     private Task task;
     private String customername;
     EditText startDate, endDate, custId, taskName, quantity, description;
     private static final int PICK_FILE_REQUEST = 1;
-    RecyclerView rec_measurement;
+    RecyclerView rec_measurement,rec_DescImages;
     FloatingActionButton forward;
     ArrayList<measurement> measurementList = new ArrayList<>();
     measurement_adapter adapter_measurement;
@@ -74,15 +76,19 @@ public class TaskDetail extends AppCompatActivity {
     Button measure;
     ScrollView scroll;
     private StorageReference mStorageRef = FirebaseStorage.getInstance().getReference();
-
+    taskdetailDescImageAdapter adapter_taskimages;
+    bigimage_adapter adapter;
+    private AlertDialog viewSelectedImages ;
+    ArrayList<String> DescImages = new ArrayList<>();
+    LinearLayoutManager linearLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_detail);
+
         dbRef = FirebaseDatabase.getInstance().getReference().child("MeChat");
         progressDialog = new ProgressDialog(this);
-        upload = (ImageButton) findViewById(R.id.upload);
         download = (ImageButton) findViewById(R.id.download);
         uploadStatus = (TextView) findViewById(R.id.uploadStatus);
         appByCustomer = (TextView) findViewById(R.id.appByCustomer);
@@ -97,34 +103,72 @@ public class TaskDetail extends AppCompatActivity {
         description = (EditText) findViewById(R.id.description);
         custId = (EditText) findViewById(R.id.custId);
         rec_measurement = (RecyclerView) findViewById(R.id.rec_measurement);
+        rec_DescImages = (RecyclerView)findViewById(R.id.rec_DescImages);
         open_measurement = (TextView) findViewById(R.id.open_measurement);
 
         text = (TextView) findViewById(R.id.textView6);
         ll = (LinearLayout) findViewById(R.id.quotation_container);
-
 
         Intent intent = getIntent();
         task_id = intent.getStringExtra("task_id");
         emp_id = TaskHome.emp_id;
         desig = TaskHome.desig;
 
-
         text.setVisibility(View.GONE);
         ll.setVisibility(View.GONE);
-
 
         dbTask = dbRef.child("Task").child(task_id);
         dbQuotation = dbTask.child("Quotation").getRef();
         dbCompleted = dbTask.child("CompletedBy").getRef();
         dbAssigned = dbTask.child("AssignedTo").getRef();
         dbMeasurement = dbTask.child("measurement").getRef();
-
+        dbDescImages = dbTask.child("DescImages").getRef();
 
         rec_measurement.setLayoutManager(new LinearLayoutManager(this));
         rec_measurement.setItemAnimator(new DefaultItemAnimator());
         rec_measurement.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         adapter_measurement = new measurement_adapter(measurementList, this);
         rec_measurement.setAdapter(adapter_measurement);
+
+        rec_DescImages.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
+        rec_DescImages.setItemAnimator(new DefaultItemAnimator());
+        rec_DescImages.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.HORIZONTAL));
+        adapter_taskimages = new taskdetailDescImageAdapter(DescImages, getApplicationContext(),this);
+        rec_DescImages.setAdapter(adapter_taskimages);
+
+        dbDescImages.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s)
+            {
+                if (dataSnapshot.exists()) {
+                    rec_DescImages.setVisibility(View.VISIBLE);
+                    String item = dataSnapshot.getValue(String.class);
+                    DescImages.add(item);
+                    adapter_taskimages.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                String item = dataSnapshot.getKey();
+                DescImages.remove(item);
+                adapter_taskimages.notifyDataSetChanged();
+            }
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         open_measurement.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -217,19 +261,6 @@ public class TaskDetail extends AppCompatActivity {
 
                 builder.create().show();
 
-
-            }
-        });
-        upload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent();
-                //sets the select file to all types of files
-                intent.setType("*/*");
-                //allows to select data and return it
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                //starts new activity to select file and return data
-                startActivityForResult(Intent.createChooser(intent, "Choose File to Upload.."), PICK_FILE_REQUEST);
 
             }
         });
@@ -454,5 +485,29 @@ public class TaskDetail extends AppCompatActivity {
         super.onResume();
         measurementList.clear();
         prepareListData();
+    }
+
+    @Override
+    public void onImageClicked(int position) {
+        viewSelectedImages = new AlertDialog.Builder(TaskDetail.this)
+                .setView(R.layout.view_image_on_click).create();
+        viewSelectedImages.show();
+
+        RecyclerView bigimage = (RecyclerView)viewSelectedImages.findViewById(R.id.bigimage);
+
+        linearLayoutManager = new LinearLayoutManager(getApplicationContext(),LinearLayoutManager.HORIZONTAL,false);
+        bigimage.setLayoutManager(linearLayoutManager);
+        bigimage.setItemAnimator(new DefaultItemAnimator());
+        bigimage.addItemDecoration(new DividerItemDecoration(getApplicationContext(), LinearLayoutManager.HORIZONTAL));
+
+        adapter = new bigimage_adapter(DescImages, this,this);
+        bigimage.setAdapter(adapter);
+
+        bigimage.scrollToPosition(position);
+    }
+
+    @Override
+    public void ondownloadButtonClicked(int position) {
+        // TODO :download task image code here
     }
 }
