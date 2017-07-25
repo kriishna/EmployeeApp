@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 
 import com.example.pulkit.employeeapp.EmployeeLogin.EmployeeSession;
 import com.example.pulkit.employeeapp.MainViews.TaskDetail;
+import com.example.pulkit.employeeapp.MainViews.TaskHome;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.adapters.notification_adapter;
 import com.example.pulkit.employeeapp.model.Notif;
@@ -50,6 +51,13 @@ public class NotificationActivity extends AppCompatActivity implements notificat
         recview.setAdapter(adapter);
 
         preparelist();
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, TaskHome.class);
+        startActivity(intent);
+        finish();
     }
 
     private void preparelist()

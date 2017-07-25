@@ -397,7 +397,6 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
 
             }
         });
-
     }
 
     @Override

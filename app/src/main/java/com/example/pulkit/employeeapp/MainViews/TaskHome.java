@@ -44,8 +44,10 @@ public class TaskHome extends AppCompatActivity {
             marshmallowPermissions.requestPermissionForLocations();
 
         session = new EmployeeSession(getApplicationContext());
-        emp_id = getIntent().getStringExtra("emp_id");
-        desig = getIntent().getStringExtra("desig");
+        if (getIntent().hasExtra("emp_id")) {
+            emp_id = getIntent().getStringExtra("emp_id");
+            desig = getIntent().getStringExtra("desig");
+        }
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);

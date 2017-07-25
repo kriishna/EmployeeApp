@@ -1,22 +1,12 @@
 package com.example.pulkit.employeeapp.CheckInternetConnectivity;
 
-import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Handler;
 
 import com.example.pulkit.employeeapp.EmployeeApp;
-import com.example.pulkit.employeeapp.Notification.DisplayNotification;
-import com.example.pulkit.employeeapp.Notification.Notification;
-import com.firebase.client.Firebase;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 public class NetWatcher extends BroadcastReceiver {
 
