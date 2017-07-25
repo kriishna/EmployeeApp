@@ -14,11 +14,11 @@ import android.widget.TextView;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.model.Notif;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import static com.example.pulkit.employeeapp.EmployeeApp.formatter;
 
 /**
  * Created by SoumyaAgarwal on 7/20/2017.
@@ -28,6 +28,8 @@ public class notification_adapter extends  RecyclerView.Adapter<notification_ada
     List<Notif> list = new ArrayList<>();
     private Context context;
     private NotificationAdapterListener listener;
+    private SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
+
 
     public notification_adapter(List<Notif> list, Context c, NotificationAdapterListener listener) {
         this.list = list;
