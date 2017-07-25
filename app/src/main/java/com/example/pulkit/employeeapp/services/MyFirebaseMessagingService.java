@@ -79,7 +79,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     String notifid = id.substring(8);
                     notificationManager.notify(Integer.parseInt(notifid) /* ID of notification */, notificationBuilder.build());
 
-
                 }
             }
 
