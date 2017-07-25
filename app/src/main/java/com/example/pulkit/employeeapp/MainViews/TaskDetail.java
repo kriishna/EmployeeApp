@@ -51,6 +51,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import org.w3c.dom.Text;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -65,17 +67,17 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     public static String task_id, emp_id, desig;
     private Task task;
     private String customername;
-    EditText startDate, endDate, custId, taskName, quantity, description, coordinators_message;
+    EditText startDate, endDate, quantity, description, coordinators_message;
     private static final int PICK_FILE_REQUEST = 1;
     RecyclerView rec_measurement,rec_DescImages;
     FloatingActionButton forward;
     ArrayList<measurement> measurementList = new ArrayList<>();
     measurement_adapter adapter_measurement;
-    TextView open_measurement, appByCustomer, uploadStatus;
+    TextView appByCustomer, uploadStatus;
     DatabaseReference dbQuotation;
     ProgressDialog progressDialog;
     LinearLayout ll;
-    TextView text;
+    TextView text, measure_and_hideme;
     Button measure;
     ScrollView scroll;
     private StorageReference mStorageRef = FirebaseStorage.getInstance().getReference();
@@ -100,21 +102,18 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         scroll = (ScrollView) findViewById(R.id.scroll);
         measure = (Button) findViewById(R.id.measure);
         forward = (FloatingActionButton) findViewById(R.id.forward);
-        taskName = (EditText) findViewById(R.id.taskName);
         coordinators_message = (EditText) findViewById(R.id.coordinators_message);
         startDate = (EditText) findViewById(R.id.startDate);
         endDate = (EditText) findViewById(R.id.endDate);
         quantity = (EditText) findViewById(R.id.quantity);
         description = (EditText) findViewById(R.id.description);
-        custId = (EditText) findViewById(R.id.custId);
         rec_measurement = (RecyclerView) findViewById(R.id.rec_measurement);
         rec_DescImages = (RecyclerView)findViewById(R.id.rec_DescImages);
-        open_measurement = (TextView) findViewById(R.id.open_measurement);
-
-        session = new EmployeeSession(getApplicationContext());
-
+        measure_and_hideme = (TextView) findViewById(R.id.measure_and_hideme);
         text = (TextView) findViewById(R.id.textView6);
         ll = (LinearLayout) findViewById(R.id.quotation_container);
+
+        session = new EmployeeSession(getApplicationContext());
 
         Intent intent = getIntent();
         task_id = intent.getStringExtra("task_id");
@@ -154,12 +153,10 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                     adapter_taskimages.notifyDataSetChanged();
                 }
             }
-
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
             }
-
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 String item = dataSnapshot.getKey();
@@ -170,27 +167,9 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
-            }
-        });
-
-        open_measurement.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (rec_measurement.getVisibility() == View.GONE) {
-                    rec_measurement.setVisibility(View.VISIBLE);
-
-                    scroll.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            scroll.fullScroll(ScrollView.FOCUS_DOWN);
-                        }
-                    });
-                } else
-                    rec_measurement.setVisibility(View.GONE);
             }
         });
 
@@ -200,7 +179,6 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                 startActivity(new Intent(TaskDetail.this, MeasureList.class));
             }
         });
-
 
         dbTask.addValueEventListener(new ValueEventListener() {
             @Override
@@ -214,8 +192,6 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         customername = dataSnapshot.child("name").getValue(String.class);
                         getSupportActionBar().setSubtitle(customername);
-                        custId.setText(task.getCustomerId() + ": " + customername);
-
                     }
 
                     @Override
@@ -255,8 +231,6 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                                         Toast.makeText(TaskDetail.this, "Task Returned", Toast.LENGTH_SHORT).show();
                                     }
                                 });
-
-
                     }
                 }).setNegativeButton("No", new DialogInterface.OnClickListener() {
                     @Override
@@ -264,11 +238,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                         builder.create().dismiss();
                     }
                 });
-
-
                 builder.create().show();
-
-
             }
         });
         download.setOnClickListener(new View.OnClickListener() {
@@ -279,16 +249,12 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                 } else {
                     launchLibrary();
                 }
-
-
             }
         });
-
     }
 
-    private void launchLibrary() {
-
-
+    private void launchLibrary()
+    {
         dbQuotation.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -359,9 +325,14 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if (dataSnapshot.exists()) {
+                    measure_and_hideme.setVisibility(View.GONE);
                     measurement item = dataSnapshot.getValue(measurement.class);
                     measurementList.add(item);
                     adapter_measurement.notifyDataSetChanged();
+                }
+                else
+                {
+                    measure_and_hideme.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -392,7 +363,6 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     void setValue(Task task) {
         startDate.setText(task.getStartDate());
         endDate.setText(task.getExpEndDate());
-        taskName.setText(task.getName());
         quantity.setText(task.getQty());
         description.setText(task.getDesc());
 
@@ -484,7 +454,6 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         progressDialog.dismiss();
     }
 
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
@@ -496,7 +465,6 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                 }
                 return;
             }
-
         }
     }
 
