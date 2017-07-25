@@ -28,6 +28,8 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
+
 public class QuotationGroups extends Fragment implements QAdapter.QAdapterListener {
 
     RecyclerView recycler;
@@ -51,7 +53,7 @@ public class QuotationGroups extends Fragment implements QAdapter.QAdapterListen
 
         recycler = (RecyclerView) rootView.findViewById(R.id.recycler);
 
-        dbTask = FirebaseDatabase.getInstance().getReference().child("MeChat").child("Quotation").getRef();
+        dbTask = DBREF.child("Quotation").getRef();
 
         mAdapter = new QAdapter(list, getActivity(), (QAdapter.QAdapterListener) this);
         linearLayoutManager = new LinearLayoutManager(getActivity());

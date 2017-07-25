@@ -30,6 +30,8 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
+
 public class taskFrag extends Fragment implements taskAdapter.TaskAdapterListener{
 
     RecyclerView task_list;
@@ -63,7 +65,7 @@ public class taskFrag extends Fragment implements taskAdapter.TaskAdapterListene
         emp_id = TaskHome.emp_id;
         task_list = (RecyclerView) rootView.findViewById(R.id.recycler);
 
-        dbTask = FirebaseDatabase.getInstance().getReference().child("MeChat").child("Employee").child(emp_id).child("AssignedTask").getRef();
+        dbTask = DBREF.child("Employee").child(emp_id).child("AssignedTask").getRef();
 
         mAdapter = new taskAdapter(TaskList, getActivity(), this);
         linearLayoutManager = new LinearLayoutManager(getActivity());
@@ -91,7 +93,7 @@ public class taskFrag extends Fragment implements taskAdapter.TaskAdapterListene
     }
 
     void LoadData() {
-        db = FirebaseDatabase.getInstance().getReference().child("MeChat").child("Task").child(list.get(i));
+        db = DBREF.child("Task").child(list.get(i));
         vl = db.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

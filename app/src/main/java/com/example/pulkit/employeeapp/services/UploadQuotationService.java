@@ -25,6 +25,8 @@ import com.google.firebase.storage.UploadTask;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
+
 /**
  * Created by SoumyaAgarwal on 7/3/2017.
  */
@@ -96,7 +98,7 @@ public class UploadQuotationService extends IntentService
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             // Get a URL to the uploaded content
                             Quotation quotation = new Quotation("No");
-                            DatabaseReference dbQuotation = FirebaseDatabase.getInstance().getReference().child("MeChat").child("Task").child(task.getTaskId()).child("Quotation").getRef();
+                            DatabaseReference dbQuotation = DBREF.child("Task").child(task.getTaskId()).child("Quotation").getRef();
                             dbQuotation.setValue(quotation);
                             updateNotification("Succesfully Uploaded");
                             stopSelf();

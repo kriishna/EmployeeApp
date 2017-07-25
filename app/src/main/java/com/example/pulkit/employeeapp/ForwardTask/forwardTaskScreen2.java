@@ -17,6 +17,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
+
 public class forwardTaskScreen2 extends AppCompatActivity {
     Button submit;
     EditText name,designation,enddate,note,startDate;
@@ -54,10 +56,10 @@ public class forwardTaskScreen2 extends AppCompatActivity {
                 String deadline  = enddate.getText().toString().trim();
                 String coordnote = note.getText().toString().trim();
                 CompletedBy completedBy = new CompletedBy(empId,curdate,deadline,coordnote);
-                DatabaseReference dbAssigned = FirebaseDatabase.getInstance().getReference().child("MeChat").child("Task").child(task_id).child("AssignedTo").child(empId);
+                DatabaseReference dbAssigned = DBREF.child("Task").child(task_id).child("AssignedTo").child(empId);
                 dbAssigned.setValue(completedBy);
 
-                DatabaseReference dbEmployee = FirebaseDatabase.getInstance().getReference().child("MeChat").child("Employee").child(empId).child("AssignedTask").child(task_id);
+                DatabaseReference dbEmployee = DBREF.child("Employee").child(empId).child("AssignedTask").child(task_id);
                 dbEmployee.setValue("pending"); //for employee
 
                 Toast.makeText(forwardTaskScreen2.this,"Task Assigned to "+empName,Toast.LENGTH_SHORT).show();

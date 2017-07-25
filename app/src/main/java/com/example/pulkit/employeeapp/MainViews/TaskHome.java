@@ -18,6 +18,7 @@ import com.example.pulkit.employeeapp.Notification.NotificationActivity;
 import com.example.pulkit.employeeapp.Quotation.QuotationGroups;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.chat.chatFrag;
+import com.example.pulkit.employeeapp.helper.MarshmallowPermissions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,12 +28,20 @@ public class TaskHome extends AppCompatActivity {
     private ViewPager viewPager;
     public static String emp_id,desig;
     EmployeeSession session;
+    private MarshmallowPermissions marshmallowPermissions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_home);
+        marshmallowPermissions = new MarshmallowPermissions(this);
+        if(!marshmallowPermissions.checkPermissionForCamera())
+            marshmallowPermissions.requestPermissionForCamera();
+        if(!marshmallowPermissions.checkPermissionForExternalStorage())
+            marshmallowPermissions.requestPermissionForExternalStorage();
+        if(!marshmallowPermissions.checkPermissionForLocations())
+            marshmallowPermissions.requestPermissionForLocations();
 
         session = new EmployeeSession(getApplicationContext());
         emp_id = getIntent().getStringExtra("emp_id");

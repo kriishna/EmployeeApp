@@ -64,9 +64,9 @@ import droidninja.filepicker.FilePickerBuilder;
 import droidninja.filepicker.FilePickerConst;
 
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
+import static com.example.pulkit.employeeapp.EmployeeApp.formatter;
 
 public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatAdapterListener,View.OnClickListener{
-    private static final int REQUEST_CODE = 101;
     private EditText typeComment;
     private ImageButton sendButton;
     Intent intent;
@@ -77,13 +77,11 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
     LinearLayoutManager linearLayoutManager;
     private MarshmallowPermissions marshmallowPermissions;
     LinearLayout emptyView;
-    private ArrayList<String> mResults = new ArrayList<>();
+    private ArrayList<String> mResults;
     private ActionModeCallback actionModeCallback;
     private ActionMode actionMode;
     UploadFileService uploadFileService;
     boolean mServiceBound = false;
-    SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy hh:mm aa");
-    private String lastDate = "20-01-3000 00:00";
     private chatAdapter mAdapter;
     private ArrayList<ChatMessage> chatList = new ArrayList<>();
     String receiverToken="nil";
@@ -103,6 +101,14 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
         marshmallowPermissions = new MarshmallowPermissions(this);
+        marshmallowPermissions = new MarshmallowPermissions(this);
+        if(!marshmallowPermissions.checkPermissionForExternalStorage())
+        {
+            marshmallowPermissions.requestPermissionForExternalStorage();
+        }
+        if(!marshmallowPermissions.checkPermissionForExternalStorage())
+            Toast.makeText(this,"You wont be able to see the images and documents sent and received",Toast.LENGTH_LONG).show();
+
         compressMe = new CompressMe(this);
         actionModeCallback = new ActionModeCallback();
 
@@ -309,7 +315,7 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
     public void loadData()
     {
 
-        dbChatlistener = dbChat.addChildEventListener(new ChildEventListener() {
+        dbChatlistener = dbChat.orderByKey().addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if (!dataSnapshot.exists()) {

@@ -35,6 +35,8 @@ import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 
+import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
+
 public class dialogue extends AppCompatActivity {
 
     EditText width, height, unit;
@@ -50,7 +52,7 @@ public class dialogue extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dialogue);
 
-        dbRef = FirebaseDatabase.getInstance().getReference().child("MeChat");
+        dbRef = DBREF;
         storageReference = FirebaseStorage.getInstance().getReference().child("MeasurementImages");
         img = (ImageView) findViewById(R.id.imageView);
         width = (EditText) findViewById(R.id.width);

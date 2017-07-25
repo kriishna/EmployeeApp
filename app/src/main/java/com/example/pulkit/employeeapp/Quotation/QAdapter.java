@@ -20,6 +20,8 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
+
 public class QAdapter extends RecyclerView.Adapter<QAdapter.MyViewHolder> {
     List<QuotationBatch> list = new ArrayList<>();
     private Context context;
@@ -68,7 +70,7 @@ public class QAdapter extends RecyclerView.Adapter<QAdapter.MyViewHolder> {
         holder.taskname.setText(iconText);
         holder.customername.setText("");
 
-        DatabaseReference dbCustomerName = FirebaseDatabase.getInstance().getReference().child("MeChat").child("Customer").child(batch.getId()).getRef();
+        DatabaseReference dbCustomerName = DBREF.child("Customer").child(batch.getId()).getRef();
         dbCustomerName.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

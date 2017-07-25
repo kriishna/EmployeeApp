@@ -27,6 +27,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 import static java.security.AccessController.getContext;
 
 public class QuotaionTasks extends AppCompatActivity implements taskAdapter.TaskAdapterListener {
@@ -65,7 +66,7 @@ public class QuotaionTasks extends AppCompatActivity implements taskAdapter.Task
 
         recycler = (RecyclerView) findViewById(R.id.recycler);
 
-        dbTask = FirebaseDatabase.getInstance().getReference().child("MeChat").child("Quotation").child(id).child("tasks").getRef();
+        dbTask = DBREF.child("Quotation").child(id).child("tasks").getRef();
 
         mAdapter = new taskAdapter(TaskList, QuotaionTasks.this, this);
         linearLayoutManager = new LinearLayoutManager(QuotaionTasks.this);
@@ -107,7 +108,7 @@ public class QuotaionTasks extends AppCompatActivity implements taskAdapter.Task
 
 
         void LoadData() {
-            db = FirebaseDatabase.getInstance().getReference().child("MeChat").child("Task").child(list.get(i));
+            db = DBREF.child("Task").child(list.get(i));
 
 
             vl = db.addValueEventListener(new ValueEventListener() {
