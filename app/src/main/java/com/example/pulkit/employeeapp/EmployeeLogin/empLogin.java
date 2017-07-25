@@ -115,7 +115,7 @@ public class empLogin extends AppCompatActivity {
                             Toast.makeText(getBaseContext(), "Wrong Password", Toast.LENGTH_SHORT).show();
                         } else
                         {
-                            session.create_oldusersession(Username,employee.getDesignation(),employee.getName());
+                            session.create_oldusersession(Username,employee.getDesignation(),employee.getName(),employee.getPhone_num(),employee.getAddress());
                             EmployeeApp.setOnlineStatus(Username);
                             String myFCMToken;
                             if(FirebaseInstanceId.getInstance().getToken()==null)

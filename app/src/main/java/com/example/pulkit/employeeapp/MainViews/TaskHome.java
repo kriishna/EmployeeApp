@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.WindowManager;
 
 import com.example.pulkit.employeeapp.EmployeeLogin.EmployeeSession;
+import com.example.pulkit.employeeapp.MyProfile.MyProfile;
 import com.example.pulkit.employeeapp.Notification.NotificationActivity;
 import com.example.pulkit.employeeapp.Quotation.QuotationGroups;
 import com.example.pulkit.employeeapp.R;
@@ -69,6 +70,10 @@ public class TaskHome extends AppCompatActivity {
             case R.id.notif:
                 Intent intent = new Intent(getApplicationContext(), NotificationActivity.class);
                 startActivity(intent);
+                break;
+            case R.id.profile:
+                Intent intent2 = new Intent(getApplicationContext(), MyProfile.class);
+                startActivity(intent2);
                 break;
         }
         return true;
