@@ -101,7 +101,7 @@ public class empLogin extends AppCompatActivity {
     }
 
     private void login() {
-        DatabaseReference db = database.child(Username).getRef();
+        DatabaseReference db = DBREF.child("Employee").child(Username).getRef();
 
             db.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
