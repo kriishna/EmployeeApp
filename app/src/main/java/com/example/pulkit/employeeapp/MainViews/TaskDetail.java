@@ -56,6 +56,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
+
 public class TaskDetail extends AppCompatActivity implements taskdetailDescImageAdapter.ImageAdapterListener,bigimage_adapter.bigimage_adapterListener{
 
     DatabaseReference dbRef, dbTask, dbCompleted, dbAssigned, dbMeasurement, dbDescImages;
@@ -89,7 +91,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_detail);
 
-        dbRef = FirebaseDatabase.getInstance().getReference().child("MeChat");
+        dbRef = DBREF;
         progressDialog = new ProgressDialog(this);
         download = (ImageButton) findViewById(R.id.download);
         uploadStatus = (TextView) findViewById(R.id.uploadStatus);
@@ -206,7 +208,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                 task = dataSnapshot.getValue(Task.class);
                 setValue(task);
                 getSupportActionBar().setTitle(task.getName());
-                DatabaseReference dbCustomerName = FirebaseDatabase.getInstance().getReference().child("MeChat").child("Customer").child(task.getCustomerId()).getRef();
+                DatabaseReference dbCustomerName = DBREF.child("Customer").child(task.getCustomerId()).getRef();
                 dbCustomerName.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -240,10 +242,10 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                     public void onClick(DialogInterface dialog, int which) {
                         DatabaseReference db, databaseReference;
 
-                        db = FirebaseDatabase.getInstance().getReference().child("MeChat").child("Employee").child(emp_id).child("AssignedTask").child(task_id);
+                        db = DBREF.child("Employee").child(emp_id).child("AssignedTask").child(task_id);
                         db.setValue("done");
 
-                        databaseReference = FirebaseDatabase.getInstance().getReference().child("MeChat").child("Task").child(task_id);
+                        databaseReference = DBREF.child("Task").child(task_id);
                         databaseReference.child("AssignedTo").child(emp_id).child("datecompleted")
                                 .setValue(new SimpleDateFormat("dd/MM/yyyy")
                                         .format(new Date()))

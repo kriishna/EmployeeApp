@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
+
 public class forwardTask extends AppCompatActivity {
     RecyclerView recview;
     RecAdapter_emp adapter;
@@ -48,10 +50,10 @@ public class forwardTask extends AppCompatActivity {
         emp_id = TaskHome.emp_id;
 
 
-        db = FirebaseDatabase.getInstance().getReference().child("MeChat").child("Employee").child(emp_id).child("AssignedTask").child(task_id);
+        db = DBREF.child("Employee").child(emp_id).child("AssignedTask").child(task_id);
         db.setValue("done");
 
-        databaseReference = FirebaseDatabase.getInstance().getReference().child("MeChat").child("Task").child(task_id);
+        databaseReference = DBREF.child("Task").child(task_id);
         databaseReference.child("AssignedTo").child(emp_id).child("datecompleted").setValue(new SimpleDateFormat("dd/MM/yyyy").format(new Date()));
 
 

@@ -31,7 +31,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:enabled="false"
-                android:inputType="textCapCharacters"
+                android:inputType="textCapSentences"
                 android:textColor="#000000" />
 
             <TextView
@@ -48,7 +48,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:enabled="false"
-                android:inputType="textCapCharacters"
+                android:inputType="textCapSentences"
                 android:textColor="#000000" />
 
 
@@ -66,7 +66,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:enabled="false"
-                android:inputType="textCapCharacters"
+                android:inputType="textCapSentences"
                 android:textColor="#000000" />
 
             <TextView
