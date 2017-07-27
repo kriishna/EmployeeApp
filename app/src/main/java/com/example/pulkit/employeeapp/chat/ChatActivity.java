@@ -169,6 +169,22 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.chat_menu,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.item1:
+                //TODO Phone call
+                break;
+        }
+        return true;
+    }
+
     private String getRecivertoken(String otheruserkey) {
         System.out.println(otheruserkey+"recd token in chat act ");
         DBREF.child("Fcmtokens").child(otheruserkey).child("token").getRef().addListenerForSingleValueEvent(new ValueEventListener() {
