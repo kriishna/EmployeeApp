@@ -53,7 +53,7 @@ public class empLogin extends AppCompatActivity {
         session = new EmployeeSession(getApplicationContext());
 
 
-        if(session.isolduser().equals("true")){
+        if(session.isolduser().equals(true)){
             Intent intent = new Intent(empLogin.this, TaskHome.class);
             intent.putExtra("emp_id",session.getUsername());
             intent.putExtra("desig",session.getDesig());

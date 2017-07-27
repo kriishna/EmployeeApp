@@ -20,6 +20,8 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -34,6 +36,7 @@ import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.adapters.bigimage_adapter;
 import com.example.pulkit.employeeapp.adapters.measurement_adapter;
 import com.example.pulkit.employeeapp.adapters.taskdetailDescImageAdapter;
+import com.example.pulkit.employeeapp.chat.ChatActivity;
 import com.example.pulkit.employeeapp.measurement.MeasureList;
 import com.example.pulkit.employeeapp.model.Quotation;
 import com.example.pulkit.employeeapp.model.Task;
@@ -66,7 +69,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     ImageButton download;
     public static String task_id, emp_id, desig;
     private Task task;
-    private String customername;
+    private String customername,mykey;
     EditText startDate, endDate, quantity, description, coordinators_message;
     private static final int PICK_FILE_REQUEST = 1;
     RecyclerView rec_measurement,rec_DescImages;
@@ -87,6 +90,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     ArrayList<String> DescImages = new ArrayList<>();
     LinearLayoutManager linearLayoutManager;
     EmployeeSession session;
+    String dbTablekey,id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,13 +119,12 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
 
         session = new EmployeeSession(getApplicationContext());
 
+        mykey = session.getUsername();
         Intent intent = getIntent();
         task_id = intent.getStringExtra("task_id");
+        id = intent.getStringExtra("customerId");
         emp_id = TaskHome.emp_id;
         desig = TaskHome.desig;
-
-        text.setVisibility(View.GONE);
-        ll.setVisibility(View.GONE);
 
         dbTask = dbRef.child("Task").child(task_id);
         dbQuotation = dbTask.child("Quotation").getRef();
@@ -251,6 +254,90 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                 }
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.taskdetail_menu,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.item1:
+                //TODO Phone call
+                break;
+            case R.id.item2:
+                checkChatref(mykey, id);
+                break;
+        }
+        return true;
+    }
+
+    private void checkChatref(final String mykey, final String otheruserkey) {
+        DatabaseReference dbChat = DBREF.child("Chats").child(mykey+otheruserkey).getRef();
+        dbChat.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                System.out.println("query1" + mykey+otheruserkey);
+                System.out.println("datasnap 1" + dataSnapshot.toString());
+                if (dataSnapshot.exists()) {
+                    System.out.println("datasnap exists1" + dataSnapshot.toString());
+                    dbTablekey = mykey+otheruserkey;
+                    goToChatActivity();
+
+                }
+                else
+                {
+                    checkChatref2(mykey,otheruserkey);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+    }
+
+    private void checkChatref2(final String mykey, final String otheruserkey) {
+        final DatabaseReference dbChat = DBREF.child("Chats").child(otheruserkey+mykey).getRef();
+        dbTablekey = otheruserkey+mykey;
+        dbChat.addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists())
+                {
+                    System.out.println("query1" + otheruserkey+mykey);
+                    goToChatActivity();
+
+
+                }
+                else
+                {
+
+                    DBREF.child("Users").child("Userchats").child(mykey).child(otheruserkey).setValue(dbTablekey);
+                    DBREF.child("Users").child("Userchats").child(otheruserkey).child(mykey).setValue(dbTablekey);
+                    goToChatActivity();
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void goToChatActivity()
+    {
+        Intent in = new Intent(this, ChatActivity.class);
+        in.putExtra("dbTableKey",dbTablekey);
+        in.putExtra("otheruserkey",id);
+        startActivity(in);
     }
 
     private void launchLibrary()

@@ -88,6 +88,7 @@ public class taskFrag extends Fragment implements taskAdapter.TaskAdapterListene
     public void onTaskRowClicked(int position) {
         Intent intent = new Intent(getContext(),TaskDetail.class);
         Task task = TaskList.get(position);
+        intent.putExtra("customerId",task.getCustomerId());
         intent.putExtra("task_id",task.getTaskId());
         startActivity(intent);
     }

@@ -185,6 +185,7 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
         return true;
     }
 
+
     private String getRecivertoken(String otheruserkey) {
         System.out.println(otheruserkey+"recd token in chat act ");
         DBREF.child("Fcmtokens").child(otheruserkey).child("token").getRef().addListenerForSingleValueEvent(new ValueEventListener() {

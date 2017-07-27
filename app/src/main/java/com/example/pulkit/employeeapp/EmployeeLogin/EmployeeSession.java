@@ -32,7 +32,7 @@ public class EmployeeSession {
     public void create_oldusersession(final String username_get,String designation,String name , String contact, String address)
             {
                 editor.putString("designation",designation.toLowerCase());
-                editor.putString(is_loggedin,"true");
+                editor.putBoolean(is_loggedin,true);
                 editor.putString(username,username_get);
                 editor.putString("name",name);
                 editor.putString("contact",contact);
@@ -50,9 +50,9 @@ public class EmployeeSession {
         editor.commit();
     }
 
-    public String isolduser()
+    public Boolean isolduser()
     {
-        return pref.getString(is_loggedin,"");
+        return pref.getBoolean(is_loggedin,false);
     }
 
     public String getUsername()
