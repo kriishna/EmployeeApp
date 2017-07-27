@@ -38,7 +38,6 @@ public class chatListAdapter extends RecyclerView.Adapter<chatListAdapter.MyView
     private EmployeeSession employeeSession;
     private String mykey;
 
-
     public chatListAdapter(ArrayList<ChatListModel> list, Context context, chatListAdapterListener listener) {
         this.context = context;
         this.list = list;
@@ -55,7 +54,6 @@ public class chatListAdapter extends RecyclerView.Adapter<chatListAdapter.MyView
         LinearLayout messageContainer;
         RelativeLayout relunread;
 
-
         public MyViewHolder(View itemView) {
             super(itemView);
             relunread = (RelativeLayout)itemView.findViewById(R.id.relunread);
@@ -67,16 +65,13 @@ public class chatListAdapter extends RecyclerView.Adapter<chatListAdapter.MyView
             imgProfile = (ImageView) itemView.findViewById(R.id.icon_profile);
             messageContainer = (LinearLayout) itemView.findViewById(R.id.message_container);
             onlineStatus = (ImageView) itemView.findViewById(R.id.onlineStatus);
-
         }
-
     }
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_list_row, parent, false);
         return new MyViewHolder(view);
-
     }
 
     @Override
