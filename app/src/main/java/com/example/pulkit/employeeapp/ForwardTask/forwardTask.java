@@ -32,11 +32,6 @@ import java.util.List;
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 
 public class forwardTask extends AppCompatActivity {
-    RecyclerView recview;
-    RecAdapter_emp adapter;
-    List<Employee> list = new ArrayList<Employee>();
-    Employee emp;
-    ProgressDialog pDialog;
     String task_id,emp_id;
     DatabaseReference db,databaseReference;
 
@@ -44,11 +39,10 @@ public class forwardTask extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forward_task);
- //       new net().execute();
+
         Intent intent = getIntent();
         task_id = intent.getStringExtra("task_id");
         emp_id = TaskHome.emp_id;
-
 
         db = DBREF.child("Employee").child(emp_id).child("AssignedTask").child(task_id);
         db.setValue("done");
@@ -56,10 +50,7 @@ public class forwardTask extends AppCompatActivity {
         databaseReference = DBREF.child("Task").child(task_id);
         databaseReference.child("AssignedTo").child(emp_id).child("datecompleted").setValue(new SimpleDateFormat("dd/MM/yyyy").format(new Date()));
 
-
     }
-
-
 
     @Override
     public void onBackPressed() {

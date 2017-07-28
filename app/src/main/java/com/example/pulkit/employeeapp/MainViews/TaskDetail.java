@@ -32,12 +32,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.pulkit.employeeapp.EmployeeLogin.EmployeeSession;
+import com.example.pulkit.employeeapp.ForwardTask.forwardTask;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.adapters.bigimage_adapter;
 import com.example.pulkit.employeeapp.adapters.measurement_adapter;
 import com.example.pulkit.employeeapp.adapters.taskdetailDescImageAdapter;
 import com.example.pulkit.employeeapp.chat.ChatActivity;
 import com.example.pulkit.employeeapp.measurement.MeasureList;
+import com.example.pulkit.employeeapp.model.CompletedBy;
 import com.example.pulkit.employeeapp.model.Quotation;
 import com.example.pulkit.employeeapp.model.Task;
 import com.example.pulkit.employeeapp.model.measurement;
@@ -62,6 +64,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
+import static com.example.pulkit.employeeapp.EmployeeApp.sendNotif;
 
 public class TaskDetail extends AppCompatActivity implements taskdetailDescImageAdapter.ImageAdapterListener,bigimage_adapter.bigimage_adapterListener{
 
@@ -91,6 +94,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     LinearLayoutManager linearLayoutManager;
     EmployeeSession session;
     String dbTablekey,id;
+    private AlertDialog confirmation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -213,37 +217,73 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
             @Override
             public void onClick(View v) {
 
-                final AlertDialog.Builder builder = new AlertDialog.Builder(TaskDetail.this);
-                builder.setTitle("Confirmation");
-                builder.setMessage("Are you sure you want to return task to coordinator?");
-                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        DatabaseReference db, databaseReference;
+                confirmation = new AlertDialog.Builder(TaskDetail.this)
+                        .setView(R.layout.confirmation_layout).create();
+                confirmation.show();
 
-                        db = DBREF.child("Employee").child(emp_id).child("AssignedTask").child(task_id);
-                        db.setValue("done");
+                Button okcompleted = (Button)confirmation.findViewById(R.id.okcompleted);
+                Button okcanceled = (Button)confirmation.findViewById(R.id.okcanceled);
+
+                okcompleted.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final DatabaseReference databaseReference;
 
                         databaseReference = DBREF.child("Task").child(task_id);
-                        databaseReference.child("AssignedTo").child(emp_id).child("datecompleted")
-                                .setValue(new SimpleDateFormat("dd/MM/yyyy")
-                                        .format(new Date()))
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        databaseReference.child("AssignedTo").child(emp_id).getRef();
+
+                        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                CompletedBy completedBy = dataSnapshot.getValue(CompletedBy.class);
+                                completedBy.setDatecompleted(new SimpleDateFormat("dd/MM/yyyy").format(new Date()));
+                                //completed job
+                                DatabaseReference dbAssigned = DBREF.child("Task").child(task_id).child("CompletedBy").child(session.getUsername());
+                                dbAssigned.setValue(completedBy);
+
+                                databaseReference.removeValue();
+                                final DatabaseReference[] dbEmployee = {DBREF.child("Employee").child(session.getUsername()).child("AssignedTask").child(task_id).getRef()};
+                                dbEmployee[0].addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Toast.makeText(TaskDetail.this, "Task Returned", Toast.LENGTH_SHORT).show();
+                                    public void onDataChange(DataSnapshot dataSnapshot)
+                                    {
+                                        dbEmployee[0].removeValue(); //for employee
+
+                                        dbEmployee[0] = DBREF.child("Employee").child(session.getUsername()).child("CompletedTask").child(task_id);
+                                        dbEmployee[0].setValue("completed"); //for employee
+
+                                        String contentforme = "I have completed "+task.getName();
+                                        sendNotif(mykey,mykey,"completedJob",contentforme,task_id);
+                                        String contentforother= "Employee "+session.getName()+" completed his job of "+task.getName();
+                                        //TODO hardcoded coordinator username
+                                        sendNotif(mykey,"pulkit","completedJob",contentforother,task_id);
+                                        confirmation.dismiss();
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
                                     }
                                 });
-                    }
-                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        builder.create().dismiss();
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
                     }
                 });
-                builder.create().show();
+
+                okcanceled.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        confirmation.dismiss();
+                    }
+                });
             }
         });
+
         download.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
