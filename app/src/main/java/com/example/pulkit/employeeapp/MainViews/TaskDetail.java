@@ -91,6 +91,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     LinearLayoutManager linearLayoutManager;
     EmployeeSession session;
     String dbTablekey,id;
+    String num;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -267,6 +268,20 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         switch (item.getItemId()){
             case R.id.item1:
                 //TODO Phone call
+                FirebaseDatabase.getInstance().getReference().child("MeChat").child("Customer").child(id).child("phone_num").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        num = dataSnapshot.getValue(String.class);
+                        Intent callIntent = new Intent(Intent.ACTION_DIAL);
+                        callIntent.setData(Uri.parse("tel:" + num));
+                        startActivity(callIntent);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
                 break;
             case R.id.item2:
                 checkChatref(mykey, id);

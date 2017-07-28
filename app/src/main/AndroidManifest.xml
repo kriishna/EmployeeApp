@@ -28,9 +28,6 @@
                 <action android:name="android.intent.action.REBOOT" />
             </intent-filter>
         </receiver>
-
-        <activity android:name=".MainActivity" />
-        <activity android:name=".Notification.Notification" />
         <activity
             android:name=".MainViews.TaskHome"
             android:screenOrientation="portrait" />

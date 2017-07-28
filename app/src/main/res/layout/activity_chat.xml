@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mainCommentLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/mainCommentLayout"
     android:focusable="true"
     android:focusableInTouchMode="true">
 
@@ -10,57 +10,57 @@
         android:id="@+id/my_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/grey_300"
         android:layout_above="@+id/sendComment"
+        android:background="@color/grey_300"
         android:nestedScrollingEnabled="true"
         android:padding="6dp"
-        android:windowSoftInputMode="adjustResize"/>
+        android:windowSoftInputMode="adjustResize" />
 
     <RelativeLayout
+        android:id="@+id/sendComment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/edittext_bg_whitebg"
         android:orientation="vertical"
         android:padding="5dp"
-        android:id="@+id/sendComment"
-        android:background="@drawable/edittext_bg_whitebg"
-        android:layout_alignParentBottom="true"
         android:windowSoftInputMode="adjustResize">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <EditText
+                android:id="@+id/typeComment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="Type Your Comment"
-                android:padding="10dp"
-                android:id="@+id/typeComment"
                 android:layout_gravity="center_vertical"
-                android:background="@drawable/edittext_bg_greystroke"/>
+                android:layout_weight="1"
+                android:background="@drawable/edittext_bg_greystroke"
+                android:hint="Type Your Comment"
+                android:padding="10dp" />
 
             <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@mipmap/ic_attach_photo"
                 android:id="@+id/photoattach"
-                />
-
-            <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/docattach"
-                android:background="@mipmap/ic_attach_doc"
-                />
+                android:background="@mipmap/ic_attach_photo" />
 
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/sendButton"
-            android:elevation="@dimen/activity_horizontal_margin"
-            android:layout_gravity="center_horizontal"
-            android:background="@mipmap/ic_send"
-            android:layout_marginLeft="5dp"/>
+            <ImageButton
+                android:id="@+id/docattach"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@mipmap/ic_attach_doc" />
+
+            <ImageButton
+                android:id="@+id/sendButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="5dp"
+                android:background="@mipmap/ic_send"
+                android:elevation="@dimen/activity_horizontal_margin" />
 
         </LinearLayout>
     </RelativeLayout>
