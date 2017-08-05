@@ -29,11 +29,10 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".MainActivity" />
-        <activity android:name=".Notification.Notification" />
         <activity
             android:name=".MainViews.TaskHome"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".chat.ChatActivity" />
         <activity android:name=".ForwardTask.forwardTask" />
         <activity
@@ -60,6 +59,11 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+        <activity
+            android:name=".drawer"
+            android:label="@string/title_activity_drawer1"
+            android:theme="@style/AppTheme.NoActionBar"/>
+
         <service android:name=".services.MyFirebaseInstanceIDService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />

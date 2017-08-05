@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.pulkit.employeeapp.EmployeeLogin.EmployeeSession;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.adapters.taskAdapter;
 import com.example.pulkit.employeeapp.model.Task;
@@ -45,6 +46,7 @@ public class taskFrag extends Fragment implements taskAdapter.TaskAdapterListene
     public static String emp_id;
     ChildEventListener ch;
     ValueEventListener vl;
+    EmployeeSession session;
 
     public taskFrag() {
     }
@@ -61,8 +63,9 @@ public class taskFrag extends Fragment implements taskAdapter.TaskAdapterListene
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.chatfrag, container, false);
 
+        session = new EmployeeSession(getActivity());
         pDialog = new ProgressDialog(getContext());
-        emp_id = TaskHome.emp_id;
+        emp_id = session.getUsername();
         task_list = (RecyclerView) rootView.findViewById(R.id.recycler);
 
         dbTask = DBREF.child("Employee").child(emp_id).child("AssignedTask").getRef();

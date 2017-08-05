@@ -3,7 +3,6 @@ package com.example.pulkit.employeeapp.MainViews;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -32,7 +31,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.pulkit.employeeapp.EmployeeLogin.EmployeeSession;
-import com.example.pulkit.employeeapp.ForwardTask.forwardTask;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.adapters.bigimage_adapter;
 import com.example.pulkit.employeeapp.adapters.measurement_adapter;
@@ -49,7 +47,6 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
@@ -213,6 +210,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
 
             }
         });
+
         forward.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -229,8 +227,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                     public void onClick(View v) {
                         final DatabaseReference databaseReference;
 
-                        databaseReference = DBREF.child("Task").child(task_id);
-                        databaseReference.child("AssignedTo").child(emp_id).getRef();
+                        databaseReference = DBREF.child("Task").child(task_id).child("AssignedTo").child(emp_id).getRef();
 
                         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
