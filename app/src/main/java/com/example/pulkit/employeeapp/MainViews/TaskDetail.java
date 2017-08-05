@@ -3,6 +3,7 @@ package com.example.pulkit.employeeapp.MainViews;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -37,7 +38,6 @@ import com.example.pulkit.employeeapp.adapters.measurement_adapter;
 import com.example.pulkit.employeeapp.adapters.taskdetailDescImageAdapter;
 import com.example.pulkit.employeeapp.chat.ChatActivity;
 import com.example.pulkit.employeeapp.measurement.MeasureList;
-import com.example.pulkit.employeeapp.model.CompletedBy;
 import com.example.pulkit.employeeapp.model.Quotation;
 import com.example.pulkit.employeeapp.model.Task;
 import com.example.pulkit.employeeapp.model.measurement;
@@ -47,6 +47,7 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
@@ -61,7 +62,6 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
-import static com.example.pulkit.employeeapp.EmployeeApp.sendNotif;
 
 public class TaskDetail extends AppCompatActivity implements taskdetailDescImageAdapter.ImageAdapterListener,bigimage_adapter.bigimage_adapterListener{
 
@@ -91,7 +91,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     LinearLayoutManager linearLayoutManager;
     EmployeeSession session;
     String dbTablekey,id;
-    private AlertDialog confirmation;
+    String num;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -210,77 +210,41 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
 
             }
         });
-
         forward.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                confirmation = new AlertDialog.Builder(TaskDetail.this)
-                        .setView(R.layout.confirmation_layout).create();
-                confirmation.show();
-
-                Button okcompleted = (Button)confirmation.findViewById(R.id.okcompleted);
-                Button okcanceled = (Button)confirmation.findViewById(R.id.okcanceled);
-
-                okcompleted.setOnClickListener(new View.OnClickListener() {
+                final AlertDialog.Builder builder = new AlertDialog.Builder(TaskDetail.this);
+                builder.setTitle("Confirmation");
+                builder.setMessage("Are you sure you want to return task to coordinator?");
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(View v) {
-                        final DatabaseReference databaseReference;
+                    public void onClick(DialogInterface dialog, int which) {
+                        DatabaseReference db, databaseReference;
 
-                        databaseReference = DBREF.child("Task").child(task_id).child("AssignedTo").child(emp_id).getRef();
+                        db = DBREF.child("Employee").child(emp_id).child("AssignedTask").child(task_id);
+                        db.setValue("done");
 
-                        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                CompletedBy completedBy = dataSnapshot.getValue(CompletedBy.class);
-                                completedBy.setDatecompleted(new SimpleDateFormat("dd/MM/yyyy").format(new Date()));
-                                //completed job
-                                DatabaseReference dbAssigned = DBREF.child("Task").child(task_id).child("CompletedBy").child(session.getUsername());
-                                dbAssigned.setValue(completedBy);
-
-                                databaseReference.removeValue();
-                                final DatabaseReference[] dbEmployee = {DBREF.child("Employee").child(session.getUsername()).child("AssignedTask").child(task_id).getRef()};
-                                dbEmployee[0].addListenerForSingleValueEvent(new ValueEventListener() {
+                        databaseReference = DBREF.child("Task").child(task_id);
+                        databaseReference.child("AssignedTo").child(emp_id).child("datecompleted")
+                                .setValue(new SimpleDateFormat("dd/MM/yyyy")
+                                        .format(new Date()))
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot)
-                                    {
-                                        dbEmployee[0].removeValue(); //for employee
-
-                                        dbEmployee[0] = DBREF.child("Employee").child(session.getUsername()).child("CompletedTask").child(task_id);
-                                        dbEmployee[0].setValue("completed"); //for employee
-
-                                        String contentforme = "I have completed "+task.getName();
-                                        sendNotif(mykey,mykey,"completedJob",contentforme,task_id);
-                                        String contentforother= "Employee "+session.getName()+" completed his job of "+task.getName();
-                                        //TODO hardcoded coordinator username
-                                        sendNotif(mykey,"pulkit","completedJob",contentforother,task_id);
-                                        confirmation.dismiss();
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-
+                                    public void onSuccess(Void aVoid) {
+                                        Toast.makeText(TaskDetail.this, "Task Returned", Toast.LENGTH_SHORT).show();
                                     }
                                 });
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
                     }
-                });
-
-                okcanceled.setOnClickListener(new View.OnClickListener() {
+                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(View v) {
-                        confirmation.dismiss();
+                    public void onClick(DialogInterface dialog, int which) {
+                        builder.create().dismiss();
                     }
                 });
+                builder.create().show();
             }
         });
-
         download.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -304,6 +268,20 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         switch (item.getItemId()){
             case R.id.item1:
                 //TODO Phone call
+                FirebaseDatabase.getInstance().getReference().child("MeChat").child("Customer").child(id).child("phone_num").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        num = dataSnapshot.getValue(String.class);
+                        Intent callIntent = new Intent(Intent.ACTION_DIAL);
+                        callIntent.setData(Uri.parse("tel:" + num));
+                        startActivity(callIntent);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
                 break;
             case R.id.item2:
                 checkChatref(mykey, id);

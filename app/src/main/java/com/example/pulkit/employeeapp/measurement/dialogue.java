@@ -92,7 +92,7 @@ public class dialogue extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             Bitmap photo = (Bitmap) data.getExtras().get("data");
-            img.setBackground(new ColorDrawable(Color.WHITE));
+       //     img.setBackground(new ColorDrawable(Color.WHITE));
             img.setBackground(new BitmapDrawable(photo));
 
             tempUri = getImageUri(getApplicationContext(), photo);

@@ -93,6 +93,7 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
     CompressMe compressMe;
     private AlertDialog viewSelectedImages ;
     ViewImageAdapter adapter;
+    String num;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,6 +125,7 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
                 {
                     NameAndStatus nameAndStatus = dataSnapshot.getValue(NameAndStatus.class);
                     getSupportActionBar().setTitle(nameAndStatus.getName());
+                    num = nameAndStatus.getNum();
                     if(nameAndStatus.getOnline())
                     {
                         getSupportActionBar().setSubtitle("Online");
@@ -165,6 +167,18 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
         mAdapter = new chatAdapter(chatList, this, dbTableKey,this);
         recyclerView.setAdapter(mAdapter);
         sendButton.setOnClickListener(this);
+
+
+
+
+        typeComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(chatList.size()>0)
+                    recyclerView.scrollToPosition(chatList.size()-1);
+            }
+        });
+
         loadData();
 
     }
@@ -180,6 +194,9 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
         switch (item.getItemId()){
             case R.id.item1:
                 //TODO Phone call
+                Intent callIntent = new Intent(Intent.ACTION_DIAL);
+                callIntent.setData(Uri.parse("tel:" + num));
+                startActivity(callIntent);
                 break;
         }
         return true;
@@ -353,7 +370,9 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
 
                     chatList.add(comment);
                     mAdapter.notifyDataSetChanged();
-                    recyclerView.scrollToPosition(chatList.size() - 1);
+
+                    if(chatList.size()>0)
+                        recyclerView.scrollToPosition(chatList.size()-1);
                 }
             }
 
@@ -382,6 +401,7 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
     @Override
     protected void onResume(){
         super.onResume();
+
 
     }
 
@@ -413,6 +433,8 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
         if(dbOnlineStatusVle!=null)
             dbOnlineStatus.removeEventListener(dbOnlineStatusVle);
         mAdapter.removeListeners();
+
+
     }
 
     ////maintain all the clicks on buttons on this page
@@ -537,6 +559,7 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
                     // mAdapter.notifyDataSetChanged();
                 }
             });
+
         }
     }
 
