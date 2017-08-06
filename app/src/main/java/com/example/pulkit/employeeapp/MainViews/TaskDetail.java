@@ -11,7 +11,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -63,17 +62,17 @@ import java.util.Date;
 
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 
-public class TaskDetail extends AppCompatActivity implements taskdetailDescImageAdapter.ImageAdapterListener,bigimage_adapter.bigimage_adapterListener{
+public class TaskDetail extends AppCompatActivity implements taskdetailDescImageAdapter.ImageAdapterListener, bigimage_adapter.bigimage_adapterListener {
 
     DatabaseReference dbRef, dbTask, dbCompleted, dbAssigned, dbMeasurement, dbDescImages;
     ImageButton download;
     public static String task_id, emp_id, desig;
     private Task task;
-    private String customername,mykey;
+    private String customername, mykey;
     EditText startDate, endDate, quantity, description, coordinators_message;
     private static final int PICK_FILE_REQUEST = 1;
-    RecyclerView rec_measurement,rec_DescImages;
-    FloatingActionButton forward;
+    RecyclerView rec_measurement, rec_DescImages;
+    Button forward;
     ArrayList<measurement> measurementList = new ArrayList<>();
     measurement_adapter adapter_measurement;
     TextView appByCustomer, uploadStatus;
@@ -86,11 +85,11 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     private StorageReference mStorageRef = FirebaseStorage.getInstance().getReference();
     taskdetailDescImageAdapter adapter_taskimages;
     bigimage_adapter adapter;
-    private AlertDialog viewSelectedImages ;
+    private AlertDialog viewSelectedImages;
     ArrayList<String> DescImages = new ArrayList<>();
     LinearLayoutManager linearLayoutManager;
     EmployeeSession session;
-    String dbTablekey,id;
+    String dbTablekey, id;
     String num;
 
     @Override
@@ -106,14 +105,14 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
 
         scroll = (ScrollView) findViewById(R.id.scroll);
         measure = (Button) findViewById(R.id.measure);
-        forward = (FloatingActionButton) findViewById(R.id.forward);
+        forward = (Button) findViewById(R.id.forward);
         coordinators_message = (EditText) findViewById(R.id.coordinators_message);
         startDate = (EditText) findViewById(R.id.startDate);
         endDate = (EditText) findViewById(R.id.endDate);
         quantity = (EditText) findViewById(R.id.quantity);
         description = (EditText) findViewById(R.id.description);
         rec_measurement = (RecyclerView) findViewById(R.id.rec_measurement);
-        rec_DescImages = (RecyclerView)findViewById(R.id.rec_DescImages);
+        rec_DescImages = (RecyclerView) findViewById(R.id.rec_DescImages);
         measure_and_hideme = (TextView) findViewById(R.id.measure_and_hideme);
         text = (TextView) findViewById(R.id.textView6);
         ll = (LinearLayout) findViewById(R.id.quotation_container);
@@ -140,16 +139,15 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         adapter_measurement = new measurement_adapter(measurementList, this);
         rec_measurement.setAdapter(adapter_measurement);
 
-        rec_DescImages.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
+        rec_DescImages.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         rec_DescImages.setItemAnimator(new DefaultItemAnimator());
         rec_DescImages.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.HORIZONTAL));
-        adapter_taskimages = new taskdetailDescImageAdapter(DescImages, getApplicationContext(),this);
+        adapter_taskimages = new taskdetailDescImageAdapter(DescImages, getApplicationContext(), this);
         rec_DescImages.setAdapter(adapter_taskimages);
 
         dbDescImages.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s)
-            {
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if (dataSnapshot.exists()) {
                     rec_DescImages.setVisibility(View.VISIBLE);
                     String item = dataSnapshot.getValue(String.class);
@@ -157,20 +155,24 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                     adapter_taskimages.notifyDataSetChanged();
                 }
             }
+
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
             }
+
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 String item = dataSnapshot.getKey();
                 DescImages.remove(item);
                 adapter_taskimages.notifyDataSetChanged();
             }
+
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
@@ -259,15 +261,14 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.taskdetail_menu,menu);
+        getMenuInflater().inflate(R.menu.taskdetail_menu, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.item1:
-                //TODO Phone call
                 FirebaseDatabase.getInstance().getReference().child("MeChat").child("Customer").child(id).child("phone_num").addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -291,21 +292,19 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     }
 
     private void checkChatref(final String mykey, final String otheruserkey) {
-        DatabaseReference dbChat = DBREF.child("Chats").child(mykey+otheruserkey).getRef();
+        DatabaseReference dbChat = DBREF.child("Chats").child(mykey + otheruserkey).getRef();
         dbChat.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                System.out.println("query1" + mykey+otheruserkey);
+                System.out.println("query1" + mykey + otheruserkey);
                 System.out.println("datasnap 1" + dataSnapshot.toString());
                 if (dataSnapshot.exists()) {
                     System.out.println("datasnap exists1" + dataSnapshot.toString());
-                    dbTablekey = mykey+otheruserkey;
+                    dbTablekey = mykey + otheruserkey;
                     goToChatActivity();
 
-                }
-                else
-                {
-                    checkChatref2(mykey,otheruserkey);
+                } else {
+                    checkChatref2(mykey, otheruserkey);
                 }
             }
 
@@ -316,21 +315,18 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     }
 
     private void checkChatref2(final String mykey, final String otheruserkey) {
-        final DatabaseReference dbChat = DBREF.child("Chats").child(otheruserkey+mykey).getRef();
-        dbTablekey = otheruserkey+mykey;
+        final DatabaseReference dbChat = DBREF.child("Chats").child(otheruserkey + mykey).getRef();
+        dbTablekey = otheruserkey + mykey;
         dbChat.addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists())
-                {
-                    System.out.println("query1" + otheruserkey+mykey);
+                if (dataSnapshot.exists()) {
+                    System.out.println("query1" + otheruserkey + mykey);
                     goToChatActivity();
 
 
-                }
-                else
-                {
+                } else {
 
                     DBREF.child("Users").child("Userchats").child(mykey).child(otheruserkey).setValue(dbTablekey);
                     DBREF.child("Users").child("Userchats").child(otheruserkey).child(mykey).setValue(dbTablekey);
@@ -347,16 +343,14 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         });
     }
 
-    private void goToChatActivity()
-    {
+    private void goToChatActivity() {
         Intent in = new Intent(this, ChatActivity.class);
-        in.putExtra("dbTableKey",dbTablekey);
-        in.putExtra("otheruserkey",id);
+        in.putExtra("dbTableKey", dbTablekey);
+        in.putExtra("otheruserkey", id);
         startActivity(in);
     }
 
-    private void launchLibrary()
-    {
+    private void launchLibrary() {
         dbQuotation.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -431,9 +425,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                     measurement item = dataSnapshot.getValue(measurement.class);
                     measurementList.add(item);
                     adapter_measurement.notifyDataSetChanged();
-                }
-                else
-                {
+                } else {
                     measure_and_hideme.setVisibility(View.VISIBLE);
                 }
             }
@@ -472,7 +464,8 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String note = dataSnapshot.getValue(String.class);
-                coordinators_message.setText(note);
+                if (!note.equals(""))
+                    coordinators_message.setText(note);
             }
 
             @Override
@@ -582,14 +575,14 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                 .setView(R.layout.view_image_on_click).create();
         viewSelectedImages.show();
 
-        RecyclerView bigimage = (RecyclerView)viewSelectedImages.findViewById(R.id.bigimage);
+        RecyclerView bigimage = (RecyclerView) viewSelectedImages.findViewById(R.id.bigimage);
 
-        linearLayoutManager = new LinearLayoutManager(getApplicationContext(),LinearLayoutManager.HORIZONTAL,false);
+        linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
         bigimage.setLayoutManager(linearLayoutManager);
         bigimage.setItemAnimator(new DefaultItemAnimator());
         bigimage.addItemDecoration(new DividerItemDecoration(getApplicationContext(), LinearLayoutManager.HORIZONTAL));
 
-        adapter = new bigimage_adapter(DescImages, this,this);
+        adapter = new bigimage_adapter(DescImages, this, this);
         bigimage.setAdapter(adapter);
 
         bigimage.scrollToPosition(position);

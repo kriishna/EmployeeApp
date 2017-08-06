@@ -79,6 +79,9 @@
 
         <activity android:name=".Notification.NotificationActivity" />
         <activity android:name=".MyProfile.MyProfile"></activity>
+
+        <activity android:name=".MyProfile.ContactCoordinator"/>
+        <activity android:name=".MyProfile.phonebook"></activity>
     </application>
 
 </manifest>
