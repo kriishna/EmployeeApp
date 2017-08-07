@@ -19,6 +19,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,10 +37,12 @@ import com.example.pulkit.employeeapp.adapters.bigimage_adapter;
 import com.example.pulkit.employeeapp.adapters.measurement_adapter;
 import com.example.pulkit.employeeapp.adapters.taskdetailDescImageAdapter;
 import com.example.pulkit.employeeapp.chat.ChatActivity;
+import com.example.pulkit.employeeapp.helper.MarshmallowPermissions;
 import com.example.pulkit.employeeapp.measurement.MeasureList;
 import com.example.pulkit.employeeapp.model.Quotation;
 import com.example.pulkit.employeeapp.model.Task;
 import com.example.pulkit.employeeapp.model.measurement;
+import com.example.pulkit.employeeapp.services.DownloadFileService;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
@@ -91,6 +94,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     EmployeeSession session;
     String dbTablekey, id;
     String num;
+    private MarshmallowPermissions marshmallowPermissions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +102,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         setContentView(R.layout.activity_task_detail);
 
         dbRef = DBREF;
+        marshmallowPermissions = new MarshmallowPermissions(this);
         progressDialog = new ProgressDialog(this);
         download = (ImageButton) findViewById(R.id.download);
         uploadStatus = (TextView) findViewById(R.id.uploadStatus);
@@ -250,13 +255,22 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         download.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) {
-                    checkPermission();
+                if (!marshmallowPermissions.checkPermissionForCamera()) {
+                    marshmallowPermissions.requestPermissionForExternalStorage();
+                    if (!marshmallowPermissions.checkPermissionForExternalStorage())
+                        showToast("Cannot Download because external storage permission not granted");
+                    else
+                        launchLibrary();
                 } else {
+
                     launchLibrary();
                 }
             }
         });
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -324,16 +338,11 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                 if (dataSnapshot.exists()) {
                     System.out.println("query1" + otheruserkey + mykey);
                     goToChatActivity();
-
-
                 } else {
-
                     DBREF.child("Users").child("Userchats").child(mykey).child(otheruserkey).setValue(dbTablekey);
                     DBREF.child("Users").child("Userchats").child(otheruserkey).child(mykey).setValue(dbTablekey);
                     goToChatActivity();
-
                 }
-
             }
 
             @Override
@@ -351,44 +360,19 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     }
 
     private void launchLibrary() {
-        dbQuotation.addValueEventListener(new ValueEventListener() {
+        final String[] url = new String[1];
+        dbQuotation.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    showpd("Downloading");
                     Quotation quotation = dataSnapshot.getValue(Quotation.class);
-                    File localFile = null;
-                    localFile = new File(Environment.getExternalStorageDirectory(), "Management/Quotation");
-                    // Create direcorty if not exists
-                    if (!localFile.exists()) {
-                        localFile.mkdirs();
-                    }
-
-                    File myDownloadedFile = new File(localFile, task_id + "Quotation.pdf");
-                    StorageReference storageReference = mStorageRef.child("Quotation").child(task_id);
-                    storageReference.getFile(myDownloadedFile)
-                            .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                                @Override
-                                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                    // Successfully downloaded data to local file
-                                    // ...
-                                    hidepd();
-                                    Toast.makeText(TaskDetail.this, "Successfully downloaded", Toast.LENGTH_SHORT).show();
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            // Handle failed download
-                            // ...
-                            String s = exception.toString();
-                            hidepd();
-                            Toast.makeText(TaskDetail.this, "Download Failed", Toast.LENGTH_SHORT).show();
-                        }
-
-
-                    });
+                    url[0] = quotation.getUrl();
+                    Intent serviceIntent = new Intent(getApplicationContext(), DownloadFileService.class);
+                    serviceIntent.putExtra("TaskId", task_id);
+                    serviceIntent.putExtra("url", url[0]);
+                    startService(serviceIntent);
                 } else {
-                    Toast.makeText(TaskDetail.this, "No quotation uploaded yet!!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TaskDetail.this, "No Quotation Uploaded Yet", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -405,7 +389,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
                 && ContextCompat.checkSelfPermission(TaskDetail.this,
                 Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {//Can add more as per requirement
+                != PackageManager.PERMISSION_GRANTED) {
 
             ActivityCompat.requestPermissions(TaskDetail.this,
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
@@ -495,60 +479,6 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == PICK_FILE_REQUEST) {
-                if (data == null) {
-                    //no data present
-                    return;
-                }
-
-                String selectedFilePath = "";
-                Uri selectedFileUri = data.getData();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    //                selectedFilePath = FilePath.getPath(this,selectedFileUri);
-                }
-
-                if (selectedFilePath != null && !selectedFilePath.equals("")) {
-                    StorageReference riversRef = mStorageRef.child("Quotation").child(task_id);
-
-                    showpd("Uploading");
-                    riversRef.putFile(selectedFileUri)
-                            .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                @Override
-                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                    // Get a URL to the uploaded content
-                                    Quotation quotation = new Quotation("No");
-                                    dbQuotation.setValue(quotation);
-                                    Toast.makeText(TaskDetail.this, "Successfully Uploaded", Toast.LENGTH_SHORT).show();
-                                    hidepd();
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception exception) {
-                                    Toast.makeText(TaskDetail.this, "Failed to Upload", Toast.LENGTH_SHORT).show();
-                                    hidepd();
-                                }
-                            });
-                } else {
-                    Toast.makeText(this, "Cannot upload file to server", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
-    }
-
-    void showpd(String text) {
-        progressDialog.setMessage(text);
-        progressDialog.show();
-    }
-
-    void hidepd() {
-        progressDialog.dismiss();
-    }
-
-    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case 1: {
@@ -589,7 +519,40 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     }
 
     @Override
-    public void ondownloadButtonClicked(int position) {
-        // TODO :download task image code here
+    public void ondownloadButtonClicked(final int position, final bigimage_adapter.MyViewHolder holder) {
+        if (!marshmallowPermissions.checkPermissionForExternalStorage()) {
+            marshmallowPermissions.requestPermissionForExternalStorage();
+        } else {
+            holder.progressBar.setVisibility(View.VISIBLE);
+            holder.download_taskdetail_image.setVisibility(View.GONE);
+            String url = DescImages.get(position);
+            StorageReference str = FirebaseStorage.getInstance().getReferenceFromUrl(url);
+            File rootPath = new File(Environment.getExternalStorageDirectory(), "MeChat/TaskDetailImages");
+
+            if (!rootPath.exists()) {
+                rootPath.mkdirs();
+            }
+            String uriSting = System.currentTimeMillis() + ".jpg";
+
+            final File localFile = new File(rootPath, uriSting);
+
+            str.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                    Log.e("firebase ", ";local tem file created  created " + localFile.toString());
+                    holder.download_taskdetail_image.setVisibility(View.VISIBLE);
+                    holder.progressBar.setVisibility(View.GONE);
+                    Toast.makeText(TaskDetail.this, "Image " + position + 1 + " Downloaded", Toast.LENGTH_SHORT).show();
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    Log.e("firebase ", ";local tem file not created  created " + exception.toString());
+                    holder.download_taskdetail_image.setVisibility(View.VISIBLE);
+                    holder.progressBar.setVisibility(View.GONE);
+                    Toast.makeText(TaskDetail.this, "Failed to download image " + position + 1, Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 }

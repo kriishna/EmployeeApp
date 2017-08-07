@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.helper.TouchImageView;
@@ -34,11 +35,13 @@ public class bigimage_adapter extends  RecyclerView.Adapter<bigimage_adapter.MyV
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TouchImageView img;
         public ImageButton download_taskdetail_image;
+        public ProgressBar progressBar;
 
         public MyViewHolder(View itemView) {
             super(itemView);
             img = (TouchImageView) itemView.findViewById(R.id.image);
             download_taskdetail_image = (ImageButton) itemView.findViewById(R.id.download_taskdetail_image);
+            progressBar = (ProgressBar) itemView.findViewById(R.id.progresshere);
         }
     }
 
@@ -62,16 +65,16 @@ public class bigimage_adapter extends  RecyclerView.Adapter<bigimage_adapter.MyV
     }
 
     public interface bigimage_adapterListener {
-        void ondownloadButtonClicked(int position);
+        void ondownloadButtonClicked(int position,MyViewHolder holder);
     }
 
-    private void applyClickEvents(MyViewHolder holder, final int position) {
+    private void applyClickEvents(final MyViewHolder holder, final int position) {
 
         holder.download_taskdetail_image.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View view) {
-                listener.ondownloadButtonClicked(position);
+                listener.ondownloadButtonClicked(position,holder);
             }
         });
     }

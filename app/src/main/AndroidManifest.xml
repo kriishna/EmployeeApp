@@ -73,15 +73,16 @@
         <service
             android:name=".services.UploadQuotationService"
             android:exported="false" />
-        <service
-            android:name=".services.DownloadFileService"
-            android:exported="false" />
 
         <activity android:name=".Notification.NotificationActivity" />
         <activity android:name=".MyProfile.MyProfile"></activity>
 
         <activity android:name=".MyProfile.ContactCoordinator"/>
         <activity android:name=".MyProfile.phonebook"></activity>
+
+        <service
+            android:name=".services.DownloadFileService"
+            android:exported="false" />
     </application>
 
 </manifest>
