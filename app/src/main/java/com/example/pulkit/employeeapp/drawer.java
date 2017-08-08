@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.pulkit.employeeapp.EmployeeLogin.EmployeeSession;
+import com.example.pulkit.employeeapp.MyProfile.CompletedJobs;
 import com.example.pulkit.employeeapp.MyProfile.ContactCoordinator;
 import com.example.pulkit.employeeapp.MyProfile.MyProfile;
 import com.example.pulkit.employeeapp.MyProfile.phonebook;
@@ -69,14 +70,23 @@ public class drawer extends AppCompatActivity implements NavigationView.OnNaviga
             case R.id.first:
                 Intent intent2 = new Intent(getApplicationContext(), MyProfile.class);
                 startActivity(intent2);
+                finish();
                 break;
             case R.id.second:
                 Intent intent = new Intent(getApplicationContext(), ContactCoordinator.class);
                 startActivity(intent);
+                finish();
+                break;
+            case R.id.fifth:
+                //TODO completed jobs
+                Intent intent3 = new Intent(getApplicationContext(), CompletedJobs.class);
+                startActivity(intent3);
+                finish();
                 break;
             case R.id.third:
                 Intent intent1 = new Intent(getApplicationContext(), phonebook.class);
                 startActivity(intent1);
+                finish();
                 break;
             case R.id.fourth:
                 //TODO About the firm

@@ -15,6 +15,13 @@
             android:title="Coordinators" />
     </group>
 
+    <group android:id="@+id/four">
+        <item
+            android:id="@+id/fifth"
+            android:icon="@drawable/ic_complete"
+            android:title="Completed Jobs" />
+    </group>
+
     <group android:id="@+id/three">
         <item
             android:id="@+id/third"
