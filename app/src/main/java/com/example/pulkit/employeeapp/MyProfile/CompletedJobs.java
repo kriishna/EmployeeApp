@@ -10,9 +10,6 @@ import android.support.v7.widget.RecyclerView;
 import com.example.pulkit.employeeapp.EmployeeLogin.EmployeeSession;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.adapters.completedjobs_adapter;
-import com.example.pulkit.employeeapp.adapters.coordinator_adapter;
-import com.example.pulkit.employeeapp.model.CompletedJob;
-import com.example.pulkit.employeeapp.model.Coordinator;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -25,44 +22,41 @@ import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 public class CompletedJobs extends AppCompatActivity {
 
     RecyclerView rec_completedjobs_list;
-    ArrayList<CompletedJob> completedjobs_list = new ArrayList<CompletedJob>();
+    ArrayList<String> completedjobs_list = new ArrayList<>();
     completedjobs_adapter completedjobs_adapter;
     LinearLayoutManager linearLayoutManager;
     DatabaseReference dbEmployee;
     EmployeeSession session;
-    String dbTablekey,mykey,id,num;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_completed_jobs);
 
-        rec_completedjobs_list = (RecyclerView)findViewById(R.id.coordinator_list);
+        rec_completedjobs_list = (RecyclerView) findViewById(R.id.completedJobs_list);
         session = new EmployeeSession(getApplicationContext());
 
-        completedjobs_adapter = new completedjobs_adapter(completedjobs_list,getApplicationContext());
+        completedjobs_adapter = new completedjobs_adapter(completedjobs_list, getApplicationContext());
         linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         rec_completedjobs_list.setLayoutManager(linearLayoutManager);
         rec_completedjobs_list.setItemAnimator(new DefaultItemAnimator());
         rec_completedjobs_list.addItemDecoration(new DividerItemDecoration(getApplicationContext(), LinearLayoutManager.VERTICAL));
         rec_completedjobs_list.setAdapter(completedjobs_adapter);
 
-        dbEmployee = DBREF.child("Employee").getRef();
+        dbEmployee = DBREF.child("Employee").child(session.getUsername()).child("CompletedTask").getRef();
 
         LoadData();
     }
 
-    void LoadData()
-    {
+    void LoadData() {
 
-        dbCoordinator.addChildEventListener(new ChildEventListener() {
+        dbEmployee.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                if (dataSnapshot.exists())
-                {
-                    Coordinator coordinator = dataSnapshot.getValue(Coordinator.class);
-                    coordinator_list.add(coordinator);
-                    coordinator_adapter.notifyDataSetChanged();
+                if (dataSnapshot.exists()) {
+                    String taskid = dataSnapshot.getKey();
+                    completedjobs_list.add(taskid);
+                    completedjobs_adapter.notifyDataSetChanged();
                 }
             }
 
@@ -73,6 +67,7 @@ public class CompletedJobs extends AppCompatActivity {
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
+
             }
 
             @Override
