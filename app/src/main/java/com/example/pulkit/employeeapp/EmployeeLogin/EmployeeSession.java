@@ -16,68 +16,67 @@ public class EmployeeSession {
     SharedPreferences pref;
     SharedPreferences.Editor editor;
     Context _context;
-    int mode=0;
-    String prefname="SESSION";
+    int mode = 0;
+    String prefname = "SESSION";
     private String is_loggedin = "is_loggedin";
-    private String username = "username",designation;
+    private String username = "username", designation="designation";
     private DatabaseReference dbEmp = DBREF.child("Employee").getRef();
 
-    public EmployeeSession(Context context)
-    {
-        this._context=context;
-        pref = _context.getSharedPreferences(prefname,mode);
+    public EmployeeSession(Context context) {
+        this._context = context;
+        pref = _context.getSharedPreferences(prefname, mode);
         editor = pref.edit();
     }
 
-    public void create_oldusersession(final String username_get,String designation,String name , String contact, String address)
-            {
-                editor.putString("designation",designation.toLowerCase());
-                editor.putBoolean(is_loggedin,true);
-                editor.putString(username,username_get);
-                editor.putString("name",name);
-                editor.putString("contact",contact);
-                editor.putString("address",address);
-                editor.commit();
+    public void create_oldusersession(final String username_get, String _designation, String name, String contact, String address) {
 
-            }
+   //     this.designation = designation.toLowerCase();
+        editor.putString(designation, _designation);
+        editor.putBoolean(is_loggedin, true);
+        editor.putString(username, username_get);
+        editor.putString("name", name);
+        editor.putString("contact", contact);
+        editor.putString("address", address);
+        editor.commit();
 
-    public void edit_oldusersession(String name, String contact, String address)
-    {
-        editor.putBoolean(is_loggedin,true);
-        editor.putString("name",name);
-        editor.putString("contact",contact);
-        editor.putString("address",address);
+    }
+
+    public void edit_oldusersession(String name, String contact, String address) {
+        editor.putBoolean(is_loggedin, true);
+        editor.putString("name", name);
+        editor.putString("contact", contact);
+        editor.putString("address", address);
         editor.commit();
     }
 
-    public Boolean isolduser()
-    {
-        return pref.getBoolean(is_loggedin,false);
+    public Boolean isolduser() {
+        return pref.getBoolean(is_loggedin, false);
     }
 
-    public String getUsername()
-    {
+    public String getUsername() {
 
-        return pref.getString(username,"");
+        return pref.getString(username, "");
     }
 
-    public String getDesig()
-    {
+    public String getDesig() {
 
-        return pref.getString(designation,"");
-    }
-    public String getName()
-    {
-
-        return pref.getString("name","");
+        return pref.getString(designation, "");
     }
 
-    public String getContact (){return pref.getString("contact","");}
+    public String getName() {
 
-    public String getAddress(){return pref.getString("address","");}
+        return pref.getString("name", "");
+    }
 
-    public void clearoldusersession()
-    {
+    public String getContact() {
+        return pref.getString("contact", "");
+    }
+
+    public String getAddress() {
+        return pref.getString("address", "");
+    }
+
+    public void clearoldusersession() {
         editor.clear();
         editor.commit();
     }

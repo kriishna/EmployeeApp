@@ -11,6 +11,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import com.example.pulkit.employeeapp.EmployeeApp;
 import com.example.pulkit.employeeapp.MainViews.TaskHome;
 import com.example.pulkit.employeeapp.R;
@@ -28,7 +29,7 @@ public class empLogin extends AppCompatActivity {
 
     EditText username, password;
     Button button;
-    String Username , Password;
+    String Username, Password;
     DatabaseReference database;
     EmployeeSession session;
     TextInputLayout input_email, input_password;
@@ -42,21 +43,22 @@ public class empLogin extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.emp_login);
 
-        sharedPreferences = getSharedPreferences("myFCMToken",MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences("myFCMToken", MODE_PRIVATE);
         editor = sharedPreferences.edit();
-        if(FirebaseInstanceId.getInstance().getToken()!=null)
-        {
-            editor.putString("myFCMToken",FirebaseInstanceId.getInstance().getToken());
+        if (FirebaseInstanceId.getInstance().getToken() != null) {
+            editor.putString("myFCMToken", FirebaseInstanceId.getInstance().getToken());
             editor.commit();
         }
 
         session = new EmployeeSession(getApplicationContext());
 
+        if (session.isolduser().equals(true)) {
 
-      /*  if(session.isolduser().equals(true))*/{
+            String x = session.getDesig();
+            String y = session.getUsername();
             Intent intent = new Intent(empLogin.this, TaskHome.class);
-            intent.putExtra("emp_id",session.getUsername());
-            intent.putExtra("desig",session.getDesig());
+            intent.putExtra("emp_id", y);
+            intent.putExtra("desig", x);
             startActivity(intent);
             finish();
         }
@@ -64,8 +66,8 @@ public class empLogin extends AppCompatActivity {
         username = (EditText) findViewById(R.id.editText2);
         password = (EditText) findViewById(R.id.editText3);
         button = (Button) findViewById(R.id.login);
-        input_email = (TextInputLayout)findViewById(R.id.input_emaillogin);
-        input_password = (TextInputLayout)findViewById(R.id.input_passwordlogin);
+        input_email = (TextInputLayout) findViewById(R.id.input_emaillogin);
+        input_password = (TextInputLayout) findViewById(R.id.input_passwordlogin);
         database = DBREF.child("Employee").getRef();
 
         button.setOnClickListener(new View.OnClickListener() {
@@ -89,11 +91,10 @@ public class empLogin extends AppCompatActivity {
                     }
                 }
 
-                if(!TextUtils.isEmpty(Username) && !TextUtils.isEmpty(Password)){
+                if (!TextUtils.isEmpty(Username) && !TextUtils.isEmpty(Password)) {
                     login();
-                }
-                else
-                    Toast.makeText(getBaseContext(),"Enter Complete Details", Toast.LENGTH_SHORT).show();
+                } else
+                    Toast.makeText(getBaseContext(), "Enter Complete Details", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -103,51 +104,49 @@ public class empLogin extends AppCompatActivity {
     private void login() {
         DatabaseReference db = DBREF.child("Employee").child(Username).getRef();
 
-            db.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    if(dataSnapshot.exists())
-                    {
+        db.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
 
-                        Employee employee = dataSnapshot.getValue(Employee.class);
+                    String x;
+                    Employee employee = dataSnapshot.getValue(Employee.class);
 
-                        if (!employee.getPassword().equals(Password)) {
-                            Toast.makeText(getBaseContext(), "Wrong Password", Toast.LENGTH_SHORT).show();
+                    x = employee.getDesignation();
+
+                    if (!employee.getPassword().equals(Password)) {
+                        Toast.makeText(getBaseContext(), "Wrong Password", Toast.LENGTH_SHORT).show();
+                    } else {
+                        session.create_oldusersession(Username, employee.getDesignation(), employee.getName(), employee.getPhone_num(), employee.getAddress());
+                        EmployeeApp.setOnlineStatus(Username);
+                        String myFCMToken;
+                        if (FirebaseInstanceId.getInstance().getToken() == null)
+                            myFCMToken = sharedPreferences.getString("myFCMToken", "");
+
+                        else
+                            myFCMToken = FirebaseInstanceId.getInstance().getToken();
+
+                        if (!myFCMToken.equals("")) {
+                            DBREF.child("Fcmtokens").child(Username).child("token").setValue(myFCMToken);
+                            Intent intent = new Intent(empLogin.this, TaskHome.class);
+                            intent.putExtra("emp_id", Username);
+                            intent.putExtra("desig", x);
+                            startActivity(intent);
+                            finish();
+
                         } else
-                        {
-                            session.create_oldusersession(Username,employee.getDesignation(),employee.getName(),employee.getPhone_num(),employee.getAddress());
-                            EmployeeApp.setOnlineStatus(Username);
-                            String myFCMToken;
-                            if(FirebaseInstanceId.getInstance().getToken()==null)
-                                myFCMToken =sharedPreferences.getString("myFCMToken","");
+                            Toast.makeText(empLogin.this, "You will need to clear the app data or reinstall the app to make it work properly", Toast.LENGTH_LONG).show();
 
-                            else
-                                myFCMToken = FirebaseInstanceId.getInstance().getToken();
-
-                            if(!myFCMToken.equals("")) {
-                                DBREF.child("Fcmtokens").child(Username).child("token").setValue(myFCMToken);
-                                Intent intent = new Intent(empLogin.this, TaskHome.class);
-                                intent.putExtra("emp_id",Username);
-                                intent.putExtra("desig",employee.getDesignation());
-                                startActivity(intent);
-                                finish();
-
-                            }
-                                else
-                                Toast.makeText(empLogin.this,"You will need to clear the app data or reinstall the app to make it work properly",Toast.LENGTH_LONG).show();
-
-                            }
                     }
-                    else
-                    {
-                        Toast.makeText(getBaseContext(), "Student Not Registered", Toast.LENGTH_SHORT).show();
-                    }
+                } else {
+                    Toast.makeText(getBaseContext(), "Student Not Registered", Toast.LENGTH_SHORT).show();
                 }
+            }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
-                }
-            });
+            }
+        });
     }
 }

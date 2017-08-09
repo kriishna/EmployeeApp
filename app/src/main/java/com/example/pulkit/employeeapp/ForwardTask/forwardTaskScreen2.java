@@ -55,7 +55,7 @@ public class forwardTaskScreen2 extends AppCompatActivity {
             public void onClick(View v) {
                 String deadline  = enddate.getText().toString().trim();
                 String coordnote = note.getText().toString().trim();
-                CompletedBy completedBy = new CompletedBy(empId,curdate,deadline,coordnote);
+                CompletedBy completedBy = new CompletedBy(empId,curdate,deadline,coordnote,"","");
                 DatabaseReference dbAssigned = DBREF.child("Task").child(task_id).child("AssignedTo").child(empId);
                 dbAssigned.setValue(completedBy);
 
