@@ -44,14 +44,10 @@ public class QuotaionTasks extends AppCompatActivity implements taskAdapter.Task
     String emp_id;
     int i = 0;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quotaion_tasks);
-
-
-        // id is quote id
 
         start = getIntent().getStringExtra("start");
         id = getIntent().getStringExtra("id");
@@ -69,7 +65,6 @@ public class QuotaionTasks extends AppCompatActivity implements taskAdapter.Task
 
         recycler = (RecyclerView) findViewById(R.id.recycler);
 
- //       dbTask = DBREF.child("Quotation").child(id).child("tasks").getRef();
         dbTask = DBREF.child("Employee").child(emp_id).child("AssignedTask").child(id).child("listoftasks").getRef();
 
         mAdapter = new taskAdapter(TaskList, QuotaionTasks.this, this);
@@ -78,7 +73,6 @@ public class QuotaionTasks extends AppCompatActivity implements taskAdapter.Task
         recycler.setItemAnimator(new DefaultItemAnimator());
         recycler.addItemDecoration(new DividerItemDecoration(QuotaionTasks.this, LinearLayoutManager.VERTICAL));
         recycler.setAdapter(mAdapter);
-
 
         new Handler().postDelayed(new Runnable() {
             public void run() {
