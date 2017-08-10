@@ -1,6 +1,5 @@
 package com.example.pulkit.employeeapp.chat;
 
-
 import android.content.Intent;
 import android.content.res.TypedArray;
 import android.graphics.Color;
@@ -8,8 +7,10 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+
+import com.example.pulkit.employeeapp.helper.DividerItemDecoration;
+
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -68,7 +69,6 @@ public class chatFrag extends Fragment implements chatListAdapter.chatListAdapte
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-//      setupUI(view.findViewById(R.id.relcity));
         fmm = getFragmentManager();
 
         EmployeeSession coordinatorSession = new EmployeeSession(getActivity());

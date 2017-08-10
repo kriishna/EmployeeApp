@@ -2,8 +2,9 @@ package com.example.pulkit.employeeapp.MyProfile;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import com.example.pulkit.employeeapp.helper.DividerItemDecoration;
+
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
