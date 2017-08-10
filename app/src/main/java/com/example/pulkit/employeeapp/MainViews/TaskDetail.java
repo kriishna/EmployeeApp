@@ -1,13 +1,11 @@
 package com.example.pulkit.employeeapp.MainViews;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -39,6 +37,8 @@ import com.example.pulkit.employeeapp.adapters.taskdetailDescImageAdapter;
 import com.example.pulkit.employeeapp.chat.ChatActivity;
 import com.example.pulkit.employeeapp.helper.MarshmallowPermissions;
 import com.example.pulkit.employeeapp.measurement.MeasureList;
+import com.example.pulkit.employeeapp.model.CompletedBy;
+import com.example.pulkit.employeeapp.model.CompletedJob;
 import com.example.pulkit.employeeapp.model.Quotation;
 import com.example.pulkit.employeeapp.model.Task;
 import com.example.pulkit.employeeapp.model.measurement;
@@ -54,9 +54,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-
-import org.w3c.dom.Text;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -64,6 +61,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
+import static com.example.pulkit.employeeapp.EmployeeApp.sendNotif;
 
 public class TaskDetail extends AppCompatActivity implements taskdetailDescImageAdapter.ImageAdapterListener, bigimage_adapter.bigimage_adapterListener {
 
@@ -74,7 +72,6 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     private Task task;
     private String customername, mykey;
     EditText startDate, endDate, quantity, description, coordinators_message;
-    private static final int PICK_FILE_REQUEST = 1;
     RecyclerView rec_measurement, rec_DescImages;
     Button forward;
     ArrayList<measurement> measurementList = new ArrayList<>();
@@ -86,10 +83,9 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     TextView text, measure_and_hideme;
     Button measure;
     ScrollView scroll;
-    private StorageReference mStorageRef = FirebaseStorage.getInstance().getReference();
     taskdetailDescImageAdapter adapter_taskimages;
     bigimage_adapter adapter;
-    private AlertDialog viewSelectedImages;
+    private AlertDialog viewSelectedImages, confirmation;
     ArrayList<String> DescImages = new ArrayList<>();
     LinearLayoutManager linearLayoutManager;
     EmployeeSession session;
@@ -218,39 +214,72 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
 
             }
         });
+
         forward.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                final AlertDialog.Builder builder = new AlertDialog.Builder(TaskDetail.this);
-                builder.setTitle("Confirmation");
-                builder.setMessage("Are you sure you want to return task to coordinator?");
-                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        DatabaseReference db, databaseReference;
+                confirmation = new AlertDialog.Builder(TaskDetail.this)
+                        .setView(R.layout.confirmation_layout).create();
+                confirmation.show();
 
-                        db = DBREF.child("Employee").child(emp_id).child("AssignedTask").child(task_id);
-                        db.setValue("done");
+                final EditText employeeNote = (EditText) confirmation.findViewById(R.id.employeeNote);
+                Button okcompleted = (Button) confirmation.findViewById(R.id.okcompleted);
+                Button okcanceled = (Button) confirmation.findViewById(R.id.okcanceled);
 
-                        databaseReference = DBREF.child("Task").child(task_id);
-                        databaseReference.child("AssignedTo").child(emp_id).child("datecompleted")
-                                .setValue(new SimpleDateFormat("dd/MM/yyyy")
-                                        .format(new Date()))
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Toast.makeText(TaskDetail.this, "Task Returned", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                    }
-                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                okcanceled.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        builder.create().dismiss();
+                    public void onClick(View v) {
+                        confirmation.dismiss();
                     }
                 });
-                builder.create().show();
+
+                okcompleted.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final String employeesnote = employeeNote.getText().toString().trim();
+
+                        final DatabaseReference db, databaseReference;
+
+                        DBREF.child("Employee").child(emp_id).child("CompletedTask").child(task_id).setValue("done");
+                        db = DBREF.child("Employee").child(emp_id).child("AssignedTask").child(task_id);
+                        db.removeValue();
+
+                        databaseReference = DBREF.child("Task").child(task_id).child("AssignedTo").child(emp_id);
+
+                        databaseReference.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                if (dataSnapshot.exists()) {
+                                    CompletedBy completedBy = dataSnapshot.getValue(CompletedBy.class);
+                                    CompletedJob completedJob = new CompletedJob();
+                                    completedJob.setEmpId(completedBy.getEmpId());
+                                    completedJob.setAssignedByName(completedBy.getAssignedByName());
+                                    completedJob.setAssignedByUsername(completedBy.getAssignedByUsername());
+                                    completedJob.setCoordinatorNote(completedBy.getNote());
+                                    completedJob.setDateassigned(completedBy.getDateassigned());
+                                    completedJob.setDatecompleted(completedBy.getDatecompleted());
+                                    completedJob.setEmpployeeNote(employeesnote);
+
+                                    databaseReference.removeValue();
+                                    DBREF.child("Task").child(task_id).child("CompletedBy").child(emp_id).setValue(completedJob);
+
+                                    String contentforme = "You completed " + task.getName();
+                                    sendNotif(mykey, mykey, "completedJob", contentforme, task_id);
+                                    String contentforother = "Employee " + session.getName() + " completed " + task.getName();
+                                    sendNotif(mykey, completedJob.getAssignedByUsername(), "completedJob", contentforother, task_id);
+                                    Toast.makeText(TaskDetail.this, contentforme, Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+                        confirmation.dismiss();
+                    }
+                });
             }
         });
         download.setOnClickListener(new View.OnClickListener() {
@@ -448,9 +477,11 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         dbAssigned.child(session.getUsername()).child("note").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                String note = dataSnapshot.getValue(String.class);
-                if (!note.equals(""))
-                    coordinators_message.setText(note);
+                if (dataSnapshot.exists()) {
+                    String note = dataSnapshot.getValue(String.class);
+                    if (!note.equals(""))
+                        coordinators_message.setText(note);
+                }
             }
 
             @Override

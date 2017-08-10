@@ -25,12 +25,12 @@ import java.util.List;
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 import static java.security.AccessController.getContext;
 
-public class NotificationActivity extends AppCompatActivity implements notification_adapter.NotificationAdapterListener{
+public class NotificationActivity extends AppCompatActivity {
 
     RecyclerView recview;
     notification_adapter adapter;
     List<Notif> list = new ArrayList<>();
-    Notif notif  = new Notif();
+    Notif notif = new Notif();
     String Username;
     EmployeeSession session;
 
@@ -47,7 +47,7 @@ public class NotificationActivity extends AppCompatActivity implements notificat
         recview.setItemAnimator(new DefaultItemAnimator());
         recview.addItemDecoration(new DividerItemDecoration(getApplicationContext(), LinearLayoutManager.VERTICAL));
 
-        adapter = new notification_adapter(list, getApplicationContext(),this);
+        adapter = new notification_adapter(list, getApplicationContext());
         recview.setAdapter(adapter);
 
         preparelist();
@@ -60,13 +60,11 @@ public class NotificationActivity extends AppCompatActivity implements notificat
         finish();
     }
 
-    private void preparelist()
-    {
+    private void preparelist() {
         final DatabaseReference db = DBREF.child("Notification").child(Username).getRef();
         db.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s)
-            {
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if (dataSnapshot.exists()) {
                     notif = dataSnapshot.getValue(Notif.class);
                     list.add(notif);
@@ -96,12 +94,4 @@ public class NotificationActivity extends AppCompatActivity implements notificat
         });
     }
 
-    @Override
-    public void onNotificationRowClicked(int position) {
-
-        Intent intent = new Intent(getApplicationContext(),TaskDetail.class);
-        Notif notif = list.get(position);
-        intent.putExtra("task_id", notif.getTaskId());
-        startActivity(intent);
-    }
 }

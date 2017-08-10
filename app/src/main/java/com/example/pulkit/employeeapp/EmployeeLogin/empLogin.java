@@ -36,7 +36,6 @@ public class empLogin extends AppCompatActivity {
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -53,7 +52,6 @@ public class empLogin extends AppCompatActivity {
         session = new EmployeeSession(getApplicationContext());
 
         if (session.isolduser().equals(true)) {
-
             String x = session.getDesig();
             String y = session.getUsername();
             Intent intent = new Intent(empLogin.this, TaskHome.class);
