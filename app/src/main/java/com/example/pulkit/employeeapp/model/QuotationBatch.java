@@ -2,18 +2,31 @@ package com.example.pulkit.employeeapp.model;
 
 public class QuotationBatch {
 
-    String endDate, startDate, note, id;
+    String endDate;
+    String startDate;
+    String coordnote;
+    String id;
+    String custName;
     private int color = -1;
 
     public QuotationBatch() {
     }
 
-    public QuotationBatch(String id, String note, String startDate, String endDate, int color) {
+    public QuotationBatch(String id, String coordnote, String startDate, String endDate, String custName, int color) {
         this.endDate = endDate;
         this.id = id;
-        this.note = note;
+        this.coordnote = coordnote;
         this.startDate = startDate;
+        this.custName = custName;
         this.color = color;
+    }
+
+    public String getCustName() {
+        return custName;
+    }
+
+    public void setCustName(String custName) {
+        this.custName = custName;
     }
 
     public String getEndDate() {
@@ -33,11 +46,11 @@ public class QuotationBatch {
     }
 
     public String getNote() {
-        return note;
+        return coordnote;
     }
 
-    public void setNote(String note) {
-        this.note = note;
+    public void setNote(String coordnote) {
+        this.coordnote = coordnote;
     }
 
     public String getStartDate() {

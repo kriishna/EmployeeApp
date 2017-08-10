@@ -52,9 +52,11 @@ public class empLogin extends AppCompatActivity {
         session = new EmployeeSession(getApplicationContext());
 
         if (session.isolduser().equals(true)) {
+            String x = session.getDesig();
+            String y = session.getUsername();
             Intent intent = new Intent(empLogin.this, TaskHome.class);
-            intent.putExtra("emp_id", session.getUsername());
-            intent.putExtra("desig", session.getDesig());
+            intent.putExtra("emp_id", y);
+            intent.putExtra("desig", x);
             startActivity(intent);
             finish();
         }
@@ -105,7 +107,10 @@ public class empLogin extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
 
+                    String x;
                     Employee employee = dataSnapshot.getValue(Employee.class);
+
+                    x = employee.getDesignation();
 
                     if (!employee.getPassword().equals(Password)) {
                         Toast.makeText(getBaseContext(), "Wrong Password", Toast.LENGTH_SHORT).show();
@@ -123,7 +128,7 @@ public class empLogin extends AppCompatActivity {
                             DBREF.child("Fcmtokens").child(Username).child("token").setValue(myFCMToken);
                             Intent intent = new Intent(empLogin.this, TaskHome.class);
                             intent.putExtra("emp_id", Username);
-                            intent.putExtra("desig", employee.getDesignation());
+                            intent.putExtra("desig", x);
                             startActivity(intent);
                             finish();
 

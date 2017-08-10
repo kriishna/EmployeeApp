@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.widget.EditText;
 
 import com.example.pulkit.employeeapp.MainViews.TaskDetail;
+import com.example.pulkit.employeeapp.MainViews.TaskHome;
 import com.example.pulkit.employeeapp.MainViews.taskFrag;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.adapters.taskAdapter;
@@ -43,6 +44,7 @@ public class QuotaionTasks extends AppCompatActivity implements taskAdapter.Task
     ProgressDialog pDialog;
     ChildEventListener ch;
     ValueEventListener vl;
+    String emp_id;
     int i = 0;
 
 
@@ -51,10 +53,14 @@ public class QuotaionTasks extends AppCompatActivity implements taskAdapter.Task
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quotaion_tasks);
 
+
+        // id is quote id
+
         start = getIntent().getStringExtra("start");
         id = getIntent().getStringExtra("id");
         end = getIntent().getStringExtra("end");
         note = getIntent().getStringExtra("note");
+        emp_id = TaskHome.emp_id;
 
         start_edit = (EditText) findViewById(R.id.start_edit);
         end_edit = (EditText) findViewById(R.id.end_edit);
@@ -66,7 +72,8 @@ public class QuotaionTasks extends AppCompatActivity implements taskAdapter.Task
 
         recycler = (RecyclerView) findViewById(R.id.recycler);
 
-        dbTask = DBREF.child("Quotation").child(id).child("tasks").getRef();
+ //       dbTask = DBREF.child("Quotation").child(id).child("tasks").getRef();
+        dbTask = DBREF.child("Employee").child(emp_id).child("AssignedTask").child(id).child("listoftasks").getRef();
 
         mAdapter = new taskAdapter(TaskList, QuotaionTasks.this, this);
         linearLayoutManager = new LinearLayoutManager(QuotaionTasks.this);
@@ -82,6 +89,9 @@ public class QuotaionTasks extends AppCompatActivity implements taskAdapter.Task
                     pDialog.dismiss();
             }
         }, 2000);
+
+
+        new net().execute();
 
     }
 
@@ -172,24 +182,16 @@ public class QuotaionTasks extends AppCompatActivity implements taskAdapter.Task
         }
     }
 
-
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onDestroy() {
+        super.onDestroy();
 
-        db.removeEventListener(vl);
-        dbTask.removeEventListener(ch);
+        if(vl!=null)
+            db.removeEventListener(vl);
+        if(ch!=null)
+            dbTask.removeEventListener(ch);
+
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
 
-
-        i = 0;
-        list.clear();
-        mAdapter.notifyDataSetChanged();
-        new net().execute();
-
-    }
 }

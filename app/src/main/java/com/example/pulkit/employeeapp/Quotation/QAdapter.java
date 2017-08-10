@@ -61,15 +61,16 @@ public class QAdapter extends RecyclerView.Adapter<QAdapter.MyViewHolder> {
     @Override
     public void onBindViewHolder(final QAdapter.MyViewHolder holder, int position) {
         QuotationBatch batch = list.get(position);
-        String iconText = batch.getId();
+        String iconText = batch.getCustName();
 
-        holder.icon_text.setText(iconText.charAt(0) + "");
+        holder.icon_text.setText((iconText.charAt(0) + "").toUpperCase());
         holder.imgProfile.setImageResource(R.drawable.bg_circle);
         holder.imgProfile.setColorFilter(batch.getColor());
         holder.timestamp.setText(batch.getStartDate());
-        holder.taskname.setText(iconText);
-        holder.customername.setText("");
+        holder.taskname.setText(batch.getId().substring(5));
+        holder.customername.setText(iconText);
 
+        /*
         DatabaseReference dbCustomerName = DBREF.child("Customer").child(batch.getId()).getRef();
         dbCustomerName.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -83,6 +84,8 @@ public class QAdapter extends RecyclerView.Adapter<QAdapter.MyViewHolder> {
 
             }
         });
+
+        */
         applyClickEvents(holder, position);
 
     }

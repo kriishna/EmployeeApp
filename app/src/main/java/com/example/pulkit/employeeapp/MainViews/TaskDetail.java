@@ -67,7 +67,8 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
 
     DatabaseReference dbRef, dbTask, dbCompleted, dbAssigned, dbMeasurement, dbDescImages;
     ImageButton download;
-    public static String task_id, emp_id, desig;
+    public static String task_id;
+    public String emp_id,desig;
     private Task task;
     private String customername, mykey;
     EditText startDate, endDate, quantity, description, coordinators_message;

@@ -52,8 +52,7 @@ public class MeasureList extends AppCompatActivity {
 
         task_id = TaskDetail.task_id;
 
-        dbRef = DBREF
-                .child("Task").child(task_id).child("measurement").getRef();
+        dbRef = DBREF.child("Task").child(task_id).child("measurement").getRef();
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
