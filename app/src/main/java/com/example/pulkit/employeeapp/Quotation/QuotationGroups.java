@@ -33,7 +33,7 @@ import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 public class QuotationGroups extends Fragment implements QAdapter.QAdapterListener {
 
     RecyclerView recycler;
-    DatabaseReference dbTask, db;
+    DatabaseReference dbTask;
     LinearLayoutManager linearLayoutManager;
     private List<QuotationBatch> list = new ArrayList<>();
     private RecyclerView.Adapter mAdapter;
@@ -50,14 +50,9 @@ public class QuotationGroups extends Fragment implements QAdapter.QAdapterListen
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.quotationfrag, container, false);
 
-
         recycler = (RecyclerView) rootView.findViewById(R.id.recycler);
 
-        //   dbTask = DBREF.child("Quotation").getRef();
-
-
         emp_id = TaskHome.emp_id;
-
 
         dbTask = DBREF.child("Employee").child(emp_id).child("AssignedTask").getRef();
 
@@ -68,7 +63,6 @@ public class QuotationGroups extends Fragment implements QAdapter.QAdapterListen
         recycler.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
         recycler.setAdapter(mAdapter);
 
-
         new Handler().postDelayed(new Runnable() {
             public void run() {
                 if (pDialog.isShowing())
@@ -78,7 +72,6 @@ public class QuotationGroups extends Fragment implements QAdapter.QAdapterListen
 
         return rootView;
     }
-
 
     @Override
     public void onTaskRowClicked(int position) {
@@ -119,8 +112,6 @@ public class QuotationGroups extends Fragment implements QAdapter.QAdapterListen
 
                     if (pDialog.isShowing())
                         pDialog.dismiss();
-
-
                 }
 
                 @Override
@@ -147,7 +138,6 @@ public class QuotationGroups extends Fragment implements QAdapter.QAdapterListen
 
         }
     }
-
 
     @Override
     public void onPause() {
