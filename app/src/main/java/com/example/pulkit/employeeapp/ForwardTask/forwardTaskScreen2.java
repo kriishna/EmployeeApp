@@ -79,6 +79,5 @@ public class forwardTaskScreen2 extends AppCompatActivity {
         intent.putExtra("task_id",task_id);
         startActivity(intent);
         finish();
-
     }
 }

@@ -51,7 +51,7 @@ public class forwardTask extends AppCompatActivity {
 
 
         db = DBREF.child("Employee").child(emp_id).child("AssignedTask").child(task_id);
-        db.setValue("done");
+        db.removeValue();
 
         databaseReference = DBREF.child("Task").child(task_id);
         databaseReference.child("AssignedTo").child(emp_id).child("datecompleted").setValue(new SimpleDateFormat("dd/MM/yyyy").format(new Date()));
@@ -68,5 +68,6 @@ public class forwardTask extends AppCompatActivity {
         intent.putExtra("task_id",task_id);
         startActivity(intent);
         finish();
+
     }
 }
