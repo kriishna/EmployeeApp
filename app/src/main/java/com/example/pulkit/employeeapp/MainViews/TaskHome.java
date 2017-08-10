@@ -1,5 +1,7 @@
 package com.example.pulkit.employeeapp.MainViews;
 
+import android.content.Intent;
+import android.location.LocationManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,6 +17,7 @@ import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.chat.chatFrag;
 import com.example.pulkit.employeeapp.drawer;
 import com.example.pulkit.employeeapp.helper.MarshmallowPermissions;
+import com.example.pulkit.employeeapp.services.LocServ;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,9 +42,7 @@ public class TaskHome extends drawer {
             marshmallowPermissions.requestPermissionForCamera();
         if (!marshmallowPermissions.checkPermissionForExternalStorage())
             marshmallowPermissions.requestPermissionForExternalStorage();
-        if (!marshmallowPermissions.checkPermissionForLocations())
-            marshmallowPermissions.requestPermissionForLocations();
-
+        checkForLoc();
         session = new EmployeeSession(getApplicationContext());
         if (getIntent().hasExtra("emp_id")) {
             emp_id = getIntent().getStringExtra("emp_id");
@@ -94,4 +95,20 @@ public class TaskHome extends drawer {
             return mFragmentTitleList.get(position);
         }
     }
+    private void checkForLoc() {
+        if(!marshmallowPermissions.checkPermissionForLocations()){
+            marshmallowPermissions.requestPermissionForLocations();
+        }
+        if(marshmallowPermissions.checkPermissionForLocations())
+        {
+            final LocationManager manager = (LocationManager) getSystemService( this.LOCATION_SERVICE );
+            if(manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)||manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+            {
+                Intent in = new Intent(this,LocServ.class);
+                startService(in);
+            }
+
+        }
+    }
+
 }

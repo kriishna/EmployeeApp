@@ -1,8 +1,6 @@
 package com.example.pulkit.employeeapp;
 
-import com.example.pulkit.employeeapp.CheckInternetConnectivity.NetWatcher;
 import com.example.pulkit.employeeapp.EmployeeLogin.EmployeeSession;
-import com.example.pulkit.employeeapp.model.Employee;
 import com.example.pulkit.employeeapp.model.Notif;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.google.firebase.FirebaseApp;
@@ -21,6 +19,7 @@ public class EmployeeApp extends android.support.multidex.MultiDexApplication {
     public static DatabaseReference DBREF;
     private EmployeeSession session;
     public static SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy hh:mm aa");
+    public static String AppName = "MeChat";
 
     @Override
     public void onCreate() {
@@ -75,9 +74,6 @@ public class EmployeeApp extends android.support.multidex.MultiDexApplication {
             });
         }
 
-    }
-    public void setConnectivityListener(NetWatcher.ConnectivityReceiverListener listener) {
-        NetWatcher.connectivityReceiverListener = listener;
     }
     public static void sendNotif(final String senderId, final String receiverId, final String type, final String content, final String taskId)
     {

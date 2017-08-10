@@ -9,6 +9,8 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <uses-feature android:name="android.hardware.camera" />
 
@@ -21,14 +23,14 @@
         android:theme="@style/AppTheme">
         <receiver android:name=".CheckInternetConnectivity.NetWatcher">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.PACKAGE_FIRST_LAUNCH" />
-                <action android:name="android.intent.action.REBOOT" />
+                    <action android:name="android.intent.action.REBOOT" />
+                <action android:name="android.location.PROVIDERS_CHANGED" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
-
+        <action android:name="android.location.PROVIDERS_CHANGED" />
+        <category android:name="android.intent.category.DEFAULT" />
         <activity
             android:name=".MainViews.TaskHome"
             android:screenOrientation="portrait"
@@ -53,7 +55,7 @@
         <activity
             android:name=".Quotation.QuotaionTasks"
             android:windowSoftInputMode="stateHidden" />
-
+<service android:name=".services.LocServ"/>
         <service android:name=".services.MyFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
@@ -83,8 +85,9 @@
         <service
             android:name=".services.DownloadFileService"
             android:exported="false" />
+        <receiver android:name=".BroadcastReceivers.AlarmReceiver"
+            android:enabled="true"/>
 
         <activity android:name=".MyProfile.CompletedJobs"></activity>
     </application>
-
 </manifest>
