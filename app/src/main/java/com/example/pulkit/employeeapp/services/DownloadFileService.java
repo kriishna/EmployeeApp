@@ -1,133 +1,144 @@
 package com.example.pulkit.employeeapp.services;
 
+import android.app.IntentService;
 import android.app.NotificationManager;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Binder;
+import android.graphics.BitmapFactory;
+import android.media.RingtoneManager;
 import android.os.Environment;
-import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.pulkit.employeeapp.model.Quotation;
+import com.example.pulkit.employeeapp.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 
-public class DownloadFileService extends Service {
-    private static String LOG_TAG = "UploadFileService";
-    private IBinder mBinder = new MyBinder();
-    SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy hh:mm aa");
-    StorageReference mStorageRef = FirebaseStorage.getInstance().getReference();
+public class DownloadFileService extends IntentService {
+
+    String TaskId;
+    String url;
+    private NotificationManager notificationManager;
+    private NotificationCompat.Builder mBuilder;
+
+    public DownloadFileService() {
+        super("Upload");
+    }
 
 
     @Override
-    public void onCreate() {
-        super.onCreate();
-        Log.v(LOG_TAG, "in onCreate");
-        Toast.makeText(getApplicationContext(),"Service Started",Toast.LENGTH_LONG).show();
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        int icon = R.mipmap.ic_download;
+        mBuilder = new NotificationCompat.Builder(
+                getApplicationContext());
+        mBuilder.setSmallIcon(icon)
+                .setLargeIcon(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.mipmap.ic_download))
+                .setContentTitle(getString(R.string.app_name))
+                .setOngoing(true)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .setColor(getApplicationContext().getResources().getColor(R.color.white))
+                .setContentText("Downloading Quotation...");
+        synchronized (this) {
+            notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.notify(0, mBuilder.build());
+        }
+        return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
-        Log.v(LOG_TAG, "in onBind");
-        return mBinder;
-    }
+    protected void onHandleIntent(Intent intent) {
+        if (intent != null) {
 
-    @Override
-    public void onRebind(Intent intent) {
-        Log.v(LOG_TAG, "in onRebind");
-        super.onRebind(intent);
-    }
-
-    @Override
-    public boolean onUnbind(Intent intent) {
-        Log.v(LOG_TAG, "in onUnbind");
-        return true;
+            TaskId = intent.getStringExtra("TaskId");
+            url = intent.getStringExtra("url");
+            downloadFile(url, TaskId);
+        }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.v(LOG_TAG, "in onDestroy");
     }
 
+    public void downloadFile(final String url, final String task_id) {
 
-    public class MyBinder extends Binder {
-        public DownloadFileService getService() {
-            return DownloadFileService.this;
+        String h = url;
+        StorageReference mStorageRef = FirebaseStorage.getInstance().getReferenceFromUrl(url);
+        File rootPath = new File(Environment.getExternalStorageDirectory(), "MeChat/Images");
+        if (!rootPath.exists()) {
+            rootPath.mkdirs();
         }
-    }
+        String uriSting = System.currentTimeMillis() + ".jpg";
 
-    public void downloadFile(final DatabaseReference dbQuotation, final String task_id) {
-        dbQuotation.addListenerForSingleValueEvent(new ValueEventListener() {
+        final File localFile = new File(rootPath, uriSting);
+
+        mStorageRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    Quotation quotation = dataSnapshot.getValue(Quotation.class);
-                    File localFile = null;
-                    localFile = new File(Environment.getExternalStorageDirectory(), "Management/Quotation");
-                    // Create direcorty if not exists
-                    if (!localFile.exists()) {
-                        localFile.mkdirs();
-                    }
+            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                Log.e("firebase ", ";local tem file created  created " + localFile.toString());
+                Toast.makeText(DownloadFileService.this, "Downloaded Quotation", Toast.LENGTH_SHORT).show();
+                updateNotification("Succesfully Downloaded");
+                stopSelf();
 
-                    File myDownloadedFile = new File(localFile, task_id + "Quotation.pdf");
-                    StorageReference storageReference = mStorageRef.child("Quotation").child(task_id);
-                    storageReference.getFile(myDownloadedFile)
-                            .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                                @Override
-                                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                        }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Toast.makeText(DownloadFileService.this, "Download Failed", Toast.LENGTH_SHORT).show();
+                updateNotification("Download failed");
+                stopSelf();
+                Log.e("firebase ", ";local tem file not created  created " + exception.toString());
+            }
+        }).addOnProgressListener(new OnProgressListener<FileDownloadTask.TaskSnapshot>() {
+            @Override
+            public void onProgress(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                double fprogress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                long bytes = taskSnapshot.getBytesTransferred();
 
+                String progress = String.format("%.2f", fprogress);
+                int constant = 1000;
+                if (bytes % constant == 0) {
+                    android.support.v4.app.NotificationCompat.Builder mBuilder =
+                            new NotificationCompat.Builder(getApplicationContext())
+                                    .setSmallIcon(android.R.drawable.stat_sys_download)
+                                    .setContentTitle("Downloading " + task_id + "Quotation.pdf")
+                                    .setContentText(" " + progress + "% completed");
 
-                    }).addOnProgressListener(new OnProgressListener<FileDownloadTask.TaskSnapshot>() {
-                        @Override
-                        public void onProgress(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                            double fprogress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
-                            long bytes = taskSnapshot.getBytesTransferred();
+                    NotificationManager mNotificationManager =
+                            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-                            String progress = String.format("%.2f", fprogress);
-                            int constant = 1000;
-                            if(bytes%constant == 0)
-                            {
-                                android.support.v4.app.NotificationCompat.Builder mBuilder =
-                                        new NotificationCompat.Builder(getApplicationContext())
-                                                .setSmallIcon(android.R.drawable.stat_sys_download)
-                                                .setContentTitle("Downloading " + task_id + "Quotation.pdf")
-                                                .setContentText(" " + progress + "% completed" );
-
-                                NotificationManager mNotificationManager =
-                                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-                                mNotificationManager.notify(100, mBuilder.build());
-                            }
-                        }
-                    });
+                    mNotificationManager.notify(100, mBuilder.build());
                 }
             }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
         });
+    }
+
+    private void updateNotification(String information) {
+        notificationManager.cancel(0);
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
+                getApplicationContext());
+        int icon = R.mipmap.ic_launcher;
+        mBuilder.setSmallIcon(icon)
+                .setLargeIcon(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.mipmap.ic_launcher))
+                .setContentTitle(getString(R.string.app_name))
+                .setOngoing(false)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .setColor(getApplicationContext().getResources().getColor(R.color.white))
+                .setContentText(information)
+                .setAutoCancel(true)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(information));
+
+        synchronized (this) {
+            notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.notify(0, mBuilder.build());
+        }
     }
 }

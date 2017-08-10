@@ -70,7 +70,7 @@ public class MyProfile extends AppCompatActivity {
                 Button sub;
                 customerEditDetails = new AlertDialog.Builder(this)
                         .setTitle("Edit Profile")
-                        .setView(R.layout.edit_myself).setIcon(R.mipmap.ic_edit_icon)
+                        .setView(R.layout.edit_myself).setIcon(R.mipmap.ic_add)
                         .create();
                 customerEditDetails.show();
 

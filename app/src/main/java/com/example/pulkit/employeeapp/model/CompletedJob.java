@@ -8,12 +8,31 @@ public class CompletedJob {
     private String empId;
     private String dateassigned;
     private String datecompleted;
+    private String assignedByUsername,assignedByName;
     private String coordinatorNote,empployeeNote;
 
-    public CompletedJob(String empId, String dateassigned, String datecompleted, String coordinatorNote, String empployeeNote) {
+    public String getAssignedByUsername() {
+        return assignedByUsername;
+    }
+
+    public void setAssignedByUsername(String assignedByUsername) {
+        this.assignedByUsername = assignedByUsername;
+    }
+
+    public String getAssignedByName() {
+        return assignedByName;
+    }
+
+    public void setAssignedByName(String assignedByName) {
+        this.assignedByName = assignedByName;
+    }
+
+    public CompletedJob(String empId, String dateassigned, String datecompleted, String assignedByUsername, String assignedByName, String coordinatorNote, String empployeeNote) {
         this.empId = empId;
         this.dateassigned = dateassigned;
         this.datecompleted = datecompleted;
+        this.assignedByUsername = assignedByUsername;
+        this.assignedByName = assignedByName;
         this.coordinatorNote = coordinatorNote;
         this.empployeeNote = empployeeNote;
     }

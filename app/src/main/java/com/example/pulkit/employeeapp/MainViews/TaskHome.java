@@ -9,27 +9,23 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.WindowManager;
+import android.widget.FrameLayout;
 
 import com.example.pulkit.employeeapp.EmployeeLogin.EmployeeSession;
-import com.example.pulkit.employeeapp.MyProfile.MyProfile;
-import com.example.pulkit.employeeapp.Notification.NotificationActivity;
 import com.example.pulkit.employeeapp.Quotation.QuotationGroups;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.chat.chatFrag;
+import com.example.pulkit.employeeapp.drawer;
 import com.example.pulkit.employeeapp.helper.MarshmallowPermissions;
 import com.example.pulkit.employeeapp.services.LocServ;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TaskHome extends AppCompatActivity {
+public class TaskHome extends drawer {
     private TabLayout tabLayout;
     private ViewPager viewPager;
-    public static String emp_id,desig;
+    public static String emp_id, desig;
     EmployeeSession session;
     private MarshmallowPermissions marshmallowPermissions;
 
@@ -37,11 +33,14 @@ public class TaskHome extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_task_home);
+
+        FrameLayout frame = (FrameLayout) findViewById(R.id.frame);
+        getLayoutInflater().inflate(R.layout.activity_task_home, frame);
+
         marshmallowPermissions = new MarshmallowPermissions(this);
-        if(!marshmallowPermissions.checkPermissionForCamera())
+        if (!marshmallowPermissions.checkPermissionForCamera())
             marshmallowPermissions.requestPermissionForCamera();
-        if(!marshmallowPermissions.checkPermissionForExternalStorage())
+        if (!marshmallowPermissions.checkPermissionForExternalStorage())
             marshmallowPermissions.requestPermissionForExternalStorage();
         checkForLoc();
         session = new EmployeeSession(getApplicationContext());
@@ -58,29 +57,9 @@ public class TaskHome extends AppCompatActivity {
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.tabsmenu,menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.notif:
-                Intent intent = new Intent(getApplicationContext(), NotificationActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.profile:
-                Intent intent2 = new Intent(getApplicationContext(), MyProfile.class);
-                startActivity(intent2);
-                break;
-        }
-        return true;
-    }
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        if(desig.toLowerCase().equals("quotation"))
+        if (desig.toLowerCase().equals("quotation"))
             adapter.addFragment(new QuotationGroups(), "Groups");
         else
             adapter.addFragment(new taskFrag(), "Tasks");

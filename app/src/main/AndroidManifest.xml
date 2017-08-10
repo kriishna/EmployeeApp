@@ -62,6 +62,10 @@
             </intent-filter>
         </service>
 
+        <activity
+            android:name=".drawer"
+            android:label="@string/title_activity_drawer1"
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <service android:name=".services.MyFirebaseInstanceIDService">
             <intent-filter>
@@ -75,11 +79,15 @@
 
         <activity android:name=".Notification.NotificationActivity" />
         <activity android:name=".MyProfile.MyProfile" />
+        <activity android:name=".MyProfile.ContactCoordinator" />
+        <activity android:name=".MyProfile.phonebook" />
 
         <service
             android:name=".services.DownloadFileService"
             android:exported="false" />
         <receiver android:name=".BroadcastReceivers.AlarmReceiver"
             android:enabled="true"/>
+
+        <activity android:name=".MyProfile.CompletedJobs"></activity>
     </application>
 </manifest>
