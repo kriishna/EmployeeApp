@@ -60,7 +60,6 @@ public class drawer extends AppCompatActivity implements NavigationView.OnNaviga
         }
     }
 
-
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -76,7 +75,6 @@ public class drawer extends AppCompatActivity implements NavigationView.OnNaviga
                 startActivity(intent);
                 break;
             case R.id.fifth:
-                //TODO completed jobs
                 Intent intent3 = new Intent(getApplicationContext(), CompletedJobs.class);
                 startActivity(intent3);
                 break;
