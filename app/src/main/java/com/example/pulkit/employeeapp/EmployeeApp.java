@@ -44,9 +44,8 @@ public class EmployeeApp extends android.support.multidex.MultiDexApplication {
         return mInstance;
     }
 
-    public static void setOnlineStatus(String userkey)
-    {
-        if(!userkey.equals("")){
+    public static void setOnlineStatus(String userkey) {
+        if (!userkey.equals("")) {
             final FirebaseDatabase database = FirebaseDatabase.getInstance();
             final DatabaseReference myConnectionsRef = DBREF.child("Users").child("Usersessions").child(userkey).child("online").getRef();
 
@@ -75,17 +74,17 @@ public class EmployeeApp extends android.support.multidex.MultiDexApplication {
         }
 
     }
-    public static void sendNotif(final String senderId, final String receiverId, final String type, final String content, final String taskId)
-    {
+
+    public static void sendNotif(final String senderId, final String receiverId, final String type, final String content, final String taskId) {
         long idLong = Calendar.getInstance().getTimeInMillis();
         idLong = 9999999999999L - idLong;
-        final String id=String.valueOf(idLong);
+        final String id = String.valueOf(idLong);
         final String timestamp = formatter.format(Calendar.getInstance().getTime());
         DBREF.child("Fcmtokens").child(receiverId).child("token").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                String receiverFCMToken=dataSnapshot.getValue(String.class);
-                Notif newNotif = new Notif(id,timestamp,type,senderId,receiverId,receiverFCMToken,content,taskId);
+                String receiverFCMToken = dataSnapshot.getValue(String.class);
+                Notif newNotif = new Notif(id, timestamp, type, senderId, receiverId, receiverFCMToken, content, taskId);
                 DBREF.child("Notification").child(receiverId).child(id).setValue(newNotif);
             }
 
