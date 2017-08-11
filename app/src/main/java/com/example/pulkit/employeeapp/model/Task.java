@@ -4,10 +4,23 @@ package com.example.pulkit.employeeapp.model;
  * Created by RajK on 03-06-2017.
  */
 
-public class Task
-{
-    private String taskId,name,startDate,expEndDate,quotationId,qty,desc,customerId;
+public class Task {
+    private String taskId, name, startDate, expEndDate, quotationId, qty, desc, customerId;
     private int color = -1;
+
+    public Task() {
+    }
+
+    public Task(String taskId, String name, String startDate, String expEndDate, String qty, String desc, String customerId, int color) {
+        this.taskId = taskId;
+        this.name = name;
+        this.startDate = startDate;
+        this.expEndDate = expEndDate;
+        this.qty = qty;
+        this.desc = desc;
+        this.customerId = customerId;
+        this.color = color;
+    }
 
     public int getColor() {
         return color;
@@ -23,10 +36,6 @@ public class Task
 
     public void setCustomerId(String customerId) {
         this.customerId = customerId;
-    }
-
-
-    public Task() {
     }
 
     public String getTaskId() {
@@ -85,14 +94,4 @@ public class Task
         this.desc = desc;
     }
 
-    public Task(String taskId, String name, String startDate, String expEndDate, String qty, String desc, String customerId,int color) {
-        this.taskId = taskId;
-        this.name = name;
-        this.startDate = startDate;
-        this.expEndDate = expEndDate;
-        this.qty = qty;
-        this.desc = desc;
-        this.customerId = customerId;
-        this.color = color;
-    }
 }

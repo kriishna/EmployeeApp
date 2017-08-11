@@ -36,7 +36,7 @@
         <activity
             android:name=".MainViews.TaskHome"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".chat.ChatActivity" />
         <activity
             android:name=".MainViews.TaskDetail"
@@ -62,11 +62,10 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
         <activity
             android:name=".drawer"
             android:label="@string/title_activity_drawer1"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"/>
 
         <service android:name=".services.MyFirebaseInstanceIDService">
             <intent-filter>
@@ -78,9 +77,10 @@
             android:exported="false" />
 
         <activity android:name=".Notification.NotificationActivity" />
-        <activity android:name=".MyProfile.MyProfile" />
-        <activity android:name=".MyProfile.ContactCoordinator" />
-        <activity android:name=".MyProfile.phonebook" />
+        <activity android:name=".MyProfile.MyProfile"></activity>
+
+        <activity android:name=".MyProfile.ContactCoordinator"/>
+        <activity android:name=".MyProfile.phonebook"></activity>
 
         <service
             android:name=".services.DownloadFileService"

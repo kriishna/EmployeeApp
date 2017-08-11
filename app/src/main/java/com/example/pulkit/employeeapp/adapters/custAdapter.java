@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.example.pulkit.employeeapp.MainViews.TaskHome;
 import com.example.pulkit.employeeapp.R;
+import com.example.pulkit.employeeapp.model.Customer;
 import com.example.pulkit.employeeapp.model.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -19,17 +20,21 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 
-public class taskAdapter extends RecyclerView.Adapter<taskAdapter.MyViewHolder> {
-    ArrayList<Task> list = new ArrayList<>();
+public class custAdapter extends RecyclerView.Adapter<custAdapter.MyViewHolder> {
+    ArrayList<Customer> list = new ArrayList<>();
     private Context context;
-    String desig = TaskHome.desig;
-    private TaskAdapterListener listener;
+    private CustomerAdapterListener listener;
+    ArrayList<String> listoftasks = new ArrayList<>();
+    List<Task> tasks = new ArrayList<>();
+    int i = 0;
+    String emp_id = TaskHome.emp_id;
 
 
-    public taskAdapter(ArrayList<Task> list, Context context, TaskAdapterListener listener) {
+    public custAdapter(ArrayList<Customer> list, Context context, CustomerAdapterListener listener) {
         this.list = list;
         this.listener = listener;
     }
@@ -59,48 +64,16 @@ public class taskAdapter extends RecyclerView.Adapter<taskAdapter.MyViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(final taskAdapter.MyViewHolder holder, int position) {
-        Task task = list.get(position);
-        String iconText = task.getName().toUpperCase();
+    public void onBindViewHolder(final custAdapter.MyViewHolder holder, int position) {
+        Customer cust = list.get(position);
+        String iconText = cust.getName().toUpperCase();
 
         holder.icon_text.setText(iconText.charAt(0) + "");
         holder.imgProfile.setImageResource(R.drawable.bg_circle);
-        holder.imgProfile.setColorFilter(task.getColor());
-        holder.timestamp.setText(task.getStartDate());
+        holder.imgProfile.setColorFilter(cust.getColor());
         holder.taskname.setText(iconText);
+        holder.customername.setText("");
 
-
-        if(desig.toLowerCase().equals("quotation")){
-            DBREF.child("Task").child(task.getTaskId()).child("Quotation").child("url").addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    if(dataSnapshot.exists())
-                        holder.customername.setText("Quotation Uploaded : YES");
-                    else
-                        holder.customername.setText("Quotation Uploaded : NO");
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-        }
-        else {
-            DatabaseReference dbCustomerName = DBREF.child("Customer").child(task.getCustomerId()).getRef();
-            dbCustomerName.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    String customername = dataSnapshot.child("name").getValue(String.class);
-                    holder.customername.setText(customername);
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-        }
         applyClickEvents(holder, position);
 
     }
@@ -110,8 +83,8 @@ public class taskAdapter extends RecyclerView.Adapter<taskAdapter.MyViewHolder> 
         return list.size();
     }
 
-    public interface TaskAdapterListener {
-        void onTaskRowClicked(int position);
+    public interface CustomerAdapterListener {
+        void onCustomerRowClicked(int position);
     }
 
     private void applyClickEvents(MyViewHolder holder, final int position) {
@@ -119,7 +92,7 @@ public class taskAdapter extends RecyclerView.Adapter<taskAdapter.MyViewHolder> 
         holder.messageContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                listener.onTaskRowClicked(position);
+                listener.onCustomerRowClicked(position);
             }
         });
 
