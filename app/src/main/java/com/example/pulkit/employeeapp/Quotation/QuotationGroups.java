@@ -8,15 +8,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import com.example.pulkit.employeeapp.helper.DividerItemDecoration;
+
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.pulkit.employeeapp.MainViews.TaskDetail;
 import com.example.pulkit.employeeapp.MainViews.TaskHome;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.model.QuotationBatch;
@@ -24,8 +24,6 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +33,7 @@ import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 public class QuotationGroups extends Fragment implements QAdapter.QAdapterListener {
 
     RecyclerView recycler;
-    DatabaseReference dbTask, db;
+    DatabaseReference dbTask;
     LinearLayoutManager linearLayoutManager;
     private List<QuotationBatch> list = new ArrayList<>();
     private RecyclerView.Adapter mAdapter;
@@ -52,14 +50,9 @@ public class QuotationGroups extends Fragment implements QAdapter.QAdapterListen
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.quotationfrag, container, false);
 
-
         recycler = (RecyclerView) rootView.findViewById(R.id.recycler);
 
-        //   dbTask = DBREF.child("Quotation").getRef();
-
-
         emp_id = TaskHome.emp_id;
-
 
         dbTask = DBREF.child("Employee").child(emp_id).child("AssignedTask").getRef();
 
@@ -70,7 +63,6 @@ public class QuotationGroups extends Fragment implements QAdapter.QAdapterListen
         recycler.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
         recycler.setAdapter(mAdapter);
 
-
         new Handler().postDelayed(new Runnable() {
             public void run() {
                 if (pDialog.isShowing())
@@ -80,7 +72,6 @@ public class QuotationGroups extends Fragment implements QAdapter.QAdapterListen
 
         return rootView;
     }
-
 
     @Override
     public void onTaskRowClicked(int position) {
@@ -121,8 +112,6 @@ public class QuotationGroups extends Fragment implements QAdapter.QAdapterListen
 
                     if (pDialog.isShowing())
                         pDialog.dismiss();
-
-
                 }
 
                 @Override
@@ -149,7 +138,6 @@ public class QuotationGroups extends Fragment implements QAdapter.QAdapterListen
 
         }
     }
-
 
     @Override
     public void onPause() {

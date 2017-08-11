@@ -1,8 +1,6 @@
 package com.example.pulkit.employeeapp;
 
-import com.example.pulkit.employeeapp.CheckInternetConnectivity.NetWatcher;
 import com.example.pulkit.employeeapp.EmployeeLogin.EmployeeSession;
-import com.example.pulkit.employeeapp.model.Employee;
 import com.example.pulkit.employeeapp.model.Notif;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.google.firebase.FirebaseApp;
@@ -21,6 +19,7 @@ public class EmployeeApp extends android.support.multidex.MultiDexApplication {
     public static DatabaseReference DBREF;
     private EmployeeSession session;
     public static SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy hh:mm aa");
+    public static String AppName = "MeChat";
 
     @Override
     public void onCreate() {
@@ -45,9 +44,8 @@ public class EmployeeApp extends android.support.multidex.MultiDexApplication {
         return mInstance;
     }
 
-    public static void setOnlineStatus(String userkey)
-    {
-        if(!userkey.equals("")){
+    public static void setOnlineStatus(String userkey) {
+        if (!userkey.equals("")) {
             final FirebaseDatabase database = FirebaseDatabase.getInstance();
             final DatabaseReference myConnectionsRef = DBREF.child("Users").child("Usersessions").child(userkey).child("online").getRef();
 
@@ -76,20 +74,17 @@ public class EmployeeApp extends android.support.multidex.MultiDexApplication {
         }
 
     }
-    public void setConnectivityListener(NetWatcher.ConnectivityReceiverListener listener) {
-        NetWatcher.connectivityReceiverListener = listener;
-    }
-    public static void sendNotif(final String senderId, final String receiverId, final String type, final String content, final String taskId)
-    {
+
+    public static void sendNotif(final String senderId, final String receiverId, final String type, final String content, final String taskId) {
         long idLong = Calendar.getInstance().getTimeInMillis();
         idLong = 9999999999999L - idLong;
-        final String id=String.valueOf(idLong);
+        final String id = String.valueOf(idLong);
         final String timestamp = formatter.format(Calendar.getInstance().getTime());
         DBREF.child("Fcmtokens").child(receiverId).child("token").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                String receiverFCMToken=dataSnapshot.getValue(String.class);
-                Notif newNotif = new Notif(id,timestamp,type,senderId,receiverId,receiverFCMToken,content,taskId);
+                String receiverFCMToken = dataSnapshot.getValue(String.class);
+                Notif newNotif = new Notif(id, timestamp, type, senderId, receiverId, receiverFCMToken, content, taskId);
                 DBREF.child("Notification").child(receiverId).child(id).setValue(newNotif);
             }
 

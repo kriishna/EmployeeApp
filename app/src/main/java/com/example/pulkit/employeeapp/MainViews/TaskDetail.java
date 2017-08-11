@@ -2,7 +2,6 @@ package com.example.pulkit.employeeapp.MainViews;
 
 import android.Manifest;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -13,8 +12,9 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import com.example.pulkit.employeeapp.helper.DividerItemDecoration;
+
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -60,6 +60,7 @@ import com.google.firebase.storage.StorageReference;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
@@ -94,6 +95,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     String dbTablekey, id;
     String num;
     private MarshmallowPermissions marshmallowPermissions;
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -240,6 +242,8 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                     @Override
                     public void onClick(View v) {
                         final String employeesnote = employeeNote.getText().toString().trim();
+                        Calendar c = Calendar.getInstance();
+                        final String curdate = dateFormat.format(c.getTime());
 
                         final DatabaseReference db, databaseReference;
 
@@ -260,7 +264,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                                     completedJob.setAssignedByUsername(completedBy.getAssignedByUsername());
                                     completedJob.setCoordinatorNote(completedBy.getNote());
                                     completedJob.setDateassigned(completedBy.getDateassigned());
-                                    completedJob.setDatecompleted(completedBy.getDatecompleted());
+                                    completedJob.setDatecompleted(curdate);
                                     completedJob.setEmpployeeNote(employeesnote);
 
                                     databaseReference.removeValue();
