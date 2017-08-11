@@ -37,12 +37,14 @@ import com.example.pulkit.employeeapp.adapters.bigimage_adapter;
 import com.example.pulkit.employeeapp.adapters.measurement_adapter;
 import com.example.pulkit.employeeapp.adapters.taskdetailDescImageAdapter;
 import com.example.pulkit.employeeapp.chat.ChatActivity;
+import com.example.pulkit.employeeapp.helper.FilePath;
 import com.example.pulkit.employeeapp.helper.MarshmallowPermissions;
 import com.example.pulkit.employeeapp.measurement.MeasureList;
 import com.example.pulkit.employeeapp.model.Quotation;
 import com.example.pulkit.employeeapp.model.Task;
 import com.example.pulkit.employeeapp.model.measurement;
 import com.example.pulkit.employeeapp.services.DownloadFileService;
+import com.example.pulkit.employeeapp.services.UploadQuotationService;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
@@ -70,7 +72,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     DatabaseReference dbRef, dbTask, dbCompleted, dbAssigned, dbMeasurement, dbDescImages;
     ImageButton download;
     public static String task_id;
-    public String emp_id,desig;
+    public String emp_id, desig;
     private Task task;
     private String customername, mykey;
     EditText startDate, endDate, quantity, description, coordinators_message;
@@ -274,6 +276,53 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 
+    private void UploadQuotation() {
+        Intent intent = new Intent();
+        //sets the select file to all types of files
+        intent.setType("*/*");
+        //allows to select data and return it
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        //starts new activity to select file and return data
+        startActivityForResult(Intent.createChooser(intent, "Choose File to Upload.."), PICK_FILE_REQUEST);
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == PICK_FILE_REQUEST) {
+                if (data == null) {
+                    //no data present
+                    return;
+                }
+
+                String selectedFilePath = "";
+                Uri selectedFileUri = data.getData();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    selectedFilePath = FilePath.getPath(this, selectedFileUri);
+                }
+
+                ArrayList<String> taskid_list = new ArrayList<>();
+
+                if (selectedFilePath != null && !selectedFilePath.equals("")) {
+                    //               final Task task = TaskList.get(i);
+                    taskid_list.add(task.getTaskId());
+                }
+
+                Intent serviceIntent = new Intent(this, UploadQuotationService.class);
+                serviceIntent.putExtra("TaskIdList", taskid_list);
+                serviceIntent.putExtra("selectedFileUri", selectedFileUri.toString());
+
+                this.startService(serviceIntent);
+            } else {
+                Toast.makeText(this, "Cannot upload file to server", Toast.LENGTH_SHORT).show();
+            }
+
+        }
+    }
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.taskdetail_menu, menu);
@@ -302,6 +351,12 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
             case R.id.item2:
                 checkChatref(mykey, id);
                 break;
+
+            case R.id.item3:
+                UploadQuotation();
+                break;
+
+
         }
         return true;
     }

@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.FrameLayout;
 
+import com.example.pulkit.employeeapp.Customer.custFrag;
 import com.example.pulkit.employeeapp.EmployeeLogin.EmployeeSession;
 import com.example.pulkit.employeeapp.Quotation.QuotationGroups;
 import com.example.pulkit.employeeapp.R;
@@ -59,7 +60,7 @@ public class TaskHome extends drawer {
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         if (desig.toLowerCase().equals("quotation"))
-            adapter.addFragment(new QuotationGroups(), "Groups");
+            adapter.addFragment(new custFrag(), "Customers");
         else
             adapter.addFragment(new taskFrag(), "Tasks");
         adapter.addFragment(new chatFrag(), "Chat");
