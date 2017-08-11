@@ -29,6 +29,7 @@
         android:textColor="@color/black"
         android:textSize="17dp"
         android:hint="Your message here !"
+        android:id="@+id/employeeNote"
         android:textColorHint="@color/grey_500"/>
 
     <RelativeLayout
