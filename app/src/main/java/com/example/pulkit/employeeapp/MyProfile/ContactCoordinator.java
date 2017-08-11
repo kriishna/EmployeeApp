@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+
+import com.example.pulkit.employeeapp.MainViews.TaskHome;
 import com.example.pulkit.employeeapp.helper.DividerItemDecoration;
 
 import android.support.v7.widget.DefaultItemAnimator;
@@ -160,4 +162,12 @@ public class ContactCoordinator extends AppCompatActivity implements coordinator
         callIntent.setData(Uri.parse("tel:" + num));
         startActivity(callIntent);
     }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, TaskHome.class);
+        startActivity(intent);
+        finish();
+    }
+
 }

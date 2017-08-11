@@ -20,6 +20,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
@@ -67,6 +69,7 @@ public class NotificationActivity extends AppCompatActivity {
                 if (dataSnapshot.exists()) {
                     notif = dataSnapshot.getValue(Notif.class);
                     list.add(notif);
+                    sortNotification();
                     adapter.notifyDataSetChanged();
                 }
             }
@@ -89,6 +92,14 @@ public class NotificationActivity extends AppCompatActivity {
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
+            }
+        });
+    }
+    private void sortNotification() {
+        Collections.sort(list, new Comparator<Notif>() {
+            @Override
+            public int compare(Notif o1, Notif o2) {
+                return Long.parseLong(o1.getId()) < Long.parseLong(o2.getId()) ? -1 : 0; // Decreasing Order
             }
         });
     }
