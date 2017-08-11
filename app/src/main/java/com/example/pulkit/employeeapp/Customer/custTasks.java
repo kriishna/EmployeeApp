@@ -156,7 +156,8 @@ public class custTasks extends AppCompatActivity implements taskAdapter.TaskAdap
 
     void LoadData() {
         db = DBREF.child("Task").child(list.get(i));
-        vl = db.addValueEventListener(new ValueEventListener() {
+
+        db.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Task task = dataSnapshot.getValue(Task.class);
@@ -171,8 +172,6 @@ public class custTasks extends AppCompatActivity implements taskAdapter.TaskAdap
 
             }
         });
-
-
     }
 
 
@@ -247,7 +246,6 @@ public class custTasks extends AppCompatActivity implements taskAdapter.TaskAdap
         TaskList.clear();
         mAdapter.notifyDataSetChanged();
         new net().execute();
-
     }
 
     @Override

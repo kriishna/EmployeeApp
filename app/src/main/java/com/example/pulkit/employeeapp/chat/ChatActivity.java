@@ -698,7 +698,7 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
         Collections.sort(chatList, new Comparator<ChatMessage>() {
             @Override
             public int compare(ChatMessage o1, ChatMessage o2) {
-                return Long.parseLong(o1.getId()) > Long.parseLong(o2.getId()) ? -1 : 0; // Decreasing Order
+                return Long.parseLong(o1.getId()) < Long.parseLong(o2.getId()) ? -1 : 0; // Decreasing Order
             }
         });
     }

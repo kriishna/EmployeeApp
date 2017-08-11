@@ -86,46 +86,16 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     alarmIntent.putExtra("body",body);
                     alarmIntent.putExtra("title","New Notification from " + nameAndStatus.getName());
                     alarmIntent.putExtra("notifId",id);
-                    final PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent, 0);
+                    alarmIntent.putExtra("task_id",taskId);
+                    String notifid = id.substring(8);
+                    Integer pendingIntentId = Integer.parseInt(notifid);
+                    alarmIntent.putExtra("pendingIntentId",pendingIntentId);
+                    final PendingIntent pendingIntent = PendingIntent.getBroadcast(context, pendingIntentId, alarmIntent, 0);
                     Integer repeat = Integer.parseInt(repeatAfter);
                     final AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
                     final int interval = 1000 * 60 * repeat;
-                    final DatabaseReference dbAssignedTask = DBREF.child("Employee").child(session.getUsername()).child("AssignedTask").child(task_id).getRef();
-                    dbAssignedTask.addChildEventListener(new ChildEventListener() {
-                        @Override
-                        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                            if(dataSnapshot.exists())
-                            {
-                                manager.setRepeating(AlarmManager.RTC_WAKEUP, Calendar.getInstance().getTimeInMillis(),
-                                        interval, pendingIntent);
-                            }
-
-                        }
-
-                        @Override
-                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                        }
-
-                        @Override
-                        public void onChildRemoved(DataSnapshot dataSnapshot) {
-                            AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-                            manager.cancel(pendingIntent);
-                            Toast.makeText(context, "Alarm Canceled", Toast.LENGTH_SHORT).show();
-                            dbAssignedTask.removeEventListener(this);
-                        }
-
-                        @Override
-                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
-
+                    manager.setRepeating(AlarmManager.RTC_WAKEUP, Calendar.getInstance().getTimeInMillis(),
+                            interval, pendingIntent);
 
                 }
             }

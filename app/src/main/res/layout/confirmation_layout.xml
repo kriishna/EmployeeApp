@@ -50,7 +50,7 @@
                 android:id="@+id/okcompleted"
                 android:layout_margin="7dp"
                 android:textSize="15dp"
-                android:textColor="@color/colorAccent"/>
+                android:textColor="#000000"/>
 
             <Button
                 android:layout_width="wrap_content"
@@ -59,7 +59,7 @@
                 android:id="@+id/okcanceled"
                 android:layout_margin="7dp"
                 android:textSize="15dp"
-                android:textColor="@color/colorAccent"/>
+                android:textColor="#000000"/>
 
         </LinearLayout>
 

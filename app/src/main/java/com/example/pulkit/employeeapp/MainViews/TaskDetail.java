@@ -1,10 +1,12 @@
 package com.example.pulkit.employeeapp.MainViews;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -94,6 +96,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     EmployeeSession session;
     String dbTablekey, id;
     String num;
+    final int PICK_FILE_REQUEST = 0;
     private MarshmallowPermissions marshmallowPermissions;
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -106,6 +109,10 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         marshmallowPermissions = new MarshmallowPermissions(this);
         progressDialog = new ProgressDialog(this);
         download = (ImageButton) findViewById(R.id.download);
+        if(session.getDesig().toLowerCase().equals("quotation"))
+        {
+            download.setVisibility(View.GONE);
+        }
         uploadStatus = (TextView) findViewById(R.id.uploadStatus);
         appByCustomer = (TextView) findViewById(R.id.appByCustomer);
 
@@ -247,7 +254,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
 
                         final DatabaseReference db, databaseReference;
 
-                        DBREF.child("Employee").child(emp_id).child("CompletedTask").child(task_id).setValue("done");
+                        DBREF.child("Employee").child(emp_id).child("CompletedTask").child(task_id).setValue("complete");
                         db = DBREF.child("Employee").child(emp_id).child("AssignedTask").child(task_id);
                         db.removeValue();
 
@@ -266,6 +273,8 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                                     completedJob.setDateassigned(completedBy.getDateassigned());
                                     completedJob.setDatecompleted(curdate);
                                     completedJob.setEmpployeeNote(employeesnote);
+                                    completedJob.setEmpName(session.getName());
+                                    completedJob.setEmpDesignation(session.getDesig());
 
                                     databaseReference.removeValue();
                                     DBREF.child("Task").child(task_id).child("CompletedBy").child(emp_id).setValue(completedJob);

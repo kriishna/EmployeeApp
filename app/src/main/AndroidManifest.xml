@@ -81,6 +81,7 @@
 
         <activity android:name=".MyProfile.ContactCoordinator"/>
         <activity android:name=".MyProfile.phonebook"></activity>
+        <activity android:name=".Customer.custTasks"></activity>
 
         <service
             android:name=".services.DownloadFileService"
