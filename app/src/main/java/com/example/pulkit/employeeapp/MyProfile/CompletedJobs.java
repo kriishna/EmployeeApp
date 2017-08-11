@@ -1,7 +1,10 @@
 package com.example.pulkit.employeeapp.MyProfile;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.example.pulkit.employeeapp.MainViews.TaskHome;
 import com.example.pulkit.employeeapp.helper.DividerItemDecoration;
 
 import android.support.v7.widget.DefaultItemAnimator;
@@ -82,4 +85,11 @@ public class CompletedJobs extends AppCompatActivity {
             }
         });
     }
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, TaskHome.class);
+        startActivity(intent);
+        finish();
+    }
+
 }

@@ -1,8 +1,5 @@
 package com.example.pulkit.employeeapp.services;
 
-/**
- * Created by ghanendra on 16/06/2017.
- */
 
 import android.Manifest;
 import android.app.Service;
@@ -26,10 +23,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import static com.example.pulkit.employeeapp.EmployeeApp.AppName;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 
 public class LocServ extends Service implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
@@ -39,7 +34,7 @@ public class LocServ extends Service implements GoogleApiClient.ConnectionCallba
     String lat, lon;
     String mobile;
     String key;
-    DatabaseReference ref;;
+    DatabaseReference ref;
     GeoFire geoFire ;
     EmployeeSession session ;
     @Override
