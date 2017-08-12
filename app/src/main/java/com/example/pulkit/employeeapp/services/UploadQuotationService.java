@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
+import static com.example.pulkit.employeeapp.EmployeeApp.sendNotif;
+import static com.example.pulkit.employeeapp.EmployeeApp.sendNotifToAllCoordinators;
+import static com.example.pulkit.employeeapp.MainViews.TaskHome.emp_id;
 
 /**
  * Created by SoumyaAgarwal on 7/3/2017.
@@ -33,6 +36,8 @@ public class UploadQuotationService extends IntentService
     public static Uri selectedFileUri;
     private NotificationManager notificationManager;
     private NotificationCompat.Builder mBuilder;
+    private String customerId,customerName;
+
 
     public UploadQuotationService() {
         super("Upload");
@@ -63,6 +68,9 @@ public class UploadQuotationService extends IntentService
         if (intent != null) {
 
             TaskIdList = intent.getStringArrayListExtra("TaskIdList");
+            customerId = intent.getStringExtra("customerId");
+            customerName = intent.getStringExtra("customerName");
+
             selectedFileUri = Uri.parse(intent.getStringExtra("selectedFileUri"));
             saveQuotationtoFirebase(TaskIdList);
         }
@@ -79,6 +87,9 @@ public class UploadQuotationService extends IntentService
         Toast.makeText(getBaseContext(),"Uploading Quotation in Background", Toast.LENGTH_SHORT).show();
         long timestamp = Calendar.getInstance().getTimeInMillis();
         timestamp = 9999999999999L-timestamp;
+        sendNotif(emp_id,customerId,"uploadQuotation","Quotation for your tasks has been uploaded","noId");
+        sendNotifToAllCoordinators(emp_id,"uploadQuotation","Quotation for "+customerName+" tasks has been uploaded","noId");
+        sendNotif(emp_id,emp_id,"uploadQuotation","You uploaded the quotation for "+ customerName,"noId");
 
         StorageReference riversRef = FirebaseStorage.getInstance().getReference().child("Quotation").child(timestamp+"");
         riversRef.putFile(selectedFileUri)

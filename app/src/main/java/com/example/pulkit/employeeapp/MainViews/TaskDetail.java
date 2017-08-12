@@ -106,6 +106,9 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         setContentView(R.layout.activity_task_detail);
 
         dbRef = DBREF;
+
+        session = new EmployeeSession(getApplicationContext());
+
         marshmallowPermissions = new MarshmallowPermissions(this);
         progressDialog = new ProgressDialog(this);
         download = (ImageButton) findViewById(R.id.download);
@@ -129,8 +132,6 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         measure_and_hideme = (TextView) findViewById(R.id.measure_and_hideme);
         text = (TextView) findViewById(R.id.textView6);
         ll = (LinearLayout) findViewById(R.id.quotation_container);
-
-        session = new EmployeeSession(getApplicationContext());
 
         mykey = session.getUsername();
         Intent intent = getIntent();
@@ -284,6 +285,10 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                                     String contentforother = "Employee " + session.getName() + " completed " + task.getName();
                                     sendNotif(mykey, completedJob.getAssignedByUsername(), "completedJob", contentforother, task_id);
                                     Toast.makeText(TaskDetail.this, contentforme, Toast.LENGTH_SHORT).show();
+                                    Intent intent1 = new Intent(TaskDetail.this,TaskHome.class);
+                                    intent1.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    startActivity(intent1);
+
                                 }
                             }
 

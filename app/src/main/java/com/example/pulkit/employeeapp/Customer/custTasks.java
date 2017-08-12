@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -18,14 +19,18 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.pulkit.employeeapp.EmployeeLogin.EmployeeSession;
 import com.example.pulkit.employeeapp.MainViews.TaskDetail;
+import com.example.pulkit.employeeapp.MainViews.TaskHome;
 import com.example.pulkit.employeeapp.MainViews.taskFrag;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.adapters.taskAdapter;
 import com.example.pulkit.employeeapp.helper.FilePath;
+import com.example.pulkit.employeeapp.model.CompletedBy;
+import com.example.pulkit.employeeapp.model.CompletedJob;
 import com.example.pulkit.employeeapp.model.Task;
 import com.example.pulkit.employeeapp.services.UploadQuotationService;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -37,16 +42,18 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
+import static com.example.pulkit.employeeapp.EmployeeApp.sendNotif;
 
 public class custTasks extends AppCompatActivity implements taskAdapter.TaskAdapterListener {
 
     RecyclerView recycler;
     taskAdapter mAdapter;
-    String custId;
+    String custId,customerName;
 
     private static final int PICK_FILE_REQUEST = 1;
     DatabaseReference dbTask, db;
@@ -60,6 +67,7 @@ public class custTasks extends AppCompatActivity implements taskAdapter.TaskAdap
     ValueEventListener vl;
     EmployeeSession session;
     Button upload;
+    private AlertDialog confirmation;
     int m = 0;
 
 
@@ -71,6 +79,8 @@ public class custTasks extends AppCompatActivity implements taskAdapter.TaskAdap
         recycler = (RecyclerView) findViewById(R.id.recycler);
 
         custId = getIntent().getStringExtra("customerId");
+        customerName = getIntent().getStringExtra("customerName");
+
         session = new EmployeeSession(this);
         pDialog = new ProgressDialog(this);
         emp_id = session.getUsername();
@@ -133,6 +143,8 @@ public class custTasks extends AppCompatActivity implements taskAdapter.TaskAdap
                     Intent serviceIntent = new Intent(this, UploadQuotationService.class);
                     serviceIntent.putExtra("TaskIdList", taskid_list);
                     serviceIntent.putExtra("selectedFileUri", selectedFileUri.toString());
+                    serviceIntent.putExtra("customerId",custId);
+                    serviceIntent.putExtra("customerName",customerName);
 
                     this.startService(serviceIntent);
                     mAdapter.notifyDataSetChanged();
@@ -258,35 +270,87 @@ public class custTasks extends AppCompatActivity implements taskAdapter.TaskAdap
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.forward:
-                Return();
+                confirmation = new AlertDialog.Builder(this)
+                        .setView(R.layout.confirmation_layout).create();
+                confirmation.show();
+                final EditText employeeNote = (EditText) confirmation.findViewById(R.id.employeeNote);
+                Button okcompleted = (Button) confirmation.findViewById(R.id.okcompleted);
+                Button okcanceled = (Button) confirmation.findViewById(R.id.okcanceled);
+
+                okcanceled.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        confirmation.dismiss();
+                    }
+                });
+
+                okcompleted.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final String employeesnote = employeeNote.getText().toString().trim();
+                        Calendar c = Calendar.getInstance();
+                        final String curdate =  new SimpleDateFormat("DD/MM/YYYY").format(c.getTime());
+                        confirmation.dismiss();
+
+                        for(final Task task:TaskList)
+                        {
+                        final DatabaseReference db, databaseReference;
+
+                        DBREF.child("Employee").child(emp_id).child("CompletedTask").child(task.getTaskId()).setValue("complete");
+                        db = DBREF.child("Employee").child(emp_id).child("AssignedTask").child(task.getTaskId());
+                        db.removeValue();
+
+                        databaseReference = DBREF.child("Task").child(task.getTaskId()).child("AssignedTo").child(emp_id);
+
+                        databaseReference.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                if (dataSnapshot.exists()) {
+                                    CompletedBy completedBy = dataSnapshot.getValue(CompletedBy.class);
+                                    CompletedJob completedJob = new CompletedJob();
+                                    completedJob.setEmpId(completedBy.getEmpId());
+                                    completedJob.setAssignedByName(completedBy.getAssignedByName());
+                                    completedJob.setAssignedByUsername(completedBy.getAssignedByUsername());
+                                    completedJob.setCoordinatorNote(completedBy.getNote());
+                                    completedJob.setDateassigned(completedBy.getDateassigned());
+                                    completedJob.setDatecompleted(curdate);
+                                    completedJob.setEmpployeeNote(employeesnote);
+                                    completedJob.setEmpName(session.getName());
+                                    completedJob.setEmpDesignation(session.getDesig());
+                                    databaseReference.removeValue();
+
+                                    DBREF.child("Task").child(task.getTaskId()).child("CompletedBy").child(emp_id).setValue(completedJob);
+                                    String contentforme = "You completed " + task.getName();
+                                    sendNotif(emp_id, emp_id, "completedJob", contentforme, task.getTaskId());
+                                    String contentforother = "Employee " + session.getName() + " completed " + task.getName();
+                                    sendNotif(emp_id, completedJob.getAssignedByUsername(), "completedJob", contentforother, task.getTaskId());
+                                    Toast.makeText(getApplicationContext(), contentforme, Toast.LENGTH_SHORT).show();
+
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+
+                    }
+                    Intent intent = new Intent(getApplicationContext(), TaskHome.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+
+
                 break;
 
             case R.id.upload:
+                if(TaskList.size()<1)
                 UploadQuotation();
                 break;
         }
         return true;
-    }
-
-    private void Return() {
-        DatabaseReference db, databaseReference;
-
-        for (int j = 0; j < TaskList.size(); j++) {
-            db = DBREF.child("Employee").child(emp_id).child("AssignedTask").child(TaskList.get(j).getTaskId());
-            db.setValue("done");
-
-            databaseReference = DBREF.child("Task").child(TaskList.get(j).getTaskId());
-            databaseReference.child("AssignedTo").child(emp_id).child("datecompleted")
-                    .setValue(new SimpleDateFormat("dd/MM/yyyy").format(new Date()))
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Toast.makeText(custTasks.this, "Task Returned", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        }
-
-        mAdapter.notifyDataSetChanged();
     }
 
 }

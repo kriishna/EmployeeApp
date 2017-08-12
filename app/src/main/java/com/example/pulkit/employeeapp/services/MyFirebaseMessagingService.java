@@ -90,7 +90,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     String notifid = id.substring(8);
                     Integer pendingIntentId = Integer.parseInt(notifid);
                     alarmIntent.putExtra("pendingIntentId",pendingIntentId);
-                    final PendingIntent pendingIntent = PendingIntent.getBroadcast(context, pendingIntentId, alarmIntent, 0);
+                    final PendingIntent pendingIntent = PendingIntent.getBroadcast(context, pendingIntentId, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                     Integer repeat = Integer.parseInt(repeatAfter);
                     final AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
                     final int interval = 1000 * 60 * repeat;

@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.pulkit.employeeapp.CheckInternetConnectivity.NetWatcher;
 import com.example.pulkit.employeeapp.EmployeeLogin.EmployeeSession;
 import com.example.pulkit.employeeapp.MainViews.TaskDetail;
 import com.example.pulkit.employeeapp.R;
@@ -41,20 +42,20 @@ import java.util.Set;
 
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 
-public class custFrag extends Fragment implements custAdapter.CustomerAdapterListener{
+public class custFrag extends Fragment implements custAdapter.CustomerAdapterListener {
 
     RecyclerView task_list;
-    DatabaseReference dbTask, db,dbCust;
+    DatabaseReference dbTask, db, dbCust;
     LinearLayoutManager linearLayoutManager;
     private List<String> custList = new ArrayList<>();
     private ArrayList<Customer> Cust = new ArrayList<>();
     private List<String> list = new ArrayList<>();
     private RecyclerView.Adapter mAdapter;
     ProgressDialog pDialog;
-    int i = 0,j=0;
+    int i = 0, j = 0;
     public static String emp_id;
     ChildEventListener ch;
-    ValueEventListener vl,custl;
+    ValueEventListener vl, custl;
     EmployeeSession session;
 
     public custFrag() {
@@ -79,6 +80,11 @@ public class custFrag extends Fragment implements custAdapter.CustomerAdapterLis
 
         dbTask = DBREF.child("Employee").child(emp_id).child("AssignedTask").getRef();
 
+        pDialog.setMessage("Please wait...");
+        pDialog.setCancelable(true);
+        pDialog.show();
+
+
         mAdapter = new custAdapter(Cust, getActivity(), this);
         linearLayoutManager = new LinearLayoutManager(getActivity());
         task_list.setLayoutManager(linearLayoutManager);
@@ -86,23 +92,26 @@ public class custFrag extends Fragment implements custAdapter.CustomerAdapterLis
         task_list.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
         task_list.setAdapter(mAdapter);
 
+
         new Handler().postDelayed(new Runnable() {
+            @Override
             public void run() {
-                if (pDialog.isShowing())
+                if(pDialog.isShowing())
                     pDialog.dismiss();
             }
-        }, 2000);
+        },1000);
 
         return rootView;
     }
 
     @Override
     public void onCustomerRowClicked(int position) {
-        Intent intent = new Intent(getContext(),custTasks.class);
+        Intent intent = new Intent(getContext(), custTasks.class);
         //Task task = TaskList.get(position);
         Customer cust = Cust.get(position);
-        intent.putExtra("customerId",cust.getId());
-  //      intent.putExtra("task_id",task.getTaskId());
+        intent.putExtra("customerId", cust.getId());
+        intent.putExtra("customerName", cust.getName());
+        //      intent.putExtra("task_id",task.getTaskId());
         startActivity(intent);
     }
 
@@ -112,7 +121,7 @@ public class custFrag extends Fragment implements custAdapter.CustomerAdapterLis
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Task task = dataSnapshot.getValue(Task.class);
-                if(!custList.contains(task.getCustomerId())) {
+                if (!custList.contains(task.getCustomerId())) {
                     custList.add(task.getCustomerId());
                     LoadCustomers();
                     j++;
@@ -133,7 +142,7 @@ public class custFrag extends Fragment implements custAdapter.CustomerAdapterLis
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Customer c = dataSnapshot.getValue(Customer.class);
 
-                if(!Cust.contains(c)) {
+                if (!Cust.contains(c)) {
                     Cust.add(c);
                     mAdapter.notifyDataSetChanged();
                 }
@@ -152,9 +161,6 @@ public class custFrag extends Fragment implements custAdapter.CustomerAdapterLis
         protected void onPreExecute() {
             super.onPreExecute();
             // Showing progress dialog
-            pDialog.setMessage("Please wait...");
-            pDialog.setCancelable(true);
-            pDialog.show();
 
         }
 
@@ -168,9 +174,14 @@ public class custFrag extends Fragment implements custAdapter.CustomerAdapterLis
                         list.add(dataSnapshot.getKey());
                         LoadTasks();
                         i++;
+                       /* if (pDialog.isShowing())
+                            pDialog.dismiss();*/
+                    }
+
+                   /* if(!dataSnapshot.exists()){
                         if (pDialog.isShowing())
                             pDialog.dismiss();
-                    }
+                    }*/
                 }
 
                 @Override
@@ -201,11 +212,11 @@ public class custFrag extends Fragment implements custAdapter.CustomerAdapterLis
     @Override
     public void onPause() {
         super.onPause();
-        if(ch!=null)
+        if (ch != null)
             dbTask.removeEventListener(ch);
-        if(vl!=null)
+        if (vl != null)
             db.removeEventListener(vl);
-        if(custl!=null)
+        if (custl != null)
             dbCust.removeEventListener(custl);
     }
 
@@ -213,7 +224,7 @@ public class custFrag extends Fragment implements custAdapter.CustomerAdapterLis
     public void onResume() {
         super.onResume();
         i = 0;
-        j=0;
+        j = 0;
         list.clear();
         custList.clear();
         Cust.clear();
@@ -221,7 +232,6 @@ public class custFrag extends Fragment implements custAdapter.CustomerAdapterLis
         new net().execute();
 
     }
-
 
 
 }
