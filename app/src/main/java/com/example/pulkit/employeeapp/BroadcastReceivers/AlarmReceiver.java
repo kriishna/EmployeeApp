@@ -26,15 +26,16 @@ EmployeeSession employeeSession;
     public void onReceive(final Context context, Intent intent) {
         final String body = intent.getStringExtra("body");
         final String title = intent.getStringExtra("title");
-        final String task_id = intent.getStringExtra("task_Id");
+        final String task_id = intent.getStringExtra("task_id");
+
         employeeSession = new EmployeeSession(context);
+
         final String notifId = intent.getStringExtra("notifId");
         Intent intent1  = new Intent(context,AlarmReceiver.class);
         final Integer pendingIntentId = intent.getIntExtra("pendingIntentId",0);
         final PendingIntent alarmIntent;
-        alarmIntent = PendingIntent.getBroadcast(context, pendingIntentId,intent1
-                ,
-                PendingIntent.FLAG_CANCEL_CURRENT);
+        alarmIntent = PendingIntent.getBroadcast(context, pendingIntentId,intent1,PendingIntent.FLAG_CANCEL_CURRENT);
+
         final DatabaseReference dbAssignedTask = DBREF.child("Employee").child(employeeSession.getUsername()).child("AssignedTask").child(task_id).getRef();
         dbAssignedTask.addListenerForSingleValueEvent(new ValueEventListener() {
 

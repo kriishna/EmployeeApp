@@ -159,6 +159,9 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         adapter_taskimages = new taskdetailDescImageAdapter(DescImages, getApplicationContext(), this);
         rec_DescImages.setAdapter(adapter_taskimages);
 
+        if(desig.toLowerCase().equals("field executive"))
+            measure.setVisibility(View.GONE);
+
         dbDescImages.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
