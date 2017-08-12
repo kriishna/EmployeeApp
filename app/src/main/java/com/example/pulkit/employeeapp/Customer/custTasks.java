@@ -84,12 +84,6 @@ public class custTasks extends AppCompatActivity implements taskAdapter.TaskAdap
         recycler.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         recycler.setAdapter(mAdapter);
 
-        new Handler().postDelayed(new Runnable() {
-            public void run() {
-                if (pDialog.isShowing())
-                    pDialog.dismiss();
-            }
-        }, 2500);
 
     }
 
@@ -202,6 +196,12 @@ public class custTasks extends AppCompatActivity implements taskAdapter.TaskAdap
 
                         mAdapter.notifyDataSetChanged();
                     }
+
+                    if(!dataSnapshot.exists()){
+                        if (pDialog.isShowing())
+                            pDialog.dismiss();
+
+                    }
                 }
 
                 @Override
@@ -273,7 +273,7 @@ public class custTasks extends AppCompatActivity implements taskAdapter.TaskAdap
 
         for (int j = 0; j < TaskList.size(); j++) {
             db = DBREF.child("Employee").child(emp_id).child("AssignedTask").child(TaskList.get(j).getTaskId());
-            db.setValue("done");
+            db.setValue("complete");
 
             databaseReference = DBREF.child("Task").child(TaskList.get(j).getTaskId());
             databaseReference.child("AssignedTo").child(emp_id).child("datecompleted")

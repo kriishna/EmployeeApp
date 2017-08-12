@@ -106,6 +106,9 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         setContentView(R.layout.activity_task_detail);
 
         dbRef = DBREF;
+
+        session = new EmployeeSession(getApplicationContext());
+
         marshmallowPermissions = new MarshmallowPermissions(this);
         progressDialog = new ProgressDialog(this);
         download = (ImageButton) findViewById(R.id.download);
@@ -129,8 +132,6 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         measure_and_hideme = (TextView) findViewById(R.id.measure_and_hideme);
         text = (TextView) findViewById(R.id.textView6);
         ll = (LinearLayout) findViewById(R.id.quotation_container);
-
-        session = new EmployeeSession(getApplicationContext());
 
         mykey = session.getUsername();
         Intent intent = getIntent();
@@ -157,6 +158,9 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         rec_DescImages.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.HORIZONTAL));
         adapter_taskimages = new taskdetailDescImageAdapter(DescImages, getApplicationContext(), this);
         rec_DescImages.setAdapter(adapter_taskimages);
+
+        if(desig.toLowerCase().equals("field executive"))
+            measure.setVisibility(View.GONE);
 
         dbDescImages.addChildEventListener(new ChildEventListener() {
             @Override

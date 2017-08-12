@@ -171,6 +171,12 @@ public class custFrag extends Fragment implements custAdapter.CustomerAdapterLis
                         if (pDialog.isShowing())
                             pDialog.dismiss();
                     }
+
+                    if(!dataSnapshot.exists()){
+                        if (pDialog.isShowing())
+                            pDialog.dismiss();
+
+                    }
                 }
 
                 @Override
