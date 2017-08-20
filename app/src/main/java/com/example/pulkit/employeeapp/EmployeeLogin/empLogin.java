@@ -19,7 +19,6 @@ import com.example.pulkit.employeeapp.model.Employee;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 
@@ -75,7 +74,7 @@ public class empLogin extends AppCompatActivity {
                 Password = password.getText().toString().trim();
 
                 if (TextUtils.isEmpty(Username)) {
-                    input_email.setError("Enter Email");
+                    input_email.setError("Enter Username");
                     if (input_email.requestFocus()) {
                         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
                     }
@@ -137,7 +136,7 @@ public class empLogin extends AppCompatActivity {
 
                     }
                 } else {
-                    Toast.makeText(getBaseContext(), "Student Not Registered", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(), "Employee Not Registered", Toast.LENGTH_SHORT).show();
                 }
             }
 
