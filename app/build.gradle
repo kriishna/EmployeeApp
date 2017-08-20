@@ -13,6 +13,17 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
+
+    signingConfigs {
+        release {
+            keyAlias 'key'
+            keyPassword 'flex00'
+            storeFile file('C:/Users/RajK/Desktop/emploee_key.jks')
+            storePassword 'flex00'
+            v2SigningEnabled false
+        }
+    }
+
     dexOptions {
         javaMaxHeapSize "4g"
     }

@@ -99,7 +99,7 @@ public class custFrag extends Fragment implements custAdapter.CustomerAdapterLis
                 if(pDialog.isShowing())
                     pDialog.dismiss();
             }
-        },1000);
+        },700);
 
         return rootView;
     }
