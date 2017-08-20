@@ -146,11 +146,11 @@ public class dialogue extends AppCompatActivity {
         protected Void doInBackground(Void... params) {
 
             if (id.equals("")) {
-                db = dbRef.child("Task").child(TaskDetail.task_id).child("measurement").push();
+                db = dbRef.child("Task").child(TaskDetail.task_id).child("Measurement").push();
                 id = db.getKey();
             }
 
-            db = dbRef.child("Task").child(TaskDetail.task_id).child("measurement").child(id);
+            db = dbRef.child("Task").child(TaskDetail.task_id).child("Measurement").child(id);
 
             if(!tempUri.toString().equals("")) {
                 sf = storageReference.child(TaskDetail.task_id).child(id + ".jpeg");

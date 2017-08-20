@@ -146,7 +146,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         dbQuotation = dbTask.child("Quotation").getRef();
         dbCompleted = dbTask.child("CompletedBy").getRef();
         dbAssigned = dbTask.child("AssignedTo").getRef();
-        dbMeasurement = dbTask.child("measurement").getRef();
+        dbMeasurement = dbTask.child("Measurement").getRef();
         dbDescImages = dbTask.child("DescImages").getRef();
 
         rec_measurement.setLayoutManager(new LinearLayoutManager(this));
