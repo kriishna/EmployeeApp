@@ -17,6 +17,8 @@ import com.example.pulkit.employeeapp.MainViews.TaskHome;
 import com.example.pulkit.employeeapp.R;
 import com.google.firebase.database.DatabaseReference;
 
+import org.apache.commons.lang3.text.WordUtils;
+
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 
 public class MyProfile extends AppCompatActivity {
@@ -89,6 +91,9 @@ public class MyProfile extends AppCompatActivity {
                         temp_name = name_new.getText().toString();
                         temp_num = num_new.getText().toString();
 
+                        temp_name = WordUtils.capitalizeFully(temp_name);
+                        temp_add= WordUtils.capitalizeFully(temp_add);
+
                         if(TextUtils.isEmpty(temp_add) || TextUtils.isEmpty(temp_name) || TextUtils.isEmpty(temp_num))
                             Toast.makeText(MyProfile.this,"Enter details...",Toast.LENGTH_SHORT).show();
 
@@ -98,6 +103,7 @@ public class MyProfile extends AppCompatActivity {
                             db.child("address").setValue(temp_add);
                             db.child("phone_num").setValue(temp_num);
                             DBREF.child("Users").child("Usersessions").child(session.getUsername()).child("num").setValue(temp_num);
+                            DBREF.child("Users").child("Usersessions").child(session.getUsername()).child("name").setValue(temp_name);
 
                             session.edit_oldusersession(temp_name,temp_num,temp_add);
                             customerEditDetails.dismiss();

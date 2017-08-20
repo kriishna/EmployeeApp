@@ -3,6 +3,7 @@
     android:id="@+id/mainCommentLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/backgroundColorLight"
     android:focusable="true"
     android:focusableInTouchMode="true">
 
@@ -11,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/sendComment"
-        android:background="@color/grey_300"
+        android:background="@color/backgroundColorLight"
         android:nestedScrollingEnabled="true"
         android:padding="6dp"
         android:windowSoftInputMode="adjustResize" />
@@ -21,7 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@drawable/edittext_bg_whitebg"
+        android:background="@drawable/edittext_bg_peach"
         android:orientation="vertical"
         android:padding="5dp"
         android:windowSoftInputMode="adjustResize">
