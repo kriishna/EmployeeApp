@@ -14,7 +14,7 @@ android {
     }
 
 
-    signingConfigs {
+  /*  signingConfigs {
         release {
             keyAlias 'key'
             keyPassword 'flex00'
@@ -22,7 +22,7 @@ android {
             storePassword 'flex00'
             v2SigningEnabled false
         }
-    }
+    }*/
 
     dexOptions {
         javaMaxHeapSize "4g"
