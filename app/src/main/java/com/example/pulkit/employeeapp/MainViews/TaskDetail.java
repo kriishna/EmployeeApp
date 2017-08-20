@@ -65,6 +65,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import static com.example.pulkit.employeeapp.EmployeeApp.AppName;
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 import static com.example.pulkit.employeeapp.EmployeeApp.sendNotif;
 
@@ -99,6 +100,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     final int PICK_FILE_REQUEST = 0;
     private MarshmallowPermissions marshmallowPermissions;
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+    private static final int PICK_FILE_REQUEST = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -383,7 +385,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.item1:
-                FirebaseDatabase.getInstance().getReference().child("MeChat").child("Customer").child(id).child("phone_num").addValueEventListener(new ValueEventListener() {
+                DBREF.child("Customer").child(id).child("phone_num").addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         num = dataSnapshot.getValue(String.class);
@@ -635,7 +637,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
             holder.download_taskdetail_image.setVisibility(View.GONE);
             String url = DescImages.get(position);
             StorageReference str = FirebaseStorage.getInstance().getReferenceFromUrl(url);
-            File rootPath = new File(Environment.getExternalStorageDirectory(), "MeChat/TaskDetailImages");
+            File rootPath = new File(Environment.getExternalStorageDirectory(), AppName+"/TaskDetailImages");
 
             if (!rootPath.exists()) {
                 rootPath.mkdirs();

@@ -32,7 +32,7 @@ public class EmployeeApp extends android.support.multidex.MultiDexApplication {
 
         Fresco.initialize(getApplicationContext());
 
-        DBREF = FirebaseDatabase.getInstance().getReference().child("MeChat").getRef();
+        DBREF = FirebaseDatabase.getInstance().getReference().child(AppName).getRef();
         session = new EmployeeSession(this);
         String userkey = session.getUsername();
         setOnlineStatus(userkey);
