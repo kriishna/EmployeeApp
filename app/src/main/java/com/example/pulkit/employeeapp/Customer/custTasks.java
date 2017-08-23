@@ -289,7 +289,7 @@ public class custTasks extends AppCompatActivity implements taskAdapter.TaskAdap
                     public void onClick(View v) {
                         final String employeesnote = employeeNote.getText().toString().trim();
                         Calendar c = Calendar.getInstance();
-                        final String curdate =  new SimpleDateFormat("DD/MM/YYYY").format(c.getTime());
+                        final String curdate =  new SimpleDateFormat("dd/MM/yyyy").format(c.getTime());
                         confirmation.dismiss();
 
                         for(final Task task:TaskList)

@@ -76,7 +76,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     public static String task_id;
     public String emp_id, desig;
     private Task task;
-    private String customername, mykey;
+    private String customername,custId, mykey;
     EditText startDate, endDate, quantity, description, coordinators_message;
     RecyclerView rec_measurement, rec_DescImages;
     Button forward;
@@ -97,7 +97,6 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     EmployeeSession session;
     String dbTablekey, id;
     String num;
-    final int PICK_FILE_REQUEST = 0;
     private MarshmallowPermissions marshmallowPermissions;
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
     private static final int PICK_FILE_REQUEST = 1;
@@ -161,9 +160,9 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         adapter_taskimages = new taskdetailDescImageAdapter(DescImages, getApplicationContext(), this);
         rec_DescImages.setAdapter(adapter_taskimages);
 
-        if(desig.toLowerCase().equals("field executive"))
+       /* if(desig.toLowerCase().equals("field executive"))
             measure.setVisibility(View.GONE);
-
+*/
         dbDescImages.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -211,7 +210,8 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                 task = dataSnapshot.getValue(Task.class);
                 setValue(task);
                 getSupportActionBar().setTitle(task.getName());
-                DatabaseReference dbCustomerName = DBREF.child("Customer").child(task.getCustomerId()).getRef();
+                custId = task.getCustomerId();
+                DatabaseReference dbCustomerName = DBREF.child("Customer").child(custId).getRef();
                 dbCustomerName.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -364,6 +364,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
 
                 Intent serviceIntent = new Intent(this, UploadQuotationService.class);
                 serviceIntent.putExtra("TaskIdList", taskid_list);
+                serviceIntent.putExtra("customerId", custId);
                 serviceIntent.putExtra("selectedFileUri", selectedFileUri.toString());
 
                 this.startService(serviceIntent);

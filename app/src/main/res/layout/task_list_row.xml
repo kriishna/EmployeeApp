@@ -94,10 +94,10 @@
         android:id="@+id/timestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
         android:textColor="@color/timestamp"
         android:textSize="@dimen/timestamp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:layout_below="@+id/icon_container"/>
 
     <RelativeLayout
         android:id="@+id/unread"

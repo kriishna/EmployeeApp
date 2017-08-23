@@ -19,7 +19,7 @@ public class EmployeeApp extends android.support.multidex.MultiDexApplication {
     public static DatabaseReference DBREF;
     private EmployeeSession session;
     public static SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy hh:mm aa");
-    public static String AppName = "MeChat";
+    public static String AppName = "demo";
 
     @Override
     public void onCreate() {

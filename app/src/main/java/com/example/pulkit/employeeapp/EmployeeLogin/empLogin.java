@@ -1,5 +1,6 @@
 package com.example.pulkit.employeeapp.EmployeeLogin;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -34,6 +35,7 @@ public class empLogin extends AppCompatActivity {
     TextInputLayout input_email, input_password;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
+    ProgressDialog pDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +103,13 @@ public class empLogin extends AppCompatActivity {
     private void login() {
         DatabaseReference db = DBREF.child("Employee").child(Username).getRef();
 
+
+        pDialog = new ProgressDialog(this);
+        pDialog.setMessage("Logging in...");
+        pDialog.setCancelable(true);
+        pDialog.show();
+
+
         db.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -112,11 +121,15 @@ public class empLogin extends AppCompatActivity {
                     x = employee.getDesignation();
 
                     if (!employee.getPassword().equals(Password)) {
+                        pDialog.dismiss();
                         Toast.makeText(getBaseContext(), "Wrong Password", Toast.LENGTH_SHORT).show();
                     } else {
                         session.create_oldusersession(Username, employee.getDesignation(), employee.getName(), employee.getPhone_num(), employee.getAddress());
                         EmployeeApp.setOnlineStatus(Username);
                         String myFCMToken;
+
+                        pDialog.dismiss();
+
                         if (FirebaseInstanceId.getInstance().getToken() == null)
                             myFCMToken = sharedPreferences.getString("myFCMToken", "");
 
@@ -136,6 +149,8 @@ public class empLogin extends AppCompatActivity {
 
                     }
                 } else {
+                    pDialog.dismiss();
+
                     Toast.makeText(getBaseContext(), "Employee Not Registered", Toast.LENGTH_SHORT).show();
                 }
             }
