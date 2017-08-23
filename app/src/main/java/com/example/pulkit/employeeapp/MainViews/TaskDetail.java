@@ -97,7 +97,6 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     EmployeeSession session;
     String dbTablekey, id;
     String num;
-    final int PICK_FILE_REQUEST = 0;
     private MarshmallowPermissions marshmallowPermissions;
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
     private static final int PICK_FILE_REQUEST = 1;
@@ -161,9 +160,9 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         adapter_taskimages = new taskdetailDescImageAdapter(DescImages, getApplicationContext(), this);
         rec_DescImages.setAdapter(adapter_taskimages);
 
-        if(desig.toLowerCase().equals("field executive"))
+       /* if(desig.toLowerCase().equals("field executive"))
             measure.setVisibility(View.GONE);
-
+*/
         dbDescImages.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
