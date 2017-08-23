@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+
 import com.example.pulkit.employeeapp.helper.DividerItemDecoration;
 
 import android.support.v7.widget.DefaultItemAnimator;
@@ -31,7 +32,7 @@ import java.util.List;
 
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 
-public class taskFrag extends Fragment implements taskAdapter.TaskAdapterListener{
+public class taskFrag extends Fragment implements taskAdapter.TaskAdapterListener {
 
     RecyclerView task_list;
     DatabaseReference dbTask, db;
@@ -87,10 +88,10 @@ public class taskFrag extends Fragment implements taskAdapter.TaskAdapterListene
 
     @Override
     public void onTaskRowClicked(int position) {
-        Intent intent = new Intent(getContext(),TaskDetail.class);
+        Intent intent = new Intent(getContext(), TaskDetail.class);
         Task task = TaskList.get(position);
-        intent.putExtra("customerId",task.getCustomerId());
-        intent.putExtra("task_id",task.getTaskId());
+        intent.putExtra("customerId", task.getCustomerId());
+        intent.putExtra("task_id", task.getTaskId());
         startActivity(intent);
     }
 
@@ -168,10 +169,10 @@ public class taskFrag extends Fragment implements taskAdapter.TaskAdapterListene
     @Override
     public void onPause() {
         super.onPause();
-        if(ch!=null)
-        dbTask.removeEventListener(ch);
-        if(vl!=null)
-        db.removeEventListener(vl);
+        if (ch != null)
+            dbTask.removeEventListener(ch);
+        if (vl != null)
+            db.removeEventListener(vl);
     }
 
     @Override
