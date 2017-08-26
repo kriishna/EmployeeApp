@@ -84,8 +84,10 @@ public class EmployeeApp extends android.support.multidex.MultiDexApplication {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String receiverFCMToken = dataSnapshot.getValue(String.class);
-                Notif newNotif = new Notif(id, timestamp, type, senderId, receiverId, receiverFCMToken, content, taskId);
-                DBREF.child("Notification").child(receiverId).child(id).setValue(newNotif);
+                if (receiverFCMToken != null && !receiverFCMToken.equals("")) {
+                    Notif newNotif = new Notif(id, timestamp, type, senderId, receiverId, receiverFCMToken, content, taskId);
+                    DBREF.child("Notification").child(receiverId).child(id).setValue(newNotif);
+                }
             }
 
             @Override
@@ -109,7 +111,7 @@ public class EmployeeApp extends android.support.multidex.MultiDexApplication {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             String receiverFCMToken = dataSnapshot.getValue(String.class);
-                            if (!receiverFCMToken.equals("") && receiverFCMToken != null) {
+                            if (receiverFCMToken != null&&!receiverFCMToken.equals("") ) {
                                 Notif newNotif = new Notif(id, timestamp, type, senderId, receiverId, receiverFCMToken, content, taskId);
                                 DBREF.child("Notification").child(receiverId).child(id).setValue(newNotif);
 

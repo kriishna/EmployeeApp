@@ -57,4 +57,6 @@ public class ViewImageAdapter extends  RecyclerView.Adapter<ViewImageAdapter.MyV
         return list.size();
     }
 
+
+
 }

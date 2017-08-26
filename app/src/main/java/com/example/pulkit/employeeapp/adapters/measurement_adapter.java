@@ -32,7 +32,6 @@ public class measurement_adapter extends RecyclerView.Adapter<measurement_adapte
 
         public MyViewHolder(View itemView) {
             super(itemView);
-            tag = (TextView) itemView.findViewById(R.id.tag);
             width = (TextView) itemView.findViewById(R.id.width);
             height = (TextView) itemView.findViewById(R.id.height);
             fleximage = (CircleImageView) itemView.findViewById(R.id.fleximage);
@@ -51,7 +50,6 @@ public class measurement_adapter extends RecyclerView.Adapter<measurement_adapte
     @Override
     public void onBindViewHolder(final measurement_adapter.MyViewHolder holder, int position) {
         measurement msr = list.get(position);
-        holder.tag.setText(msr.getTag());
         holder.width.setText(msr.getWidth());
         holder.height.setText(msr.getHeight());
         holder.unit.setText(msr.getUnit());

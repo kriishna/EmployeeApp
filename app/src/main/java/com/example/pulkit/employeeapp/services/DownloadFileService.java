@@ -72,7 +72,6 @@ public class DownloadFileService extends IntentService {
 
     public void downloadFile(final String url, final String task_id) {
 
-        String h = url;
         StorageReference mStorageRef = FirebaseStorage.getInstance().getReferenceFromUrl(url);
         File rootPath = new File(Environment.getExternalStorageDirectory(), AppName +"/Images");
         if (!rootPath.exists()) {
@@ -88,7 +87,6 @@ public class DownloadFileService extends IntentService {
                 Log.e("firebase ", ";local tem file created  created " + localFile.toString());
                 Toast.makeText(DownloadFileService.this, "Downloaded Quotation", Toast.LENGTH_SHORT).show();
                 updateNotification("Succesfully Downloaded");
-                stopSelf();
 
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -96,29 +94,11 @@ public class DownloadFileService extends IntentService {
             public void onFailure(@NonNull Exception exception) {
                 Toast.makeText(DownloadFileService.this, "Download Failed", Toast.LENGTH_SHORT).show();
                 updateNotification("Download failed");
-                stopSelf();
                 Log.e("firebase ", ";local tem file not created  created " + exception.toString());
             }
         }).addOnProgressListener(new OnProgressListener<FileDownloadTask.TaskSnapshot>() {
             @Override
             public void onProgress(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                double fprogress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
-                long bytes = taskSnapshot.getBytesTransferred();
-
-                String progress = String.format("%.2f", fprogress);
-                int constant = 1000;
-                if (bytes % constant == 0) {
-                    android.support.v4.app.NotificationCompat.Builder mBuilder =
-                            new NotificationCompat.Builder(getApplicationContext())
-                                    .setSmallIcon(android.R.drawable.stat_sys_download)
-                                    .setContentTitle("Downloading " + task_id + "Quotation.pdf")
-                                    .setContentText(" " + progress + "% completed");
-
-                    NotificationManager mNotificationManager =
-                            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-                    mNotificationManager.notify(100, mBuilder.build());
-                }
             }
         });
     }
@@ -141,6 +121,9 @@ public class DownloadFileService extends IntentService {
         synchronized (this) {
             notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.notify(0, mBuilder.build());
+            stopSelf();
+
         }
+
     }
 }

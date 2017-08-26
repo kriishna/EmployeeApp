@@ -143,7 +143,6 @@ public class CompressMe
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-
         return filename;
 
     }

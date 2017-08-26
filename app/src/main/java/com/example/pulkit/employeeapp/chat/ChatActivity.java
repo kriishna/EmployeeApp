@@ -76,7 +76,6 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
     LinearLayoutManager linearLayoutManager;
     private MarshmallowPermissions marshmallowPermissions;
     LinearLayout emptyView;
-    private ArrayList<String> mResults;
     private ActionModeCallback actionModeCallback;
     private ActionMode actionMode;
     boolean mServiceBound = false;
@@ -238,13 +237,13 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
                     if (photoPaths.size() > 0)
                     {
                         viewSelectedImages = new AlertDialog.Builder(ChatActivity.this)
-                                .setTitle("Selected Images").setView(R.layout.activity_view_selected_image).create();
+                                .setView(R.layout.activity_view_selected_image).create();
                         viewSelectedImages.show();
 
                         final ImageView ImageViewlarge = (ImageView) viewSelectedImages.findViewById(R.id.ImageViewlarge);
                         ImageButton cancel = (ImageButton) viewSelectedImages.findViewById(R.id.cancel);
-                        Button canceldone = (Button)viewSelectedImages.findViewById(R.id.canceldone);
-                        Button okdone = (Button)viewSelectedImages.findViewById(R.id.okdone);
+                        ImageButton canceldone = (ImageButton)viewSelectedImages.findViewById(R.id.canceldone);
+                        ImageButton okdone = (ImageButton)viewSelectedImages.findViewById(R.id.okdone);
                         RecyclerView rv = (RecyclerView) viewSelectedImages.findViewById(R.id.viewImages);
 
                         linearLayoutManager = new LinearLayoutManager(getApplicationContext(),LinearLayoutManager.HORIZONTAL,false);
@@ -291,6 +290,7 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
                         canceldone.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+                                photoPaths.clear();
                                 viewSelectedImages.dismiss();
                             }
                         });
@@ -463,7 +463,6 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
                 break;
 
             case R.id.photoattach:
-                mResults = new ArrayList<>();
                 if (!marshmallowPermissions.checkPermissionForCamera())
                     marshmallowPermissions.requestPermissionForCamera();
                 if (!marshmallowPermissions.checkPermissionForExternalStorage())

@@ -3,6 +3,7 @@ package com.example.pulkit.employeeapp.MainViews;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -14,6 +15,9 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+
+import com.example.pulkit.employeeapp.adapters.ViewImageAdapter;
+import com.example.pulkit.employeeapp.helper.CompressMe;
 import com.example.pulkit.employeeapp.helper.DividerItemDecoration;
 
 import android.support.v7.widget.DefaultItemAnimator;
@@ -26,6 +30,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -39,6 +44,8 @@ import com.example.pulkit.employeeapp.adapters.taskdetailDescImageAdapter;
 import com.example.pulkit.employeeapp.chat.ChatActivity;
 import com.example.pulkit.employeeapp.helper.FilePath;
 import com.example.pulkit.employeeapp.helper.MarshmallowPermissions;
+import com.example.pulkit.employeeapp.listener.ClickListener;
+import com.example.pulkit.employeeapp.listener.RecyclerTouchListener;
 import com.example.pulkit.employeeapp.measurement.MeasureList;
 import com.example.pulkit.employeeapp.model.CompletedBy;
 import com.example.pulkit.employeeapp.model.CompletedJob;
@@ -58,12 +65,18 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.zfdang.multiple_images_selector.ImagesSelectorActivity;
+import com.zfdang.multiple_images_selector.SelectorSettings;
 
 import java.io.File;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+
+import droidninja.filepicker.FilePickerBuilder;
+import droidninja.filepicker.FilePickerConst;
 
 import static com.example.pulkit.employeeapp.EmployeeApp.AppName;
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
@@ -71,15 +84,19 @@ import static com.example.pulkit.employeeapp.EmployeeApp.sendNotif;
 
 public class TaskDetail extends AppCompatActivity implements taskdetailDescImageAdapter.ImageAdapterListener, bigimage_adapter.bigimage_adapterListener {
 
+    private static final int REQUEST_CODE = 101;
     DatabaseReference dbRef, dbTask, dbCompleted, dbAssigned, dbMeasurement, dbDescImages;
     ImageButton download;
     public static String task_id;
     public String emp_id, desig;
     private Task task;
-    private String customername,custId, mykey;
+    String item;
+    private ArrayList<String> docPaths = new ArrayList<>(), photoPaths = new ArrayList<>();
+    private String customername, custId, mykey;
     EditText startDate, endDate, quantity, description, coordinators_message;
     RecyclerView rec_measurement, rec_DescImages;
     Button forward;
+    CompressMe compressMe;
     ArrayList<measurement> measurementList = new ArrayList<>();
     measurement_adapter adapter_measurement;
     TextView appByCustomer, uploadStatus;
@@ -91,7 +108,8 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     ScrollView scroll;
     taskdetailDescImageAdapter adapter_taskimages;
     bigimage_adapter adapter;
-    private AlertDialog viewSelectedImages, confirmation;
+    ViewImageAdapter madapter;
+    private AlertDialog viewSelectedImages, confirmation, viewSelectedImages1;
     ArrayList<String> DescImages = new ArrayList<>();
     LinearLayoutManager linearLayoutManager;
     EmployeeSession session;
@@ -113,8 +131,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         marshmallowPermissions = new MarshmallowPermissions(this);
         progressDialog = new ProgressDialog(this);
         download = (ImageButton) findViewById(R.id.download);
-        if(session.getDesig().toLowerCase().equals("quotation"))
-        {
+        if (session.getDesig().toLowerCase().equals("quotation")) {
             download.setVisibility(View.GONE);
         }
         uploadStatus = (TextView) findViewById(R.id.uploadStatus);
@@ -159,6 +176,8 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         rec_DescImages.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.HORIZONTAL));
         adapter_taskimages = new taskdetailDescImageAdapter(DescImages, getApplicationContext(), this);
         rec_DescImages.setAdapter(adapter_taskimages);
+
+        compressMe = new CompressMe(this);
 
        /* if(desig.toLowerCase().equals("field executive"))
             measure.setVisibility(View.GONE);
@@ -290,7 +309,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                                     String contentforother = "Employee " + session.getName() + " completed " + task.getName();
                                     sendNotif(mykey, completedJob.getAssignedByUsername(), "completedJob", contentforother, task_id);
                                     Toast.makeText(TaskDetail.this, contentforme, Toast.LENGTH_SHORT).show();
-                                    Intent intent1 = new Intent(TaskDetail.this,TaskHome.class);
+                                    Intent intent1 = new Intent(TaskDetail.this, TaskHome.class);
                                     intent1.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                     startActivity(intent1);
 
@@ -342,35 +361,111 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == PICK_FILE_REQUEST) {
-                if (data == null) {
-                    //no data present
-                    return;
+        switch (requestCode) {
+            case REQUEST_CODE:
+                if (resultCode == Activity.RESULT_OK && data != null) {
+                    photoPaths = data.getStringArrayListExtra(SelectorSettings.SELECTOR_RESULTS);
+                    assert photoPaths != null;
+
+                    System.out.println(String.format("Totally %d images selected:", photoPaths.size()));
+                    if (photoPaths.size() > 0) {
+                        viewSelectedImages1 = new AlertDialog.Builder(TaskDetail.this)
+                                .setView(R.layout.activity_view_selected_image).create();
+                        viewSelectedImages1.show();
+
+                        final ImageView ImageViewlarge = (ImageView) viewSelectedImages1.findViewById(R.id.ImageViewlarge);
+                        ImageButton cancel = (ImageButton) viewSelectedImages1.findViewById(R.id.cancel);
+                        ImageButton canceldone = (ImageButton) viewSelectedImages1.findViewById(R.id.canceldone);
+                        ImageButton okdone = (ImageButton) viewSelectedImages1.findViewById(R.id.okdone);
+                        RecyclerView rv = (RecyclerView) viewSelectedImages1.findViewById(R.id.viewImages);
+
+                        linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
+                        rv.setLayoutManager(linearLayoutManager);
+                        rv.setItemAnimator(new DefaultItemAnimator());
+                        rv.addItemDecoration(new DividerItemDecoration(getApplicationContext(), LinearLayoutManager.HORIZONTAL));
+
+                        madapter = new ViewImageAdapter(photoPaths, this);
+                        rv.setAdapter(madapter);
+
+
+                        madapter.notifyDataSetChanged();
+
+                        item = photoPaths.get(0);
+                        ImageViewlarge.setImageURI(Uri.parse(item));
+
+                        rv.performClick();
+
+                        rv.addOnItemTouchListener(new RecyclerTouchListener(this, rv, new ClickListener() {
+                            @Override
+                            public void onClick(View view, int position) {
+                                madapter.selectedPosition = position;
+                                madapter.notifyDataSetChanged();
+                                item = photoPaths.get(position);
+                                ImageViewlarge.setImageURI(Uri.parse(item));
+                            }
+
+                            @Override
+                            public void onLongClick(View view, int position) {
+
+                            }
+                        }));
+
+                        cancel.setVisibility(View.GONE);
+
+                        canceldone.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                photoPaths.clear();
+                                viewSelectedImages1.dismiss();
+                            }
+                        });
+
+                        okdone.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                String l = compressMe.compressImage(photoPaths.get(0), TaskDetail.this);
+                                uploadFile(l, "photo");
+                                viewSelectedImages1.dismiss();
+
+                            }
+                        });
+
+                    }
                 }
+                break;
 
-                String selectedFilePath = "";
-                Uri selectedFileUri = data.getData();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    selectedFilePath = FilePath.getPath(this, selectedFileUri);
+            case FilePickerConst.REQUEST_CODE_DOC:
+                if (resultCode == Activity.RESULT_OK && data != null) {
+                    docPaths = new ArrayList<>();
+                    docPaths.addAll(data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_DOCS));
+                    for (String result : docPaths) {
+                        uploadFile(result, "doc");
+                    }
                 }
+                break;
 
-                ArrayList<String> taskid_list = new ArrayList<>();
+        }
 
-                if (selectedFilePath != null && !selectedFilePath.equals("")) {
-                    //               final Task task = TaskList.get(i);
-                    taskid_list.add(task.getTaskId());
-                }
+    }
 
-                Intent serviceIntent = new Intent(this, UploadQuotationService.class);
-                serviceIntent.putExtra("TaskIdList", taskid_list);
-                serviceIntent.putExtra("customerId", custId);
-                serviceIntent.putExtra("selectedFileUri", selectedFileUri.toString());
 
-                this.startService(serviceIntent);
-            } else {
-                Toast.makeText(this, "Cannot upload file to server", Toast.LENGTH_SHORT).show();
-            }
+    private void uploadFile(String filePath, String type) {
+
+        if (filePath != null && !filePath.equals("")) {
+            ArrayList<String> taskid_list = new ArrayList<>();
+
+            taskid_list.add(task.getTaskId());
+
+            String temp = Uri.fromFile(new File(filePath)).toString();
+
+            Intent serviceIntent = new Intent(this, UploadQuotationService.class);
+            serviceIntent.putExtra("TaskIdList", taskid_list);
+            serviceIntent.putExtra("customerId", custId);
+            serviceIntent.putExtra("selectedFileUri", temp);
+
+            this.startService(serviceIntent);
+        } else {
+            Toast.makeText(this, "Cannot upload file to server", Toast.LENGTH_SHORT).show();
 
         }
     }
@@ -406,10 +501,45 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                 break;
 
             case R.id.item3:
-                UploadQuotation();
+                final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage("Upload Quotation ")
+                        .setCancelable(true)
+                        .setPositiveButton("Upload File", new DialogInterface.OnClickListener() {
+                            public void onClick(final DialogInterface dialog, int id) {
+                                //          UploadQuotation();
+
+
+                                if (!marshmallowPermissions.checkPermissionForExternalStorage())
+                                    marshmallowPermissions.requestPermissionForExternalStorage();
+
+                                if (marshmallowPermissions.checkPermissionForExternalStorage()) {
+
+                                    FilePickerBuilder.getInstance().setMaxCount(1)
+                                            .setActivityTheme(R.style.AppTheme)
+                                            .pickFile(TaskDetail.this);
+                                }
+                            }
+
+
+                        })
+                        .setNegativeButton("Upload photo", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+
+                                if (!marshmallowPermissions.checkPermissionForCamera() && !marshmallowPermissions.checkPermissionForExternalStorage()) {
+                                    ActivityCompat.requestPermissions(TaskDetail.this,
+                                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA},
+                                            2);
+                                } else {
+                                    Intent intent = new Intent(TaskDetail.this, ImagesSelectorActivity.class);
+                                    intent.putExtra(SelectorSettings.SELECTOR_MAX_IMAGE_NUMBER, 1);
+                                    intent.putExtra(SelectorSettings.SELECTOR_SHOW_CAMERA, true);
+                                    startActivityForResult(intent, REQUEST_CODE);
+                                }
+                            }
+                        });
+                AlertDialog alert = builder.create();
+                alert.show();
                 break;
-
-
         }
         return true;
     }
@@ -590,7 +720,8 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         switch (requestCode) {
             case 1: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -638,7 +769,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
             holder.download_taskdetail_image.setVisibility(View.GONE);
             String url = DescImages.get(position);
             StorageReference str = FirebaseStorage.getInstance().getReferenceFromUrl(url);
-            File rootPath = new File(Environment.getExternalStorageDirectory(), AppName+"/TaskDetailImages");
+            File rootPath = new File(Environment.getExternalStorageDirectory(), AppName + "/TaskDetailImages");
 
             if (!rootPath.exists()) {
                 rootPath.mkdirs();

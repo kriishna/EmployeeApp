@@ -2,19 +2,16 @@ package com.example.pulkit.employeeapp.measurement;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.MediaStore;
+import android.os.Handler;
+
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -23,30 +20,42 @@ import android.widget.Toast;
 
 import com.example.pulkit.employeeapp.MainViews.TaskDetail;
 import com.example.pulkit.employeeapp.R;
+import com.example.pulkit.employeeapp.adapters.ViewImageAdapter;
+import com.example.pulkit.employeeapp.adapters.bigimage_adapter;
+import com.example.pulkit.employeeapp.helper.CompressMe;
 import com.example.pulkit.employeeapp.model.measurement;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
+import com.zfdang.multiple_images_selector.ImagesSelectorActivity;
+import com.zfdang.multiple_images_selector.SelectorSettings;
 
-import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.util.ArrayList;
 
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 
 public class dialogue extends AppCompatActivity {
 
+    private ArrayList<String> docPaths = new ArrayList<>(), photoPaths = new ArrayList<>();
     EditText width, height, unit;
     String fleximage = "", temp_width, temp_height, temp_unit, id = "";
-    private static final int CAMERA_REQUEST = 1888;
+    private static final int REQUEST_CODE = 51;
     DatabaseReference dbRef, db;
     StorageReference storageReference, sf;
     Uri tempUri = Uri.parse("");
     ProgressDialog pd;
+    CompressMe compressMe;
     ImageView img;
+    LinearLayoutManager linearLayoutManager;
+    bigimage_adapter adapter;
+    ViewImageAdapter madapter;
+    String item;
+    private AlertDialog viewSelectedImages, confirmation, viewSelectedImages1;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +71,7 @@ public class dialogue extends AppCompatActivity {
         pd = new ProgressDialog(dialogue.this);
         pd.setMessage("Uploading....");
 
+        compressMe = new CompressMe(this);
 
         if (getIntent().hasExtra("width")) {
             temp_width = getIntent().getStringExtra("width");
@@ -82,42 +92,37 @@ public class dialogue extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(cameraIntent, CAMERA_REQUEST);
+                Intent intent = new Intent(dialogue.this, ImagesSelectorActivity.class);
+                intent.putExtra(SelectorSettings.SELECTOR_MAX_IMAGE_NUMBER, 1);
+                intent.putExtra(SelectorSettings.SELECTOR_SHOW_CAMERA, true);
+                startActivityForResult(intent, REQUEST_CODE);
             }
         });
-
     }
 
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
-            Bitmap photo = (Bitmap) data.getExtras().get("data");
-       //     img.setBackground(new ColorDrawable(Color.WHITE));
-            img.setBackground(new BitmapDrawable(photo));
+        if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
 
-            tempUri = getImageUri(getApplicationContext(), photo);
+            photoPaths = data.getStringArrayListExtra(SelectorSettings.SELECTOR_RESULTS);
+            assert photoPaths != null;
 
+            System.out.println(String.format("Totally %d images selected:", photoPaths.size()));
+            if (photoPaths.size() > 0) {
+                new Handler().postDelayed(new Runnable() {
+                    public void run() {
+
+                        item = photoPaths.get(0);
+                        String l = compressMe.compressImage(item, dialogue.this);
+                        img.setImageURI(Uri.parse(l));
+                        tempUri = Uri.fromFile(new File(l));
+                    }
+                }, 500);
+
+            }
 
         }
 
-
-    }
-
-    public Uri getImageUri(Context inContext, Bitmap inImage) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
-        return Uri.parse(path);
-    }
-
-    public String getRealPathFromURI(Uri uri) {
-        String temp;
-        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
-        cursor.moveToFirst();
-        int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-        temp = cursor.getString(idx);
-        cursor.close();
-        return temp;
     }
 
 
@@ -152,7 +157,7 @@ public class dialogue extends AppCompatActivity {
 
             db = dbRef.child("Task").child(TaskDetail.task_id).child("Measurement").child(id);
 
-            if(!tempUri.toString().equals("")) {
+            if (!tempUri.toString().equals("")) {
                 sf = storageReference.child(TaskDetail.task_id).child(id + ".jpeg");
 
                 UploadTask uploadTask = sf.putFile(tempUri);
@@ -189,8 +194,7 @@ public class dialogue extends AppCompatActivity {
                     }
                 });
 
-            }
-            else{
+            } else {
                 Intent intent = new Intent();
                 intent.putExtra("width", temp_width);
                 intent.putExtra("height", temp_height);

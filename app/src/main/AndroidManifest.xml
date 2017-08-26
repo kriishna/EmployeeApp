@@ -38,6 +38,10 @@
         <category android:name="android.intent.category.DEFAULT" />
 
         <activity
+            android:name="com.zfdang.multiple_images_selector.ImagesSelectorActivity"
+            android:configChanges="orientation|screenSize" />
+
+        <activity
             android:name=".MainViews.TaskHome"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"/>
