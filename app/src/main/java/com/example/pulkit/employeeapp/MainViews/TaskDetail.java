@@ -32,6 +32,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -765,6 +766,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         if (!marshmallowPermissions.checkPermissionForExternalStorage()) {
             marshmallowPermissions.requestPermissionForExternalStorage();
         } else {
+            holder.progressBar = new ProgressBar(TaskDetail.this);
             holder.progressBar.setVisibility(View.VISIBLE);
             holder.download_taskdetail_image.setVisibility(View.GONE);
             String url = DescImages.get(position);
