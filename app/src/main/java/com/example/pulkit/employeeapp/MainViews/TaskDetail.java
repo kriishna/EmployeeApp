@@ -133,7 +133,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         marshmallowPermissions = new MarshmallowPermissions(this);
         progressDialog = new ProgressDialog(this);
         download = (ImageButton) findViewById(R.id.download);
-        if (!session.getDesig().toLowerCase().equals("quotation")) {
+        if (!session.getDesig().toLowerCase().equals("accounts")) {
             download.setVisibility(View.GONE);
         }
         uploadStatus = (TextView) findViewById(R.id.uploadStatus);

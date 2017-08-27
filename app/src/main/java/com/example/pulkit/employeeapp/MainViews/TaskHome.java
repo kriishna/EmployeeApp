@@ -62,7 +62,7 @@ public class TaskHome extends drawer {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        if (desig.toLowerCase().equals("quotation"))
+        if (desig.toLowerCase().equals("accounts"))
             adapter.addFragment(new custFrag(), "Customers");
         else
             adapter.addFragment(new taskFrag(), "Tasks");
