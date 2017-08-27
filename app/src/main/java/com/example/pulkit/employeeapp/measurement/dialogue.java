@@ -41,7 +41,7 @@ import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 
 public class dialogue extends AppCompatActivity {
 
-    private ArrayList<String> docPaths = new ArrayList<>(), photoPaths = new ArrayList<>();
+    private ArrayList<String> photoPaths = new ArrayList<>();
     EditText width, height, unit;
     String fleximage = "", temp_width, temp_height, temp_unit, id = "";
     private static final int REQUEST_CODE = 51;
@@ -51,11 +51,7 @@ public class dialogue extends AppCompatActivity {
     ProgressDialog pd;
     CompressMe compressMe;
     ImageView img;
-    LinearLayoutManager linearLayoutManager;
-    bigimage_adapter adapter;
-    ViewImageAdapter madapter;
     String item;
-    private AlertDialog viewSelectedImages, confirmation, viewSelectedImages1;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -58,10 +58,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_margin="20dp"
             android:src="@drawable/ic_camera_alt_black_24dp"
             android:background="@color/grey_100"
-            android:elevation="10dp"
+            android:elevation="1dp"
             android:padding="30dp" />
 
 

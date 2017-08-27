@@ -99,6 +99,7 @@ public class DownloadFileService extends IntentService {
         }).addOnProgressListener(new OnProgressListener<FileDownloadTask.TaskSnapshot>() {
             @Override
             public void onProgress(FileDownloadTask.TaskSnapshot taskSnapshot) {
+
             }
         });
     }
@@ -122,8 +123,8 @@ public class DownloadFileService extends IntentService {
             notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.notify(0, mBuilder.build());
             stopSelf();
-
         }
-
     }
+
+
 }

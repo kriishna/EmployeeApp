@@ -38,7 +38,9 @@ import com.example.pulkit.employeeapp.helper.TouchImageView;
 import com.example.pulkit.employeeapp.listener.ClickListener;
 import com.example.pulkit.employeeapp.listener.RecyclerTouchListener;
 import com.example.pulkit.employeeapp.model.ChatMessage;
+import com.example.pulkit.employeeapp.model.Employee;
 import com.example.pulkit.employeeapp.model.NameAndStatus;
+import com.example.pulkit.employeeapp.services.DownloadFileForChatService;
 import com.example.pulkit.employeeapp.services.UploadPhotoAndFile;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -64,31 +66,30 @@ import droidninja.filepicker.FilePickerConst;
 import static com.example.pulkit.employeeapp.EmployeeApp.AppName;
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 import static com.example.pulkit.employeeapp.EmployeeApp.formatter;
-
-public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatAdapterListener,View.OnClickListener{
+public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatAdapterListener, View.OnClickListener {
     private EditText typeComment;
     private ImageButton sendButton;
     Intent intent;
     private RecyclerView recyclerView;
-    DatabaseReference dbChat,dbOnlineStatus;
+    DatabaseReference dbChat, dbOnlineStatus;
     ValueEventListener dbOnlineStatusVle;
     private String otheruserkey, mykey;
     LinearLayoutManager linearLayoutManager;
     private MarshmallowPermissions marshmallowPermissions;
     LinearLayout emptyView;
+    private ArrayList<String> mResults;
     private ActionModeCallback actionModeCallback;
     private ActionMode actionMode;
-    boolean mServiceBound = false;
     private chatAdapter mAdapter;
     private ArrayList<ChatMessage> chatList = new ArrayList<>();
-    String receiverToken="nil";
+    String receiverToken = "nil";
     private ChildEventListener dbChatlistener;
     ImageButton photoattach, docattach;
     public String dbTableKey;
     private EmployeeSession session;
-    private ArrayList<String> docPaths,photoPaths;
+    private ArrayList<String> docPaths, photoPaths;
     CompressMe compressMe;
-    private AlertDialog viewSelectedImages ;
+    private AlertDialog viewSelectedImages;
     ViewImageAdapter adapter;
     String num;
 
@@ -96,9 +97,7 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
-        marshmallowPermissions = new MarshmallowPermissions(this);
         marshmallowPermissions = new MarshmallowPermissions(this);
         if(!marshmallowPermissions.checkPermissionForExternalStorage())
         {
@@ -118,11 +117,11 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
         dbOnlineStatusVle = dbOnlineStatus.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists())
-                {
+                if (dataSnapshot.exists()) {
+
                     NameAndStatus nameAndStatus = dataSnapshot.getValue(NameAndStatus.class);
-                    getSupportActionBar().setTitle(nameAndStatus.getName());
                     num = nameAndStatus.getNum();
+                    getSupportActionBar().setTitle(nameAndStatus.getName());
                     if(nameAndStatus.getOnline())
                     {
                         getSupportActionBar().setSubtitle("Online");
@@ -132,6 +131,7 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
                         getSupportActionBar().setSubtitle("Offline");
                     }
                 }
+
             }
 
             @Override
@@ -140,7 +140,7 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
             }
         });
 
-        System.out.println("recevier token chat act oncreate"+getRecivertoken(otheruserkey));
+        System.out.println("recevier token chat act oncreate" + getRecivertoken(otheruserkey));
 
         session = new EmployeeSession(this);
 
@@ -161,12 +161,12 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
 
         linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
-        mAdapter = new chatAdapter(chatList, this, dbTableKey,this);
+        mAdapter = new chatAdapter(chatList, this, dbTableKey, this);
         recyclerView.setAdapter(mAdapter);
         sendButton.setOnClickListener(this);
 
-
-
+        typeComment.setFocusableInTouchMode(true);
+        typeComment.setFocusable(true);
 
         typeComment.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -191,25 +191,23 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
         switch (item.getItemId()){
             case R.id.item1:
                 Intent callIntent = new Intent(Intent.ACTION_DIAL);
-                callIntent.setData(Uri.parse("tel:" + num));
+                callIntent.setData(Uri.parse("tel:"+ num));
                 startActivity(callIntent);
                 break;
         }
         return true;
     }
 
-
     private String getRecivertoken(String otheruserkey) {
-        System.out.println(otheruserkey+"recd token in chat act ");
+        System.out.println(otheruserkey + "recd token in chat act ");
         DBREF.child("Fcmtokens").child(otheruserkey).child("token").getRef().addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
+                if (dataSnapshot.exists()) {
                     receiverToken = dataSnapshot.getValue().toString();
-                    System.out.println(dataSnapshot.getValue()+"recd token in chat act "+receiverToken);
-                }
-                else{
-                    receiverToken="nil";
+                    System.out.println(dataSnapshot.getValue() + "recd token in chat act " + receiverToken);
+                } else {
+                    receiverToken = "nil";
                 }
             }
 
@@ -218,42 +216,37 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
 
             }
         });
-        return  receiverToken;
+        return receiverToken;
     }
-
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode)
-        {
+        switch (requestCode) {
             case FilePickerConst.REQUEST_CODE_PHOTO:
-                if(resultCode== Activity.RESULT_OK && data!=null)
+                if (resultCode == Activity.RESULT_OK && data != null)
                 {
                     photoPaths = new ArrayList<>();
                     photoPaths.addAll(data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_MEDIA));
 
-                    if (photoPaths.size() > 0)
-                    {
+                    if (photoPaths.size() > 0) {
                         viewSelectedImages = new AlertDialog.Builder(ChatActivity.this)
                                 .setView(R.layout.activity_view_selected_image).create();
                         viewSelectedImages.show();
 
                         final ImageView ImageViewlarge = (ImageView) viewSelectedImages.findViewById(R.id.ImageViewlarge);
                         ImageButton cancel = (ImageButton) viewSelectedImages.findViewById(R.id.cancel);
-                        ImageButton canceldone = (ImageButton)viewSelectedImages.findViewById(R.id.canceldone);
-                        ImageButton okdone = (ImageButton)viewSelectedImages.findViewById(R.id.okdone);
+                        ImageButton canceldone = (ImageButton) viewSelectedImages.findViewById(R.id.canceldone);
+                        ImageButton okdone = (ImageButton) viewSelectedImages.findViewById(R.id.okdone);
                         RecyclerView rv = (RecyclerView) viewSelectedImages.findViewById(R.id.viewImages);
 
-                        linearLayoutManager = new LinearLayoutManager(getApplicationContext(),LinearLayoutManager.HORIZONTAL,false);
+                        linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
                         rv.setLayoutManager(linearLayoutManager);
                         rv.setItemAnimator(new DefaultItemAnimator());
                         rv.addItemDecoration(new DividerItemDecoration(getApplicationContext(), LinearLayoutManager.HORIZONTAL));
 
                         adapter = new ViewImageAdapter(photoPaths, this);
                         rv.setAdapter(adapter);
-
 
                         final String[] item = {photoPaths.get(0)};
                         ImageViewlarge.setImageURI(Uri.parse(item[0]));
@@ -279,11 +272,20 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
                                 int i = photoPaths.indexOf(item[0]);
                                 if (i == photoPaths.size() - 1)
                                     i = 0;
-                                photoPaths.remove(item[0]);
-                                adapter.selectedPosition = i;
-                                adapter.notifyDataSetChanged();
-                                item[0] = photoPaths.get(i);
-                                ImageViewlarge.setImageURI(Uri.parse(item[0]));
+                                if(photoPaths.size()==1)
+                                {
+                                    photoPaths.clear();
+                                    viewSelectedImages.dismiss();
+
+                                }
+                                else {
+                                    photoPaths.remove(item[0]);
+                                    adapter.selectedPosition = i;
+                                    adapter.notifyDataSetChanged();
+                                    item[0] = photoPaths.get(i);
+                                    ImageViewlarge.setImageURI(Uri.parse(item[0]));
+                                }
+
                             }
                         });
 
@@ -299,10 +301,9 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
                             @Override
                             public void onClick(View v) {
                                 int i = photoPaths.size();
-                                if (i>0)
-                                {
-                                    for(String result : photoPaths) {
-                                        String l = compressMe.compressImage(result,getApplicationContext());
+                                if (i > 0) {
+                                    for (String result : photoPaths) {
+                                        String l = compressMe.compressImage(result, getApplicationContext());
                                         uploadFile(l, "photo");
 
                                     }
@@ -318,25 +319,23 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
                 }
                 break;
             case FilePickerConst.REQUEST_CODE_DOC:
-                if(resultCode== Activity.RESULT_OK && data!=null)
-                {
+                if (resultCode == Activity.RESULT_OK && data != null) {
                     docPaths = new ArrayList<>();
                     docPaths.addAll(data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_DOCS));
-                    for(String result : docPaths) {
-                        uploadFile(result,"doc");
+                    for (String result : docPaths) {
+                        uploadFile(result, "doc");
                     }
                 }
                 break;
         }
     }
 
-    private void uploadFile(String filePath, String type)
-    {
+    private void uploadFile(String filePath, String type) {
         final String timestamp = formatter.format(Calendar.getInstance().getTime());
         long curTime = Calendar.getInstance().getTimeInMillis();
         final long id = curTime;
 
-        ChatMessage cm = new ChatMessage(mykey,otheruserkey,timestamp,"photo",id+"","0","nourl",receiverToken,dbTableKey,0,filePath,"");
+        ChatMessage cm = new ChatMessage(mykey, otheruserkey, timestamp, type, id + "", "0", "nourl", receiverToken, dbTableKey, 0, filePath, "");
         dbChat.child(String.valueOf(id)).setValue(cm);
 
         Intent intent = new Intent(this, UploadPhotoAndFile.class);
@@ -349,26 +348,23 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
         intent.putExtra("timestamp",timestamp);
         intent.putExtra("id",id);
         startService(intent);
+
     }
 
-
-    public void loadData()
-    {
+    public void loadData() {
 
         dbChatlistener = dbChat.orderByKey().addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if (!dataSnapshot.exists()) {
                     Toast.makeText(ChatActivity.this, "No more comments", Toast.LENGTH_SHORT).show();
-                }
-                else {
+                } else {
                     ChatMessage comment = dataSnapshot.getValue(ChatMessage.class);
                     if (!comment.getSenderUId().equals(mykey)) {
 
                         dbChat.child(comment.getId()).child("status").setValue("3");
                         comment.setStatus("3");  // all message status set to read
-                    }
-                    else {
+                    } else {
                         if (comment.getStatus().equals("0"))
                             dbChat.child(comment.getId()).child("status").setValue("1");
                         comment.setStatus("1");  // all message status set to read
@@ -380,12 +376,16 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
 
                     if(chatList.size()>0)
                         recyclerView.scrollToPosition(chatList.size()-1);
+
                 }
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                if(dataSnapshot.exists())
+                {
 
+                }
             }
 
             @Override
@@ -406,17 +406,14 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
     }
 
     @Override
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
-
-
     }
 
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-
     }
 
     @Override
@@ -427,24 +424,21 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(dbChatlistener!=null)
+        if (dbChatlistener != null)
             dbChat.removeEventListener(dbChatlistener);
-        if(dbOnlineStatusVle!=null)
+        if (dbOnlineStatusVle != null)
             dbOnlineStatus.removeEventListener(dbOnlineStatusVle);
         mAdapter.removeListeners();
-
-
     }
 
     ////maintain all the clicks on buttons on this page
     @Override
     public void onClick(View v) {
-        switch (v.getId())
-        {
+        switch (v.getId()) {
             case R.id.sendButton:
-                if(receiverToken.matches("nil")){
+                if (receiverToken.matches("nil")) {
                     getRecivertoken(otheruserkey);
-                    System.out.println("calling receiver token from send message"+receiverToken);
+                    System.out.println("calling receiver token from send message" + receiverToken);
                 }
                 String commentString = typeComment.getText().toString().trim();
                 if (TextUtils.isEmpty(commentString)) {
@@ -453,16 +447,19 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
                     long curTime = Calendar.getInstance().getTimeInMillis();
                     long id = curTime;
                     String timestamp = formatter.format(Calendar.getInstance().getTime());
-                    System.out.println(commentString+"time stamp"+timestamp);
-                    ChatMessage cm = new ChatMessage(mykey,otheruserkey,timestamp,"text",id+"","0",commentString,receiverToken,dbTableKey);
+                    System.out.println(commentString + "time stamp" + timestamp);
+                    ChatMessage cm = new ChatMessage(mykey, otheruserkey, timestamp, "text", id + "", "0", commentString, receiverToken, dbTableKey);
                     dbChat.child(String.valueOf(id)).setValue(cm);
                     DBREF.child("Chats").child(dbTableKey).child("lastMsg").setValue(id);
                     typeComment.setText("");
 
                 }
+
+
                 break;
 
             case R.id.photoattach:
+                mResults = new ArrayList<>();
                 if (!marshmallowPermissions.checkPermissionForCamera())
                     marshmallowPermissions.requestPermissionForCamera();
                 if (!marshmallowPermissions.checkPermissionForExternalStorage())
@@ -477,10 +474,10 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
 
             case R.id.docattach:
 
-                if(!marshmallowPermissions.checkPermissionForExternalStorage())
+                if (!marshmallowPermissions.checkPermissionForExternalStorage())
                     marshmallowPermissions.requestPermissionForExternalStorage();
 
-                if(marshmallowPermissions.checkPermissionForExternalStorage()) {
+                if (marshmallowPermissions.checkPermissionForExternalStorage()) {
 
                     FilePickerBuilder.getInstance().setMaxCount(10)
                             .setActivityTheme(R.style.AppTheme)
@@ -494,7 +491,6 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
     @Override
     protected void onStart() {
         super.onStart();
-
     }
 
     ///////////Everything below is for action mode
@@ -537,7 +533,6 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
                     // mAdapter.notifyDataSetChanged();
                 }
             });
-
         }
     }
 
@@ -550,6 +545,7 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
         }
         mAdapter.notifyDataSetChanged();
     }
+
     private void enableActionMode(int position) {
         if (actionMode == null) {
             actionMode = startSupportActionMode(actionModeCallback);
@@ -574,28 +570,23 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
     public void onMessageRowClicked(int position) {
         if (mAdapter.getSelectedItemCount() > 0) {
             enableActionMode(position);
-        }
-        else
-        {
+        } else {
             ChatMessage comment = chatList.get(position);
             String type = comment.getType();
             String uri;
-            if(comment.getSenderUId().equals(session.getUsername()))
-            {
+            if (comment.getSenderUId().equals(session.getUsername())) {
                 uri = comment.getMesenderlocal_storage();
-            }
-            else
-            {
+            } else {
                 uri = comment.getOthersenderlocal_storage();
             }
-            switch (type){
+            switch (type) {
                 case "photo":
                     viewSelectedImages = new AlertDialog.Builder(ChatActivity.this)
                             .setView(R.layout.viewchatimage).create();
                     viewSelectedImages.show();
 
                     TouchImageView viewchatimage = (TouchImageView) viewSelectedImages.findViewById(R.id.chatimage);
-                    ImageButton backbutton = (ImageButton)viewSelectedImages.findViewById(R.id.back);
+                    ImageButton backbutton = (ImageButton) viewSelectedImages.findViewById(R.id.back);
 
                     viewchatimage.setImageURI(Uri.parse(uri));
 
@@ -632,67 +623,19 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
     }
 
     @Override
-    public void download_chatimageClicked(final int position, final chatAdapter.MyViewHolder holder) {
-
+    public void download_chatimageClicked(final int position, final chatAdapter.MyViewHolder holder)
+    {
         mAdapter.showProgressBar(holder);
         final ChatMessage comment = chatList.get(position);
-        StorageReference str = FirebaseStorage.getInstance().getReferenceFromUrl(comment.getImgurl());
         String type = comment.getType();
 
-        switch (type)
-        {
-            case "photo":
-                File rootPath = new File(Environment.getExternalStorageDirectory(), AppName+"/Images");
-                if (!rootPath.exists()) {
-                    rootPath.mkdirs();
-                }
-                String uriSting = System.currentTimeMillis() + ".jpg";
+        Intent serviceIntent = new Intent(getApplicationContext(), DownloadFileForChatService.class);
+        serviceIntent.putExtra("type", type);
+        serviceIntent.putExtra("url", comment.getImgurl());
+        serviceIntent.putExtra("dbTableKey", dbTableKey);
+        serviceIntent.putExtra("Id", comment.getId());
+        startService(serviceIntent);
 
-                final File localFile = new File(rootPath, uriSting);
-                final String localuri = (rootPath.getAbsolutePath() + "/" + uriSting);
-                str.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                        Log.e("firebase ", ";local tem file created  created " + localFile.toString());
-                        dbChat = DBREF.child("Chats").child(dbTableKey).child("ChatMessages").getRef();
-                        dbChat.child(comment.getId()).child("othersenderlocal_storage").setValue(localuri);
-                        comment.setOthersenderlocal_storage(localuri);
-                        mAdapter.dismissProgressBar(holder);
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        mAdapter.dismissProgressBar(holder);
-                        Log.e("firebase ", ";local tem file not created  created " + exception.toString());
-                    }
-                });
-                break;
-            case "doc":
-                rootPath = new File(Environment.getExternalStorageDirectory(), AppName+"/Docs");
-                if (!rootPath.exists()) {
-                    rootPath.mkdirs();
-                }
-                uriSting = System.currentTimeMillis() + ".jpg";
-
-                final File localdocFile = new File(rootPath, uriSting);
-                final String localdocuri = (rootPath.getAbsolutePath() + "/" + uriSting);
-                str.getFile(localdocFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                        dbChat = DBREF.child("Chats").child(dbTableKey).child("ChatMessages").getRef();
-                        dbChat.child(comment.getId()).child("othersenderlocal_storage").setValue(localdocuri);
-                        comment.setOthersenderlocal_storage(localdocuri);
-                        mAdapter.dismissProgressBar(holder);
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        mAdapter.dismissProgressBar(holder);
-                        Log.e("firebase ", ";local tem file not created  created " + exception.toString());
-                    }
-                });
-                break;
-        }
     }
     private void sortChatMessages() {
         Collections.sort(chatList, new Comparator<ChatMessage>() {
@@ -702,5 +645,4 @@ public class ChatActivity extends AppCompatActivity implements chatAdapter.ChatA
             }
         });
     }
-
 }
