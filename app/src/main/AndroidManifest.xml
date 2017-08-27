@@ -49,7 +49,8 @@
         <activity
             android:name=".MainViews.TaskDetail"
             android:windowSoftInputMode="stateHidden" />
-        <activity android:name=".EmployeeLogin.empLogin">
+        <activity android:name=".EmployeeLogin.empLogin"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

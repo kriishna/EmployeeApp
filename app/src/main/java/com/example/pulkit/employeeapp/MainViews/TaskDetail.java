@@ -24,6 +24,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -502,44 +503,37 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                 break;
 
             case R.id.item3:
-                final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage("Upload Quotation ")
-                        .setCancelable(true)
-                        .setPositiveButton("Upload File", new DialogInterface.OnClickListener() {
-                            public void onClick(final DialogInterface dialog, int id) {
-                                //          UploadQuotation();
+                LayoutInflater layoutInflaterAndroid = LayoutInflater.from(this);
+                View mView = layoutInflaterAndroid.inflate(R.layout.options_foruploadquotation, null);
+                AlertDialog.Builder alertDialogBuilderUserInput = new AlertDialog.Builder(this);
+                alertDialogBuilderUserInput.setView(mView);
+
+                LinearLayout uploadPhoto = (LinearLayout) mView.findViewById(R.id.uploadPhoto);
+                LinearLayout uploadDoc = (LinearLayout) mView.findViewById(R.id.uploadDoc);
 
 
-                                if (!marshmallowPermissions.checkPermissionForExternalStorage())
-                                    marshmallowPermissions.requestPermissionForExternalStorage();
-
-                                if (marshmallowPermissions.checkPermissionForExternalStorage()) {
-
-                                    FilePickerBuilder.getInstance().setMaxCount(1)
-                                            .setActivityTheme(R.style.AppTheme)
-                                            .pickFile(TaskDetail.this);
-                                }
-                            }
-
-
-                        })
-                        .setNegativeButton("Upload photo", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-
-                                if (!marshmallowPermissions.checkPermissionForCamera() && !marshmallowPermissions.checkPermissionForExternalStorage()) {
-                                    ActivityCompat.requestPermissions(TaskDetail.this,
-                                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA},
-                                            2);
-                                } else {
-                                    Intent intent = new Intent(TaskDetail.this, ImagesSelectorActivity.class);
-                                    intent.putExtra(SelectorSettings.SELECTOR_MAX_IMAGE_NUMBER, 1);
-                                    intent.putExtra(SelectorSettings.SELECTOR_SHOW_CAMERA, true);
-                                    startActivityForResult(intent, REQUEST_CODE);
-                                }
-                            }
-                        });
-                AlertDialog alert = builder.create();
-                alert.show();
+                alertDialogBuilderUserInput.setCancelable(true);
+                final AlertDialog alertDialogAndroid = alertDialogBuilderUserInput.create();
+                alertDialogAndroid.show();
+                uploadPhoto.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(TaskDetail.this, ImagesSelectorActivity.class);
+                        intent.putExtra(SelectorSettings.SELECTOR_MAX_IMAGE_NUMBER, 1);
+                        intent.putExtra(SelectorSettings.SELECTOR_SHOW_CAMERA, true);
+                        startActivityForResult(intent, REQUEST_CODE);
+                        alertDialogAndroid.dismiss();
+                    }
+                });
+                uploadDoc.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        FilePickerBuilder.getInstance().setMaxCount(1)
+                                .setActivityTheme(R.style.AppTheme)
+                                .pickFile(TaskDetail.this);
+                        alertDialogAndroid.dismiss();
+                    }
+                });
                 break;
         }
         return true;
