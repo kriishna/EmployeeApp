@@ -143,12 +143,20 @@ public class taskFrag extends Fragment implements taskAdapter.TaskAdapterListene
 
                 @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
+                    i = 0;
+                    list.clear();
+                    TaskList.clear();
+                    mAdapter.notifyDataSetChanged();
+                    new net().execute();
                 }
 
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+                    i = 0;
+                    list.clear();
+                    TaskList.clear();
+                    mAdapter.notifyDataSetChanged();
+                    new net().execute();
                 }
 
                 @Override
