@@ -133,7 +133,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         marshmallowPermissions = new MarshmallowPermissions(this);
         progressDialog = new ProgressDialog(this);
         download = (ImageButton) findViewById(R.id.download);
-        if (session.getDesig().toLowerCase().equals("quotation")) {
+        if (!session.getDesig().toLowerCase().equals("quotation")) {
             download.setVisibility(View.GONE);
         }
         uploadStatus = (TextView) findViewById(R.id.uploadStatus);
@@ -464,6 +464,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
             serviceIntent.putExtra("TaskIdList", taskid_list);
             serviceIntent.putExtra("customerId", custId);
             serviceIntent.putExtra("selectedFileUri", temp);
+            serviceIntent.putExtra("customerName",customername);
 
             this.startService(serviceIntent);
         } else {
