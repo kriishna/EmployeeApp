@@ -2,18 +2,16 @@ package com.example.pulkit.employeeapp.MainViews;
 
 import android.content.Intent;
 import android.location.LocationManager;
+import android.os.Parcelable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.FrameLayout;
-
 import com.example.pulkit.employeeapp.Customer.custFrag;
 import com.example.pulkit.employeeapp.EmployeeLogin.EmployeeSession;
-import com.example.pulkit.employeeapp.Quotation.QuotationGroups;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.chat.chatFrag;
 import com.example.pulkit.employeeapp.drawer;
@@ -45,6 +43,10 @@ public class TaskHome extends drawer {
             marshmallowPermissions.requestPermissionForExternalStorage();
         checkForLoc();
         session = new EmployeeSession(getApplicationContext());
+        if(session.get_ShortCutInstalled()==false)
+        {
+            createShortCut();
+        }
         if (getIntent().hasExtra("emp_id")) {
             emp_id = getIntent().getStringExtra("emp_id");
             desig = getIntent().getStringExtra("desig");
@@ -60,7 +62,7 @@ public class TaskHome extends drawer {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        if (desig.toLowerCase().equals("quotation"))
+        if (desig.toLowerCase().equals("accounts"))
             adapter.addFragment(new custFrag(), "Customers");
         else
             adapter.addFragment(new taskFrag(), "Tasks");
@@ -111,5 +113,16 @@ public class TaskHome extends drawer {
 
         }
     }
+    public void createShortCut(){
+        Intent shortcutintent = new Intent("com.android.launcher.action.INSTALL_SHORTCUT");
+        shortcutintent.putExtra("duplicate", false);
+        shortcutintent.putExtra(Intent.EXTRA_SHORTCUT_NAME, getString(R.string.app_name));
+        Parcelable icon = Intent.ShortcutIconResource.fromContext(getApplicationContext(), R.mipmap.ic_launcher);
+        shortcutintent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, icon);
+        shortcutintent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, new Intent(getApplicationContext(), TaskHome.class));
+        sendBroadcast(shortcutintent);
+        session.set_ShortCutInstalled();
+    }
+
 
 }
