@@ -48,6 +48,7 @@ import java.util.List;
 
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 import static com.example.pulkit.employeeapp.EmployeeApp.sendNotif;
+import static com.example.pulkit.employeeapp.EmployeeApp.simpleDateFormat;
 
 public class custTasks extends AppCompatActivity implements taskAdapter.TaskAdapterListener {
 
@@ -309,7 +310,7 @@ public class custTasks extends AppCompatActivity implements taskAdapter.TaskAdap
                     public void onClick(View v) {
                         final String employeesnote = employeeNote.getText().toString().trim();
                         Calendar c = Calendar.getInstance();
-                        final String curdate = new SimpleDateFormat("dd/MM/yyyy").format(c.getTime());
+                        final String curdate = simpleDateFormat.format(c.getTime());
                         confirmation.dismiss();
 
                         for (final Task task : TaskList) {

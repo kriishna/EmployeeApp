@@ -68,10 +68,26 @@ public class EmployeeTask_Adapter extends RecyclerView.Adapter<EmployeeTask_Adap
                     holder.icon_text.setText(iconText.charAt(0) + "");
                     holder.imgProfile.setImageResource(R.drawable.bg_circle);
                     holder.imgProfile.setColorFilter(task.getColor());
-                    holder.timestamp.setText(task.getExpEndDate());
+//                    holder.timestamp.setText(task.getExpEndDate());
                     holder.taskname.setText(iconText);
+                    DBREF.child("Task").child(task.getTaskId()).child("AssignedTo").child(empId).child("datecompleted").addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if(dataSnapshot.exists()){
+                                String temp = dataSnapshot.getValue(String.class);
+                                holder.timestamp.setText(temp);
+                                applyBackgroundColor(holder,temp);
+                            }
 
-                    if(!task.getCustomerId().equals(custTasks.custId))
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+                    if(empId.equals("quotation")&&!task.getCustomerId().equals(custTasks.custId))
                         holder.base_container.setVisibility(View.GONE);
                     else
                         holder.base_container.setVisibility(View.VISIBLE);
@@ -109,7 +125,7 @@ public class EmployeeTask_Adapter extends RecyclerView.Adapter<EmployeeTask_Adap
                     }
 
                     applyClickEvents(holder, position);
-      //              applyBackgroundColor(holder, emp);
+
                 }
 
             }
@@ -121,21 +137,21 @@ public class EmployeeTask_Adapter extends RecyclerView.Adapter<EmployeeTask_Adap
         });
     }
 
-    private void applyBackgroundColor(EmployeeTask_Adapter.MyViewHolder holder, CompletedBy emp) {
+    private void applyBackgroundColor(EmployeeTask_Adapter.MyViewHolder holder, String deadline) {
 
         try {
             String curdate = simpleDateFormat.format(Calendar.getInstance().getTime());
             Date curDate = simpleDateFormat.parse(curdate);
-            if (emp.getDatecompleted() != null) {
-                Date aDate = simpleDateFormat.parse(emp.getDatecompleted());
+            if (deadline != null) {
+                Date aDate = simpleDateFormat.parse(deadline);
 
                 if (curDate.compareTo(aDate) > -1) {
-                    holder.messageContainer.setBackgroundResource(R.color.colorAccent);
+                    holder.base_container.setBackgroundResource(R.color.colorAccent);
                 } else {
-                    holder.messageContainer.setBackgroundColor(Color.WHITE);
+                    holder.base_container.setBackgroundColor(Color.WHITE);
                 }
             } else
-                holder.messageContainer.setBackgroundColor(Color.WHITE);
+                holder.base_container.setBackgroundColor(Color.WHITE);
 
 
         } catch (ParseException e) {

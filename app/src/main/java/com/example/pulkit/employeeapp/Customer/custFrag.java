@@ -2,7 +2,6 @@ package com.example.pulkit.employeeapp.Customer;
 
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,31 +14,19 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.example.pulkit.employeeapp.CheckInternetConnectivity.NetWatcher;
 import com.example.pulkit.employeeapp.EmployeeLogin.EmployeeSession;
-import com.example.pulkit.employeeapp.MainViews.TaskDetail;
-import com.example.pulkit.employeeapp.adapters.custAdapter;
 import com.example.pulkit.employeeapp.adapters.newcustAdapter;
-import com.example.pulkit.employeeapp.adapters.taskAdapter;
 import com.example.pulkit.employeeapp.model.Customer;
 import com.example.pulkit.employeeapp.model.Task;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 
 public class custFrag extends Fragment implements newcustAdapter.CustomerAdapterListener {

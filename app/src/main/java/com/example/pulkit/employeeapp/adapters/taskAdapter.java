@@ -1,17 +1,20 @@
 package com.example.pulkit.employeeapp.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.pulkit.employeeapp.Customer.custTasks;
 import com.example.pulkit.employeeapp.MainViews.TaskHome;
 import com.example.pulkit.employeeapp.R;
+import com.example.pulkit.employeeapp.model.CompletedBy;
 import com.example.pulkit.employeeapp.model.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -19,9 +22,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
+import static com.example.pulkit.employeeapp.EmployeeApp.simpleDateFormat;
 
 public class taskAdapter extends RecyclerView.Adapter<taskAdapter.MyViewHolder> {
     ArrayList<Task> list = new ArrayList<>();
@@ -39,6 +46,7 @@ public class taskAdapter extends RecyclerView.Adapter<taskAdapter.MyViewHolder> 
         TextView taskname, customername, timestamp, icon_text;
         ImageView imgProfile;
         public LinearLayout messageContainer;
+        public RelativeLayout ll_overall;
 
         public MyViewHolder(View itemView) {
             super(itemView);
@@ -48,6 +56,7 @@ public class taskAdapter extends RecyclerView.Adapter<taskAdapter.MyViewHolder> 
             icon_text = (TextView) itemView.findViewById(R.id.icon_text);
             imgProfile = (ImageView) itemView.findViewById(R.id.icon_profile);
             messageContainer = (LinearLayout) itemView.findViewById(R.id.message_container);
+            ll_overall = (RelativeLayout)itemView.findViewById(R.id.base_container);
         }
 
     }
@@ -94,6 +103,7 @@ public class taskAdapter extends RecyclerView.Adapter<taskAdapter.MyViewHolder> 
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     String customername = dataSnapshot.child("name").getValue(String.class);
                     holder.customername.setText(customername);
+
                 }
 
                 @Override
@@ -109,6 +119,7 @@ public class taskAdapter extends RecyclerView.Adapter<taskAdapter.MyViewHolder> 
                 if(dataSnapshot.exists()){
                     String temp = dataSnapshot.getValue(String.class);
                     holder.timestamp.setText(temp);
+                    applyBackgroundColor(holder,temp);
                 }
 
             }
@@ -140,6 +151,29 @@ public class taskAdapter extends RecyclerView.Adapter<taskAdapter.MyViewHolder> 
             }
         });
 
+    }
+    private void applyBackgroundColor(taskAdapter.MyViewHolder holder, String deadline) {
+
+        try {
+            String curdate = simpleDateFormat.format(Calendar.getInstance().getTime());
+            Date curDate = simpleDateFormat.parse(curdate);
+            if(deadline!=null) {
+                Date aDate = simpleDateFormat.parse(deadline);
+
+                if (curDate.compareTo(aDate) > -1) {
+                    holder.ll_overall.setBackgroundResource(R.color.colorAccent);
+                } else {
+                    holder.ll_overall.setBackgroundColor(Color.WHITE);
+                }
+            }
+
+            else
+                holder.ll_overall.setBackgroundColor(Color.WHITE);
+
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
 }

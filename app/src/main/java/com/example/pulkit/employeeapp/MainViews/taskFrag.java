@@ -121,7 +121,6 @@ public class taskFrag extends Fragment implements EmployeeTask_Adapter.EmployeeT
                         }
                         mAdapter = new EmployeeTask_Adapter(listoftasks, getActivity(), emp_id, listener);
                         task_list.setAdapter(mAdapter);
-
                     }
                     mAdapter.notifyDataSetChanged();
                     if (pDialog.isShowing())

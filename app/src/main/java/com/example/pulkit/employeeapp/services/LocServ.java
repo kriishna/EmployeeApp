@@ -23,6 +23,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import static com.example.pulkit.employeeapp.EmployeeApp.AppName;
+import static com.example.pulkit.employeeapp.EmployeeApp.formatterWithMonthNameAndTime;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -65,7 +67,7 @@ public class LocServ extends Service implements GoogleApiClient.ConnectionCallba
 
     @Override
     public void onLocationChanged(Location location) {
-        mobile = new SimpleDateFormat("dd-MMM-yyyy hh:mm aa").format(Calendar.getInstance().getTime());
+        mobile = formatterWithMonthNameAndTime.format(Calendar.getInstance().getTime());
         FirebaseDatabase.getInstance().getReference().child("GlobalEmployee").child("EmployeeDetail").child(key).child("lastSeen").setValue(mobile);
         lat = String.valueOf(location.getLatitude());
         lon = String.valueOf(location.getLongitude());

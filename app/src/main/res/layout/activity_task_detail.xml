@@ -44,9 +44,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:enabled="false"
-                        android:inputType="textCapCharacters"
+                        android:inputType="textMultiLine"
                         android:text="No Message from Coordinator !"
-                        android:textColor="@color/black"
+                        android:textColor="@color/timestamp"
                         android:textSize="15sp" />
 
                 </LinearLayout>
@@ -79,7 +79,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:enabled="false"
-                        android:inputType="numberSigned"
+                        android:inputType="textMultiLine"
                         android:textColor="#000000" />
 
                     <android.support.v7.widget.RecyclerView
@@ -108,8 +108,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:enabled="false"
+                            android:textColor="@color/timestamp"
                             android:inputType="numberSigned"
-                            android:textColor="@color/black"
                             android:textSize="15dp" />
 
                     </LinearLayout>
@@ -167,6 +167,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text=""
+                                    android:textColor="@color/timestamp"
                                     android:textStyle="italic" />
                             </LinearLayout>
 
@@ -186,6 +187,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text=""
+                                    android:textColor="@color/timestamp"
                                     android:textStyle="italic" />
                             </LinearLayout>
                         </LinearLayout>
@@ -300,8 +302,8 @@
                             android:layout_height="wrap_content"
                             android:enabled="false"
                             android:hint="DD/MM/YYYY"
+                            android:textColor="@color/timestamp"
                             android:inputType="date"
-                            android:textColor="@color/black"
                             android:textSize="15sp" />
                     </LinearLayout>
 
@@ -326,7 +328,7 @@
                             android:enabled="false"
                             android:hint="DD/MM/YYYY"
                             android:inputType="date"
-                            android:textColor="@color/black"
+                            android:textColor="@color/timestamp"
                             android:textSize="15sp" />
                     </LinearLayout>
                 </LinearLayout>

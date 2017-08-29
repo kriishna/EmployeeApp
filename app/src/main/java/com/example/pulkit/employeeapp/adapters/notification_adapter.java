@@ -25,11 +25,12 @@ import java.util.Calendar;
 import java.util.List;
 
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
+import static com.example.pulkit.employeeapp.EmployeeApp.simpleDateFormatWithMonthName;
 
 public class notification_adapter extends  RecyclerView.Adapter<notification_adapter.MyViewHolder> {
     List<Notif> list = new ArrayList<>();
     private Context context;
-    private SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
+  //  private SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
 
 
     public notification_adapter(List<Notif> list, Context c) {
@@ -87,7 +88,7 @@ public class notification_adapter extends  RecyclerView.Adapter<notification_ada
         holder.notif_message.setText(notif.getContent());
         applyProfilePicture(holder);
 
-        String timestamp = formatter.format(Calendar.getInstance().getTime());
+        String timestamp = simpleDateFormatWithMonthName.format(Calendar.getInstance().getTime());
         String senderTimestamp = notif.getTimestamp().substring(0,11);
         if(timestamp.equals(senderTimestamp))
             senderTimestamp = notif.getTimestamp().substring(12).trim();

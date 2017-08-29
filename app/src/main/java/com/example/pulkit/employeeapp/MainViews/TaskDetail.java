@@ -83,6 +83,7 @@ import droidninja.filepicker.FilePickerConst;
 import static com.example.pulkit.employeeapp.EmployeeApp.AppName;
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 import static com.example.pulkit.employeeapp.EmployeeApp.sendNotif;
+import static com.example.pulkit.employeeapp.EmployeeApp.simpleDateFormat;
 
 public class TaskDetail extends AppCompatActivity implements taskdetailDescImageAdapter.ImageAdapterListener, bigimage_adapter.bigimage_adapterListener {
 
@@ -118,7 +119,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     String dbTablekey, id;
     String num;
     private MarshmallowPermissions marshmallowPermissions;
-    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+ //   SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
     private static final int PICK_FILE_REQUEST = 1;
 
     @Override
@@ -291,7 +292,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                     public void onClick(View v) {
                         final String employeesnote = employeeNote.getText().toString().trim();
                         Calendar c = Calendar.getInstance();
-                        final String curdate = dateFormat.format(c.getTime());
+                        final String curdate = simpleDateFormat.format(c.getTime());
 
                         final DatabaseReference db, databaseReference;
 
@@ -688,18 +689,22 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     }
 
     void setValue(Task task) {
-        startDate.setText(task.getStartDate());
-        endDate.setText(task.getExpEndDate());
         quantity.setText(task.getQty());
         description.setText(task.getDesc());
 
-        dbAssigned.child(session.getUsername()).child("note").addListenerForSingleValueEvent(new ValueEventListener() {
+        dbAssigned.child(session.getUsername()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    String note = dataSnapshot.getValue(String.class);
-                    if (!note.equals(""))
-                        coordinators_message.setText(note);
+                    CompletedBy completedBy = dataSnapshot.getValue(CompletedBy.class);
+                    if (completedBy.getNote()!=null)
+                        coordinators_message.setText(completedBy.getNote());
+                    if(completedBy.getDatecompleted()!=null)
+                        endDate.setText(completedBy.getDatecompleted());
+                    startDate.setText(completedBy.getDateassigned());
+
+
+
                 }
             }
 
