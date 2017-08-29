@@ -53,8 +53,8 @@ public class custTasks extends AppCompatActivity implements taskAdapter.TaskAdap
 
     RecyclerView recycler;
     taskAdapter mAdapter;
-    String custId,customerName;
-
+    String customerName;
+    public static String custId;
     private static final int PICK_FILE_REQUEST = 1;
     DatabaseReference dbTask, db;
     LinearLayoutManager linearLayoutManager;
@@ -66,7 +66,6 @@ public class custTasks extends AppCompatActivity implements taskAdapter.TaskAdap
     ChildEventListener ch;
     ValueEventListener vl;
     EmployeeSession session;
-    Button upload;
     private AlertDialog confirmation;
     int m = 0;
 
@@ -79,7 +78,21 @@ public class custTasks extends AppCompatActivity implements taskAdapter.TaskAdap
         recycler = (RecyclerView) findViewById(R.id.recycler);
 
         custId = getIntent().getStringExtra("customerId");
-        customerName = getIntent().getStringExtra("customerName");
+        //       customerName = getIntent().getStringExtra("customerName");
+
+        // to get customer name
+        DBREF.child("Customer").child(custId).child("name").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                customerName = dataSnapshot.getValue(String.class);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
 
         session = new EmployeeSession(this);
         pDialog = new ProgressDialog(this);
@@ -143,8 +156,8 @@ public class custTasks extends AppCompatActivity implements taskAdapter.TaskAdap
                     Intent serviceIntent = new Intent(this, UploadQuotationService.class);
                     serviceIntent.putExtra("TaskIdList", taskid_list);
                     serviceIntent.putExtra("selectedFileUri", selectedFileUri.toString());
-                    serviceIntent.putExtra("customerId",custId);
-                    serviceIntent.putExtra("customerName",customerName);
+                    serviceIntent.putExtra("customerId", custId);
+                    serviceIntent.putExtra("customerName", customerName);
 
                     this.startService(serviceIntent);
                     mAdapter.notifyDataSetChanged();
@@ -219,11 +232,18 @@ public class custTasks extends AppCompatActivity implements taskAdapter.TaskAdap
                 @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
+                    Intent i = new Intent(custTasks.this, custTasks.class);
+                    i.putExtra("customerId", custId);
+                    startActivity(i);
+                    finish();
                 }
 
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+                    Intent i = new Intent(custTasks.this, custTasks.class);
+                    i.putExtra("customerId", custId);
+                    startActivity(i);
+                    finish();
                 }
 
                 @Override
@@ -289,54 +309,53 @@ public class custTasks extends AppCompatActivity implements taskAdapter.TaskAdap
                     public void onClick(View v) {
                         final String employeesnote = employeeNote.getText().toString().trim();
                         Calendar c = Calendar.getInstance();
-                        final String curdate =  new SimpleDateFormat("dd/MM/yyyy").format(c.getTime());
+                        final String curdate = new SimpleDateFormat("dd/MM/yyyy").format(c.getTime());
                         confirmation.dismiss();
 
-                        for(final Task task:TaskList)
-                        {
-                        final DatabaseReference db, databaseReference;
+                        for (final Task task : TaskList) {
+                            final DatabaseReference db, databaseReference;
 
-                        DBREF.child("Employee").child(emp_id).child("CompletedTask").child(task.getTaskId()).setValue("complete");
-                        db = DBREF.child("Employee").child(emp_id).child("AssignedTask").child(task.getTaskId());
-                        db.removeValue();
+                            DBREF.child("Employee").child(emp_id).child("CompletedTask").child(task.getTaskId()).setValue("complete");
+                            db = DBREF.child("Employee").child(emp_id).child("AssignedTask").child(task.getTaskId());
+                            db.removeValue();
 
-                        databaseReference = DBREF.child("Task").child(task.getTaskId()).child("AssignedTo").child(emp_id);
+                            databaseReference = DBREF.child("Task").child(task.getTaskId()).child("AssignedTo").child(emp_id);
 
-                        databaseReference.addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                if (dataSnapshot.exists()) {
-                                    CompletedBy completedBy = dataSnapshot.getValue(CompletedBy.class);
-                                    CompletedJob completedJob = new CompletedJob();
-                                    completedJob.setEmpId(completedBy.getEmpId());
-                                    completedJob.setAssignedByName(completedBy.getAssignedByName());
-                                    completedJob.setAssignedByUsername(completedBy.getAssignedByUsername());
-                                    completedJob.setCoordinatorNote(completedBy.getNote());
-                                    completedJob.setDateassigned(completedBy.getDateassigned());
-                                    completedJob.setDatecompleted(curdate);
-                                    completedJob.setEmpployeeNote(employeesnote);
-                                    completedJob.setEmpName(session.getName());
-                                    completedJob.setEmpDesignation(session.getDesig());
-                                    databaseReference.removeValue();
+                            databaseReference.addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    if (dataSnapshot.exists()) {
+                                        CompletedBy completedBy = dataSnapshot.getValue(CompletedBy.class);
+                                        CompletedJob completedJob = new CompletedJob();
+                                        completedJob.setEmpId(completedBy.getEmpId());
+                                        completedJob.setAssignedByName(completedBy.getAssignedByName());
+                                        completedJob.setAssignedByUsername(completedBy.getAssignedByUsername());
+                                        completedJob.setCoordinatorNote(completedBy.getNote());
+                                        completedJob.setDateassigned(completedBy.getDateassigned());
+                                        completedJob.setDatecompleted(curdate);
+                                        completedJob.setEmpployeeNote(employeesnote);
+                                        completedJob.setEmpName(session.getName());
+                                        completedJob.setEmpDesignation(session.getDesig());
+                                        databaseReference.removeValue();
 
-                                    DBREF.child("Task").child(task.getTaskId()).child("CompletedBy").child(emp_id).setValue(completedJob);
-                                    String contentforme = "You completed " + task.getName();
-                                    sendNotif(emp_id, emp_id, "completedJob", contentforme, task.getTaskId());
-                                    String contentforother = "Employee " + session.getName() + " completed " + task.getName();
-                                    sendNotif(emp_id, completedJob.getAssignedByUsername(), "completedJob", contentforother, task.getTaskId());
-                                    Toast.makeText(getApplicationContext(), contentforme, Toast.LENGTH_SHORT).show();
+                                        DBREF.child("Task").child(task.getTaskId()).child("CompletedBy").child(emp_id).setValue(completedJob);
+                                        String contentforme = "You completed " + task.getName();
+                                        sendNotif(emp_id, emp_id, "completedJob", contentforme, task.getTaskId());
+                                        String contentforother = "Employee " + session.getName() + " completed " + task.getName();
+                                        sendNotif(emp_id, completedJob.getAssignedByUsername(), "completedJob", contentforother, task.getTaskId());
+                                        Toast.makeText(getApplicationContext(), contentforme, Toast.LENGTH_SHORT).show();
+
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
 
                                 }
-                            }
+                            });
 
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-
-                    }
-                    Intent intent = new Intent(getApplicationContext(), TaskHome.class);
+                        }
+                        Intent intent = new Intent(getApplicationContext(), TaskHome.class);
                         startActivity(intent);
                         finish();
                     }
@@ -346,8 +365,8 @@ public class custTasks extends AppCompatActivity implements taskAdapter.TaskAdap
                 break;
 
             case R.id.upload:
-                if(TaskList.size()<1)
-                UploadQuotation();
+                if (TaskList.size() > 1)
+                    UploadQuotation();
                 break;
         }
         return true;

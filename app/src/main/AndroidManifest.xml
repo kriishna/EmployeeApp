@@ -12,9 +12,10 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="com.android.alarm.permission.SET_ALARM"/>
-    <uses-permission android:name="android.permission.CAMERA"/>
-<uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
     <uses-feature android:name="android.hardware.camera" />
 
     <application
@@ -22,9 +23,9 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="aa emp"
-        tools:replace="label"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:replace="label">
         <receiver android:name=".CheckInternetConnectivity.NetWatcher">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -34,17 +35,18 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
+
         <action android:name="android.location.PROVIDERS_CHANGED" />
+
         <category android:name="android.intent.category.DEFAULT" />
 
         <activity
             android:name="com.zfdang.multiple_images_selector.ImagesSelectorActivity"
             android:configChanges="orientation|screenSize" />
-
         <activity
             android:name=".MainViews.TaskHome"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".chat.ChatActivity" />
         <activity
             android:name=".MainViews.TaskDetail"
@@ -70,10 +72,11 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
         <activity
             android:name=".drawer"
             android:label="@string/title_activity_drawer1"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <service android:name=".services.MyFirebaseInstanceIDService">
             <intent-filter>
@@ -85,23 +88,25 @@
             android:exported="false" />
 
         <activity android:name=".Notification.NotificationActivity" />
-        <activity android:name=".MyProfile.MyProfile"></activity>
-
-        <activity android:name=".MyProfile.ContactCoordinator"/>
-        <activity android:name=".MyProfile.phonebook"></activity>
-        <activity android:name=".Customer.custTasks"></activity>
+        <activity android:name=".MyProfile.MyProfile" />
+        <activity android:name=".MyProfile.ContactCoordinator" />
+        <activity android:name=".MyProfile.phonebook" />
+        <activity android:name=".Customer.custTasks" />
 
         <service
             android:name=".services.DownloadFileService"
             android:exported="false" />
+
         <receiver
             android:name=".BroadcastReceivers.AlarmReceiver"
             android:enabled="true" />
 
-        <activity android:name=".MyProfile.CompletedJobs"></activity>
+        <activity android:name=".MyProfile.CompletedJobs" />
 
         <service
             android:name=".services.UploadPhotoAndFile"
-            android:exported="false"></service>
+            android:exported="false" />
+
     </application>
+
 </manifest>

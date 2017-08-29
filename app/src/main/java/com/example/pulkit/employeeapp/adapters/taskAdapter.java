@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.pulkit.employeeapp.Customer.custTasks;
 import com.example.pulkit.employeeapp.MainViews.TaskHome;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.model.Task;
@@ -66,7 +67,7 @@ public class taskAdapter extends RecyclerView.Adapter<taskAdapter.MyViewHolder> 
         holder.icon_text.setText(iconText.charAt(0) + "");
         holder.imgProfile.setImageResource(R.drawable.bg_circle);
         holder.imgProfile.setColorFilter(task.getColor());
-        holder.timestamp.setText(task.getStartDate());
+   //     holder.timestamp.setText(task.getExpEndDate());
         holder.taskname.setText(iconText);
 
 
@@ -101,6 +102,22 @@ public class taskAdapter extends RecyclerView.Adapter<taskAdapter.MyViewHolder> 
                 }
             });
         }
+
+        DBREF.child("Task").child(task.getTaskId()).child("AssignedTo").child(custTasks.emp_id).child("datecompleted").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    String temp = dataSnapshot.getValue(String.class);
+                    holder.timestamp.setText(temp);
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
         applyClickEvents(holder, position);
 
     }

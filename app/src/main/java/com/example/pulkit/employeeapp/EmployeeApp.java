@@ -19,6 +19,10 @@ public class EmployeeApp extends android.support.multidex.MultiDexApplication {
     public static DatabaseReference DBREF;
     private EmployeeSession session;
     public static SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy hh:mm aa");
+    public static SimpleDateFormat formatterWithMonthNameAndTime = new SimpleDateFormat("dd-MMM-yyyy hh:mm aa");
+    public static SimpleDateFormat simpleDateFormatWithMonthName = new SimpleDateFormat("dd-MMM-yyyy");
+    public static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+
     public static String AppName = "demo";
 
     @Override

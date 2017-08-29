@@ -7,6 +7,7 @@
     android:focusable="true"
     android:orientation="vertical"
     android:paddingBottom="@dimen/padding_list_row"
+    android:id="@+id/base_container"
     android:paddingLeft="?listPreferredItemPaddingLeft"
     android:paddingRight="?listPreferredItemPaddingRight"
     android:paddingTop="@dimen/padding_list_row">

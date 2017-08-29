@@ -155,7 +155,21 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         mykey = session.getUsername();
         Intent intent = getIntent();
         task_id = intent.getStringExtra("task_id");
-        id = intent.getStringExtra("customerId");
+
+        // to get customer id
+        DBREF.child("Task").child(task_id).child("customerId").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                id = dataSnapshot.getValue(String.class);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
         emp_id = TaskHome.emp_id;
         desig = TaskHome.desig;
 
