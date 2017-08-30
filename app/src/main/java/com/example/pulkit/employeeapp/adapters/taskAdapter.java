@@ -106,7 +106,7 @@ public class taskAdapter extends RecyclerView.Adapter<taskAdapter.MyViewHolder> 
         holder.taskname.setText(iconText);
 
 
-        if(desig.toLowerCase().equals("quotation")){
+        if(desig.toLowerCase().equals("accounts")){
             DBREF.child("Task").child(task.getTaskId()).child("Quotation").child("url").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {

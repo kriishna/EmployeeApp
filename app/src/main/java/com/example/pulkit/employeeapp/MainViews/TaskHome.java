@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.widget.FrameLayout;
 import com.example.pulkit.employeeapp.Customer.custFrag;
 import com.example.pulkit.employeeapp.EmployeeLogin.EmployeeSession;
+import com.example.pulkit.employeeapp.EmployeeLogin.empLogin;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.chat.chatFrag;
 import com.example.pulkit.employeeapp.drawer;
@@ -119,7 +120,7 @@ public class TaskHome extends drawer {
         shortcutintent.putExtra(Intent.EXTRA_SHORTCUT_NAME, getString(R.string.app_name));
         Parcelable icon = Intent.ShortcutIconResource.fromContext(getApplicationContext(), R.mipmap.ic_launcher);
         shortcutintent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, icon);
-        shortcutintent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, new Intent(getApplicationContext(), TaskHome.class));
+        shortcutintent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, new Intent(getApplicationContext(), empLogin.class));
         sendBroadcast(shortcutintent);
         session.set_ShortCutInstalled();
     }
