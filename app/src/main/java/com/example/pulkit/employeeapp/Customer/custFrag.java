@@ -37,7 +37,7 @@ public class custFrag extends Fragment implements newcustAdapter.CustomerAdapter
     private ArrayList<String> custList = new ArrayList<>();
     private ArrayList<Customer> Cust = new ArrayList<>();
     private List<String> list = new ArrayList<>();
-    private RecyclerView.Adapter newadapter;
+    private newcustAdapter newadapter;
     ProgressDialog pDialog;
     int i = 0, j = 0;
     public static String emp_id;

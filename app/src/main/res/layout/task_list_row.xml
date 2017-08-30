@@ -84,6 +84,11 @@
                 android:layout_width="@dimen/icon_width_height"
                 android:layout_height="@dimen/icon_width_height"
                 android:src="@drawable/bg_circle" />
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:src="@drawable/ic_done_black_24dp" />
 
 
         </RelativeLayout>
@@ -100,10 +105,10 @@
 
             <TextView
                 android:id="@+id/icon_text"
+                android:text=""
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:text="T"
                 android:textColor="@android:color/white"
                 android:textSize="@dimen/icon_text" />
         </RelativeLayout>

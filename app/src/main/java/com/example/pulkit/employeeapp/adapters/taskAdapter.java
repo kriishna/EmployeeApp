@@ -3,6 +3,8 @@ package com.example.pulkit.employeeapp.adapters;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseBooleanArray;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +16,7 @@ import android.widget.TextView;
 import com.example.pulkit.employeeapp.Customer.custTasks;
 import com.example.pulkit.employeeapp.MainViews.TaskHome;
 import com.example.pulkit.employeeapp.R;
+import com.example.pulkit.employeeapp.helper.FlipAnimator;
 import com.example.pulkit.employeeapp.model.CompletedBy;
 import com.example.pulkit.employeeapp.model.Task;
 import com.google.firebase.database.DataSnapshot;
@@ -26,6 +29,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 import static com.example.pulkit.employeeapp.EmployeeApp.simpleDateFormat;
@@ -35,18 +39,27 @@ public class taskAdapter extends RecyclerView.Adapter<taskAdapter.MyViewHolder> 
     private Context context;
     String desig = TaskHome.desig;
     private TaskAdapterListener listener;
+    private SparseBooleanArray selectedItems;
+    private SparseBooleanArray animationItemsIndex;
+    private boolean reverseAllAnimations = false;
+    private static int currentSelectedIndex = -1;
+
 
 
     public taskAdapter(ArrayList<Task> list, Context context, TaskAdapterListener listener) {
         this.list = list;
         this.listener = listener;
+        selectedItems = new SparseBooleanArray();
+        animationItemsIndex = new SparseBooleanArray();
+        this.context = context;
+
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
+    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener{
         TextView taskname, customername, timestamp, icon_text;
         ImageView imgProfile;
         public LinearLayout messageContainer;
-        public RelativeLayout ll_overall;
+        public RelativeLayout ll_overall,iconContainer,iconBack,iconFront;
 
         public MyViewHolder(View itemView) {
             super(itemView);
@@ -57,7 +70,20 @@ public class taskAdapter extends RecyclerView.Adapter<taskAdapter.MyViewHolder> 
             imgProfile = (ImageView) itemView.findViewById(R.id.icon_profile);
             messageContainer = (LinearLayout) itemView.findViewById(R.id.message_container);
             ll_overall = (RelativeLayout)itemView.findViewById(R.id.base_container);
+            iconBack = (RelativeLayout) itemView.findViewById(R.id.icon_back);
+            iconFront = (RelativeLayout) itemView.findViewById(R.id.icon_front);
+            iconContainer = (RelativeLayout) itemView.findViewById(R.id.icon_container);
+
+
+
         }
+        @Override
+        public boolean onLongClick(View v) {
+            listener.onRowLongClicked(getAdapterPosition());
+            v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+            return true;
+        }
+
 
     }
 
@@ -80,7 +106,7 @@ public class taskAdapter extends RecyclerView.Adapter<taskAdapter.MyViewHolder> 
         holder.taskname.setText(iconText);
 
 
-        if(desig.toLowerCase().equals("accounts")){
+        if(desig.toLowerCase().equals("quotation")){
             DBREF.child("Task").child(task.getTaskId()).child("Quotation").child("url").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -130,7 +156,7 @@ public class taskAdapter extends RecyclerView.Adapter<taskAdapter.MyViewHolder> 
             }
         });
         applyClickEvents(holder, position);
-
+        applyIconAnimation(holder, position);
     }
 
     @Override
@@ -140,6 +166,9 @@ public class taskAdapter extends RecyclerView.Adapter<taskAdapter.MyViewHolder> 
 
     public interface TaskAdapterListener {
         void onTaskRowClicked(int position);
+        void onRowLongClicked(int position);
+        void onIconClicked(int position);
+
     }
 
     private void applyClickEvents(MyViewHolder holder, final int position) {
@@ -150,6 +179,21 @@ public class taskAdapter extends RecyclerView.Adapter<taskAdapter.MyViewHolder> 
                 listener.onTaskRowClicked(position);
             }
         });
+        holder.messageContainer.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                listener.onRowLongClicked(position);
+                view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                return true;
+            }
+        });
+        holder.iconContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.onIconClicked(position);
+            }
+        });
+
 
     }
     private void applyBackgroundColor(taskAdapter.MyViewHolder holder, String deadline) {
@@ -175,5 +219,70 @@ public class taskAdapter extends RecyclerView.Adapter<taskAdapter.MyViewHolder> 
             e.printStackTrace();
         }
     }
+    private void applyIconAnimation(taskAdapter.MyViewHolder holder, int position) {
+        if (selectedItems.get(position, false)) {
+            holder.iconFront.setVisibility(View.GONE);
+            resetIconYAxis(holder.iconBack);
+            holder.iconBack.setVisibility(View.VISIBLE);
+            holder.iconBack.setAlpha(1);
+            if (currentSelectedIndex == position) {
+                FlipAnimator.flipView(context, holder.iconBack, holder.iconFront, true);
+                resetCurrentIndex();
+            }
+        } else {
+            holder.iconBack.setVisibility(View.GONE);
+            resetIconYAxis(holder.iconFront);
+            holder.iconFront.setVisibility(View.VISIBLE);
+            holder.iconFront.setAlpha(1);
+            if ((reverseAllAnimations && animationItemsIndex.get(position, false)) || currentSelectedIndex == position) {
+                FlipAnimator.flipView(context, holder.iconBack, holder.iconFront, false);
+                resetCurrentIndex();
+            }
+        }
+    }
+
+    private void resetIconYAxis(View view) {
+        if (view.getRotationY() != 0) {
+            view.setRotationY(0);
+        }
+    }
+
+    private void resetCurrentIndex() {
+        currentSelectedIndex = -1;
+    }
+
+    public void resetAnimationIndex() {
+        reverseAllAnimations = false;
+        animationItemsIndex.clear();
+    }
+
+    public void toggleSelection(int pos) {
+        currentSelectedIndex = pos;
+        if (selectedItems.get(pos, false)) {
+            selectedItems.delete(pos);
+            animationItemsIndex.delete(pos);
+        } else {
+            selectedItems.put(pos, true);
+            animationItemsIndex.put(pos, true);
+        }
+        notifyItemChanged(pos);
+    }
+
+    public void clearSelections() {
+        reverseAllAnimations = true;
+        selectedItems.clear();
+        notifyDataSetChanged();
+    }
+    public List<Integer> getSelectedItems() {
+        List<Integer> items = new ArrayList<>(selectedItems.size());
+        for (int i = 0; i < selectedItems.size(); i++) {
+            items.add(selectedItems.keyAt(i));
+        }
+        return items;
+    }
+    public int getSelectedItemCount() {
+        return selectedItems.size();
+    }
+
 
 }

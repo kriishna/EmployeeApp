@@ -3,6 +3,8 @@ package com.example.pulkit.employeeapp.adapters;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseBooleanArray;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +17,7 @@ import android.widget.TextView;
 import com.example.pulkit.employeeapp.Customer.custTasks;
 import com.example.pulkit.employeeapp.MainViews.TaskHome;
 import com.example.pulkit.employeeapp.R;
+import com.example.pulkit.employeeapp.helper.FlipAnimator;
 import com.example.pulkit.employeeapp.model.CompletedBy;
 import com.example.pulkit.employeeapp.model.Task;
 import com.google.firebase.database.DataSnapshot;
@@ -32,12 +35,13 @@ import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 import static com.example.pulkit.employeeapp.EmployeeApp.simpleDateFormat;
 
 
-public class EmployeeTask_Adapter extends RecyclerView.Adapter<EmployeeTask_Adapter.MyViewHolder> {
+public class EmployeeTask_Adapter extends RecyclerView.Adapter<EmployeeTask_Adapter.MyViewHolder>{
     List<String> list = new ArrayList<>();
     private Context context;
     String empId;
     String desig = TaskHome.desig;
     private EmployeeTask_AdapterListener listener;
+
 
     public EmployeeTask_Adapter(List<String> list, Context context, String empId, EmployeeTask_AdapterListener listener) {
         this.list = list;
@@ -87,12 +91,12 @@ public class EmployeeTask_Adapter extends RecyclerView.Adapter<EmployeeTask_Adap
                         }
                     });
 
-                    if(empId.equals("quotation")&&!task.getCustomerId().equals(custTasks.custId))
+                    if(empId.equals("accounts")&&!task.getCustomerId().equals(custTasks.custId))
                         holder.base_container.setVisibility(View.GONE);
                     else
                         holder.base_container.setVisibility(View.VISIBLE);
 
-                    if(desig.toLowerCase().equals("quotation")){
+                    if(desig.toLowerCase().equals("accounts")){
                         DBREF.child("Task").child(task.getTaskId()).child("Quotation").child("url").addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -170,6 +174,7 @@ public class EmployeeTask_Adapter extends RecyclerView.Adapter<EmployeeTask_Adap
         ImageView imgProfile;
         RelativeLayout base_container;
         public LinearLayout messageContainer;
+        RelativeLayout iconBack, iconFront, iconContainer;
 
         public MyViewHolder(View itemView) {
             super(itemView);
@@ -180,16 +185,22 @@ public class EmployeeTask_Adapter extends RecyclerView.Adapter<EmployeeTask_Adap
             imgProfile = (ImageView) itemView.findViewById(R.id.icon_profile);
             messageContainer = (LinearLayout) itemView.findViewById(R.id.message_container);
             base_container = (RelativeLayout) itemView.findViewById(R.id.base_container);
+            iconBack = (RelativeLayout) itemView.findViewById(R.id.icon_back);
+            iconFront = (RelativeLayout) itemView.findViewById(R.id.icon_front);
+            iconContainer = (RelativeLayout) itemView.findViewById(R.id.icon_container);
+
         }
+
+
 
     }
 
     public interface EmployeeTask_AdapterListener {
         void onRowClick(int position, MyViewHolder holder);
+
     }
 
     private void applyClickEvents(final MyViewHolder holder, final int position) {
-
         holder.messageContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -197,5 +208,6 @@ public class EmployeeTask_Adapter extends RecyclerView.Adapter<EmployeeTask_Adap
             }
         });
     }
+
 
 }

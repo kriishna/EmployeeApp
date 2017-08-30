@@ -11,10 +11,14 @@ import android.support.v4.app.Fragment;
 import com.example.pulkit.employeeapp.adapters.EmployeeTask_Adapter;
 import com.example.pulkit.employeeapp.helper.DividerItemDecoration;
 
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -39,7 +43,7 @@ public class taskFrag extends Fragment implements EmployeeTask_Adapter.EmployeeT
     DatabaseReference dbTask;
     LinearLayoutManager linearLayoutManager;
     List<String> listoftasks = new ArrayList<>();
-    private RecyclerView.Adapter mAdapter;
+    private EmployeeTask_Adapter mAdapter;
     ProgressDialog pDialog;
     int i = 0;
     public static String emp_id;
@@ -67,7 +71,6 @@ public class taskFrag extends Fragment implements EmployeeTask_Adapter.EmployeeT
         emp_id = session.getUsername();
         task_list = (RecyclerView) rootView.findViewById(R.id.recycler);
         listener = this;
-
         dbTask = DBREF.child("Employee").child(emp_id).child("AssignedTask").getRef();
 
         linearLayoutManager = new LinearLayoutManager(getActivity());
@@ -89,9 +92,11 @@ public class taskFrag extends Fragment implements EmployeeTask_Adapter.EmployeeT
 
     @Override
     public void onRowClick(int position, EmployeeTask_Adapter.MyViewHolder holder) {
-        Intent intent = new Intent(getContext(), TaskDetail.class);
-        intent.putExtra("task_id", listoftasks.get(position));
-        startActivity(intent);
+
+            Intent intent = new Intent(getContext(), TaskDetail.class);
+            intent.putExtra("task_id", listoftasks.get(position));
+            startActivity(intent);
+
     }
 
 
@@ -136,5 +141,6 @@ public class taskFrag extends Fragment implements EmployeeTask_Adapter.EmployeeT
             return null;
         }
     }
+
 
 }

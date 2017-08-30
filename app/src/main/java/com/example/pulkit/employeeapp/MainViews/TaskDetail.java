@@ -194,7 +194,6 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         adapter_taskimages = new taskdetailDescImageAdapter(DescImages, getApplicationContext(), this);
         rec_DescImages.setAdapter(adapter_taskimages);
 
-        compressMe = new CompressMe(this);
 
        /* if(desig.toLowerCase().equals("field executive"))
             measure.setVisibility(View.GONE);
@@ -362,16 +361,6 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
 
     private void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-    }
-
-    private void UploadQuotation() {
-        Intent intent = new Intent();
-        //sets the select file to all types of files
-        intent.setType("*/*");
-        //allows to select data and return it
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        //starts new activity to select file and return data
-        startActivityForResult(Intent.createChooser(intent, "Choose File to Upload.."), PICK_FILE_REQUEST);
     }
 
 
