@@ -66,6 +66,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.zfdang.multiple_images_selector.ImagesSelectorActivity;
 import com.zfdang.multiple_images_selector.SelectorSettings;
@@ -773,33 +774,48 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
             holder.progressBar.setVisibility(View.VISIBLE);
             holder.download_taskdetail_image.setVisibility(View.GONE);
             String url = DescImages.get(position);
-            StorageReference str = FirebaseStorage.getInstance().getReferenceFromUrl(url);
-            File rootPath = new File(Environment.getExternalStorageDirectory(), AppName + "/TaskDetailImages");
 
-            if (!rootPath.exists()) {
-                rootPath.mkdirs();
-            }
-            String uriSting = System.currentTimeMillis() + ".jpg";
-
-            final File localFile = new File(rootPath, uriSting);
-
-            str.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+            final StorageReference str = FirebaseStorage.getInstance().getReferenceFromUrl(url);
+            final String[] ext = new String[1];
+            str.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
                 @Override
-                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                    Log.e("firebase ", ";local tem file created  created " + localFile.toString());
-                    holder.download_taskdetail_image.setVisibility(View.VISIBLE);
-                    holder.progressBar.setVisibility(View.GONE);
-                    Toast.makeText(TaskDetail.this, "Image " + position + 1 + " Downloaded", Toast.LENGTH_SHORT).show();
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    Log.e("firebase ", ";local tem file not created  created " + exception.toString());
-                    holder.download_taskdetail_image.setVisibility(View.VISIBLE);
-                    holder.progressBar.setVisibility(View.GONE);
-                    Toast.makeText(TaskDetail.this, "Failed to download image " + position + 1, Toast.LENGTH_SHORT).show();
+                public void onSuccess(StorageMetadata storageMetadata) {
+                    ext[0] = storageMetadata.getContentType();
+                    int p = ext[0].lastIndexOf("/");
+                    String l = "." + ext[0].substring(p + 1);
+
+
+                    File rootPath = new File(Environment.getExternalStorageDirectory(), AppName + "/TaskDetailImages");
+
+                    if (!rootPath.exists()) {
+                        rootPath.mkdirs();
+                    }
+                    String uriSting = System.currentTimeMillis() + l;
+
+                    final File localFile = new File(rootPath, uriSting);
+
+                    str.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                            Log.e("firebase ", ";local tem file created  created " + localFile.toString());
+                            holder.download_taskdetail_image.setVisibility(View.VISIBLE);
+                            holder.progressBar.setVisibility(View.GONE);
+                            Toast.makeText(TaskDetail.this, "Image " + position + 1 + " Downloaded", Toast.LENGTH_SHORT).show();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            Log.e("firebase ", ";local tem file not created  created " + exception.toString());
+                            holder.download_taskdetail_image.setVisibility(View.VISIBLE);
+                            holder.progressBar.setVisibility(View.GONE);
+                            Toast.makeText(TaskDetail.this, "Failed to download image " + position + 1, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
                 }
             });
+
+
         }
     }
 }
