@@ -72,6 +72,7 @@ public class taskFrag extends Fragment implements EmployeeTask_Adapter.EmployeeT
         task_list = (RecyclerView) rootView.findViewById(R.id.recycler);
         listener = this;
         dbTask = DBREF.child("Employee").child(emp_id).child("AssignedTask").getRef();
+        mAdapter = new EmployeeTask_Adapter(listoftasks, getActivity(), emp_id, listener);
 
         linearLayoutManager = new LinearLayoutManager(getActivity());
         task_list.setLayoutManager(linearLayoutManager);
