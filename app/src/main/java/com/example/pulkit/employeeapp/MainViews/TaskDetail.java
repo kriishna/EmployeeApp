@@ -326,7 +326,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                                     sendNotif(mykey, completedJob.getAssignedByUsername(), "completedJob", contentforother, task_id);
                                     Toast.makeText(TaskDetail.this, contentforme, Toast.LENGTH_SHORT).show();
                                     Intent intent1 = new Intent(TaskDetail.this, TaskHome.class);
-                                    intent1.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                                     startActivity(intent1);
 
                                 }

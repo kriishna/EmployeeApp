@@ -103,6 +103,7 @@ public class custFrag extends Fragment implements newcustAdapter.CustomerAdapter
         intent.putExtra("customerId", custList.get(position));
  //       intent.putExtra("customerName", cust.getName());
         startActivity(intent);
+
     }
 
     void LoadTasks() {
@@ -178,6 +179,7 @@ public class custFrag extends Fragment implements newcustAdapter.CustomerAdapter
             return null;
         }
     }
+
 
 
 

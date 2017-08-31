@@ -101,6 +101,7 @@ public class UploadQuotationService extends IntentService
                             Quotation quotation = new Quotation("No",taskSnapshot.getDownloadUrl().toString());
                             DatabaseReference dbQuotation = DBREF.child("Task").child(TaskIdList.get(i)).child("Quotation").getRef();
                             dbQuotation.setValue(quotation);
+
                         }
                         updateNotification("Succesfully Uploaded");
 

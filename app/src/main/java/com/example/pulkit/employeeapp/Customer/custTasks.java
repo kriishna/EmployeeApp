@@ -639,6 +639,7 @@ public class custTasks extends AppCompatActivity implements taskAdapter.TaskAdap
                             if(taskid_list.size()==TaskList.size()) {
                                 Intent intent = new Intent(getApplicationContext(), TaskHome.class);
                                 startActivity(intent);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                                 finish();
                             }
                             else
@@ -646,6 +647,7 @@ public class custTasks extends AppCompatActivity implements taskAdapter.TaskAdap
                                 Intent i = new Intent(custTasks.this, custTasks.class);
                                 i.putExtra("customerId", custId);
                                 startActivity(i);
+                                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                                 finish();
                             }
                         }
