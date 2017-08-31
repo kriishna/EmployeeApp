@@ -23,7 +23,7 @@ public class EmployeeApp extends android.support.multidex.MultiDexApplication {
     public static SimpleDateFormat simpleDateFormatWithMonthName = new SimpleDateFormat("dd-MMM-yyyy");
     public static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
-    public static String AppName = "demo";
+    public static String AppName = "MeChat";
 
     @Override
     public void onCreate() {

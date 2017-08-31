@@ -22,7 +22,7 @@
         android:name=".EmployeeApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="aa emp"
+        android:label="JobTracker(E)"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="label">
