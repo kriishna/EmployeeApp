@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Job Tracker(E)</string>
+    <string name="app_name">JobTracker(E)</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="title_activity_drawer1">drawer1</string>
