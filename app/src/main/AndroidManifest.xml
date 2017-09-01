@@ -24,8 +24,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        >
+        android:theme="@style/AppTheme">
         <receiver android:name=".CheckInternetConnectivity.NetWatcher">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -47,22 +46,27 @@
             android:name=".MainViews.TaskHome"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".chat.ChatActivity" />
+        <activity android:name=".chat.ChatActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".MainViews.TaskDetail"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
         <activity android:name=".EmployeeLogin.empLogin"
-            android:exported="true">
+            android:exported="true"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".measurement.MeasureList" />
+        <activity android:name=".measurement.MeasureList"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".measurement.dialogue"
-            android:windowSoftInputMode="stateHidden" />
+            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="portrait" />
 
         <service android:name=".services.LocServ" />
         <service android:name=".services.MyFirebaseMessagingService">
@@ -74,7 +78,8 @@
         <activity
             android:name=".drawer"
             android:label="@string/title_activity_drawer1"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait" />
 
         <service android:name=".services.MyFirebaseInstanceIDService">
             <intent-filter>
@@ -85,11 +90,16 @@
             android:name=".services.UploadQuotationService"
             android:exported="false" />
 
-        <activity android:name=".Notification.NotificationActivity" />
-        <activity android:name=".MyProfile.MyProfile" />
-        <activity android:name=".MyProfile.ContactCoordinator" />
-        <activity android:name=".MyProfile.phonebook" />
-        <activity android:name=".Customer.custTasks" />
+        <activity android:name=".Notification.NotificationActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".MyProfile.MyProfile"
+            android:screenOrientation="portrait" />
+        <activity android:name=".MyProfile.ContactCoordinator"
+            android:screenOrientation="portrait" />
+        <activity android:name=".MyProfile.phonebook"
+            android:screenOrientation="portrait" />
+        <activity android:name=".Customer.custTasks"
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".services.DownloadFileService"
@@ -99,7 +109,8 @@
             android:name=".BroadcastReceivers.AlarmReceiver"
             android:enabled="true" />
 
-        <activity android:name=".MyProfile.CompletedJobs" />
+        <activity android:name=".MyProfile.CompletedJobs"
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".services.UploadPhotoAndFile"
