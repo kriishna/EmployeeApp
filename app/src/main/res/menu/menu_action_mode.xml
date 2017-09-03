@@ -7,7 +7,7 @@
 
     <item
         android:id="@+id/uploadquotation"
-        android:icon="@drawable/ic_cloud_upload_black_24dp"
+        android:icon="@drawable/ic_upload_white"
         android:orderInCategory="100"
         android:title="Upload"
         app:showAsAction="always" />
