@@ -40,6 +40,9 @@ public class TaskHome extends drawer {
         getLayoutInflater().inflate(R.layout.activity_task_home, frame);
 
         marshmallowPermissions = new MarshmallowPermissions(this);
+        if (!marshmallowPermissions.checkPermissionForReadExternalStorage())
+            marshmallowPermissions.requestPermissionForReadExternalStorage();
+
         if (!marshmallowPermissions.checkPermissionForCamera())
             marshmallowPermissions.requestPermissionForCamera();
         if (!marshmallowPermissions.checkPermissionForExternalStorage())

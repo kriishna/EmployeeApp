@@ -16,7 +16,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:padding="12dp"
-            android:text="Length"
+            android:drawableLeft="@mipmap/ic_arrow_horizontal"
+            android:text="Width"
             android:gravity="center_horizontal"/>
 
         <TextView
@@ -25,7 +26,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:padding="12dp"
-            android:text="Breadth"
+            android:text="Height"
+            android:drawableLeft="@mipmap/ic_arrow_vertical"
             android:gravity="center_horizontal"/>
 
         <TextView
