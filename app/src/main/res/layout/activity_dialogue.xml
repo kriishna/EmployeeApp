@@ -33,6 +33,12 @@
             android:layout_height="wrap_content"
             android:hint="Unit"
             android:singleLine="true" />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Descrption"
+            android:id="@+id/tag"
+            android:inputType="textMultiLine"/>
 
 
         <RelativeLayout

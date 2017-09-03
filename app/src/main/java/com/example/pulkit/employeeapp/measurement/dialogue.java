@@ -18,6 +18,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.pulkit.employeeapp.Customer.custTasks;
 import com.example.pulkit.employeeapp.MainViews.TaskDetail;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.adapters.ViewImageAdapter;
@@ -37,13 +38,16 @@ import com.zfdang.multiple_images_selector.SelectorSettings;
 import java.io.File;
 import java.util.ArrayList;
 
+import droidninja.filepicker.FilePickerBuilder;
+import droidninja.filepicker.FilePickerConst;
+
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 
 public class dialogue extends AppCompatActivity {
 
     private ArrayList<String> photoPaths = new ArrayList<>();
-    EditText width, height, unit;
-    String fleximage = "", temp_width, temp_height, temp_unit, id = "";
+    EditText width, height, unit,tag;
+    String tagString="", fleximage = "", temp_width, temp_height, temp_unit, id = "";
     private static final int REQUEST_CODE = 51;
     DatabaseReference dbRef, db;
     StorageReference storageReference, sf;
@@ -56,7 +60,7 @@ public class dialogue extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dialogue);
-
+        tag = (EditText)findViewById(R.id.tag);
         dbRef = DBREF;
         storageReference = FirebaseStorage.getInstance().getReference().child("MeasurementImages");
         img = (ImageView) findViewById(R.id.imageView);
@@ -88,20 +92,18 @@ public class dialogue extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(dialogue.this, ImagesSelectorActivity.class);
-                intent.putExtra(SelectorSettings.SELECTOR_MAX_IMAGE_NUMBER, 1);
-                intent.putExtra(SelectorSettings.SELECTOR_SHOW_CAMERA, true);
-                startActivityForResult(intent, REQUEST_CODE);
-            }
+                FilePickerBuilder.getInstance().setMaxCount(10)
+                        .setActivityTheme(R.style.AppTheme)
+                        .pickPhoto(dialogue.this);
+                    }
         });
     }
 
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
-
-            photoPaths = data.getStringArrayListExtra(SelectorSettings.SELECTOR_RESULTS);
-            assert photoPaths != null;
+        if (requestCode == FilePickerConst.REQUEST_CODE_PHOTO && resultCode == Activity.RESULT_OK && data != null) {
+            photoPaths=new ArrayList<>();
+            photoPaths.addAll(data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_MEDIA));
 
             System.out.println(String.format("Totally %d images selected:", photoPaths.size()));
             if (photoPaths.size() > 0) {

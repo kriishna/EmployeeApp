@@ -369,10 +369,10 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
-            case REQUEST_CODE:
+            case FilePickerConst.REQUEST_CODE_PHOTO:
                 if (resultCode == Activity.RESULT_OK && data != null) {
-                    photoPaths = data.getStringArrayListExtra(SelectorSettings.SELECTOR_RESULTS);
-                    assert photoPaths != null;
+                    photoPaths = new ArrayList<>();
+                    photoPaths.addAll(data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_MEDIA));
 
                     System.out.println(String.format("Totally %d images selected:", photoPaths.size()));
                     if (photoPaths.size() > 0) {
@@ -524,10 +524,9 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                 uploadPhoto.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(TaskDetail.this, ImagesSelectorActivity.class);
-                        intent.putExtra(SelectorSettings.SELECTOR_MAX_IMAGE_NUMBER, 1);
-                        intent.putExtra(SelectorSettings.SELECTOR_SHOW_CAMERA, true);
-                        startActivityForResult(intent, REQUEST_CODE);
+                        FilePickerBuilder.getInstance().setMaxCount(10)
+                                .setActivityTheme(R.style.AppTheme)
+                                .pickPhoto(TaskDetail.this);
                         alertDialogAndroid.dismiss();
                     }
                 });
