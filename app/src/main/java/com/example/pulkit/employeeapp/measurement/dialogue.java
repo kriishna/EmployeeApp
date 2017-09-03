@@ -87,6 +87,8 @@ public class dialogue extends AppCompatActivity {
                 Picasso.with(dialogue.this).load(fleximage).into(img);
         }
 
+        ;
+
         ImageButton photoButton = (ImageButton) findViewById(R.id.capture);
         photoButton.setOnClickListener(new View.OnClickListener() {
 
