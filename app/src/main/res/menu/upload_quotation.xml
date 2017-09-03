@@ -7,6 +7,4 @@
         android:title="ADD"
         app:showAsAction="always"
         android:id="@+id/manage_account"/>
-
-
 </menu>
