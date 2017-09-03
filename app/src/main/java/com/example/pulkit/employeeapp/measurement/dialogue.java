@@ -7,24 +7,19 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-
 import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+
+import com.example.pulkit.employeeapp.MainViews.TaskDetail;
+import com.example.pulkit.employeeapp.R;
+import com.example.pulkit.employeeapp.helper.CompressMe;
+import com.example.pulkit.employeeapp.model.measurement;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.example.pulkit.employeeapp.Customer.custTasks;
-import com.example.pulkit.employeeapp.MainViews.TaskDetail;
-import com.example.pulkit.employeeapp.R;
-import com.example.pulkit.employeeapp.adapters.ViewImageAdapter;
-import com.example.pulkit.employeeapp.adapters.bigimage_adapter;
-import com.example.pulkit.employeeapp.helper.CompressMe;
-import com.example.pulkit.employeeapp.model.measurement;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
@@ -43,30 +38,32 @@ import droidninja.filepicker.FilePickerConst;
 
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 
+
 public class dialogue extends AppCompatActivity {
 
     private ArrayList<String> photoPaths = new ArrayList<>();
-    EditText width, height, unit,tag;
-    String tagString="", fleximage = "", temp_width, temp_height, temp_unit, id = "";
+    EditText width, height, unit, tag;
+    String fleximage = "", temp_width, temp_height, temp_unit, id = "", temp_tag="";
     private static final int REQUEST_CODE = 51;
     DatabaseReference dbRef, db;
     StorageReference storageReference, sf;
     Uri tempUri = Uri.parse("");
     ProgressDialog pd;
-    CompressMe compressMe;
     ImageView img;
     String item;
+    CompressMe compressMe;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dialogue);
-        tag = (EditText)findViewById(R.id.tag);
+
         dbRef = DBREF;
         storageReference = FirebaseStorage.getInstance().getReference().child("MeasurementImages");
         img = (ImageView) findViewById(R.id.imageView);
         width = (EditText) findViewById(R.id.width);
         height = (EditText) findViewById(R.id.height);
         unit = (EditText) findViewById(R.id.unit);
+        tag = (EditText) findViewById(R.id.tag);
 
         pd = new ProgressDialog(dialogue.this);
         pd.setMessage("Uploading....");
@@ -78,34 +75,34 @@ public class dialogue extends AppCompatActivity {
             temp_height = getIntent().getStringExtra("height");
             temp_unit = getIntent().getStringExtra("unit");
             fleximage = getIntent().getStringExtra("fleximage");
+            temp_tag = getIntent().getStringExtra("tag");
             id = getIntent().getStringExtra("id");
 
             width.setText(temp_width);
             height.setText(temp_height);
             unit.setText(temp_unit);
+            tag.setText(temp_tag);
             if (!fleximage.equals(""))
                 Picasso.with(dialogue.this).load(fleximage).into(img);
         }
-
-        ;
 
         ImageButton photoButton = (ImageButton) findViewById(R.id.capture);
         photoButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                FilePickerBuilder.getInstance().setMaxCount(10)
+                FilePickerBuilder.getInstance().setMaxCount(1)
                         .setActivityTheme(R.style.AppTheme)
-                        .pickPhoto(dialogue.this);
-                    }
+                        .pickPhoto(dialogue.this);    }
         });
-    }
 
+    }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == FilePickerConst.REQUEST_CODE_PHOTO && resultCode == Activity.RESULT_OK && data != null) {
-            photoPaths=new ArrayList<>();
+            photoPaths =new ArrayList<>();
             photoPaths.addAll(data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_MEDIA));
+            assert photoPaths != null;
 
             System.out.println(String.format("Totally %d images selected:", photoPaths.size()));
             if (photoPaths.size() > 0) {
@@ -118,10 +115,10 @@ public class dialogue extends AppCompatActivity {
                         tempUri = Uri.fromFile(new File(l));
                     }
                 }, 500);
-
             }
 
         }
+
 
     }
 
@@ -132,6 +129,7 @@ public class dialogue extends AppCompatActivity {
         temp_width = width.getText().toString();
         temp_height = height.getText().toString();
         temp_unit = unit.getText().toString();
+        temp_tag = tag.getText().toString();
 
         if (temp_width.equals("") || temp_height.equals("") || temp_unit.equals(""))
             Toast.makeText(this, "Enter complete details...", Toast.LENGTH_SHORT).show();
@@ -157,7 +155,7 @@ public class dialogue extends AppCompatActivity {
 
             db = dbRef.child("Task").child(TaskDetail.task_id).child("Measurement").child(id);
 
-            if (!tempUri.toString().equals("")) {
+            if(!tempUri.toString().equals("")) {
                 sf = storageReference.child(TaskDetail.task_id).child(id + ".jpeg");
 
                 UploadTask uploadTask = sf.putFile(tempUri);
@@ -168,7 +166,7 @@ public class dialogue extends AppCompatActivity {
 
                         Toast.makeText(dialogue.this, "Upload successful", Toast.LENGTH_SHORT).show();
                         fleximage = taskSnapshot.getDownloadUrl().toString();
-                        measurement temp = new measurement("", temp_width, temp_height, fleximage, temp_unit, id);
+                        measurement temp = new measurement(temp_tag, temp_width, temp_height, fleximage, temp_unit, id);
                         db.setValue(temp);
                         pd.dismiss();
 
@@ -180,6 +178,7 @@ public class dialogue extends AppCompatActivity {
                         intent.putExtra("height", temp_height);
                         intent.putExtra("unit", temp_unit);
                         intent.putExtra("fleximage", fleximage);
+                        intent.putExtra("tag", temp_tag);
                         intent.putExtra("id", id);
 
                         setResult(RESULT_OK, intent);
@@ -194,12 +193,14 @@ public class dialogue extends AppCompatActivity {
                     }
                 });
 
-            } else {
+            }
+            else{
                 Intent intent = new Intent();
                 intent.putExtra("width", temp_width);
                 intent.putExtra("height", temp_height);
                 intent.putExtra("unit", temp_unit);
                 intent.putExtra("fleximage", fleximage);
+                intent.putExtra("tag", temp_tag);
                 intent.putExtra("id", id);
 
                 setResult(RESULT_OK, intent);

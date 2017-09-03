@@ -1,39 +1,32 @@
 package com.example.pulkit.employeeapp.measurement;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.CardView;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.example.pulkit.employeeapp.MainViews.TaskDetail;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.listener.ClickListener;
 import com.example.pulkit.employeeapp.listener.RecyclerTouchListener;
-import com.example.pulkit.employeeapp.model.measurement;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-
 import java.util.ArrayList;
 import java.util.List;
+import com.example.pulkit.employeeapp.model.measurement;
 
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
-
 
 public class MeasureList extends AppCompatActivity {
 
@@ -71,7 +64,7 @@ public class MeasureList extends AppCompatActivity {
                 //Action for on click event
 
 
-                String width, height, unit, fleximage;
+                String width, height, unit, fleximage,tag;
 
 
                 measurement temp = listItems.get(position);
@@ -79,6 +72,7 @@ public class MeasureList extends AppCompatActivity {
                 height = temp.getHeight();
                 unit = temp.getUnit();
                 fleximage = temp.getFleximage();
+                tag = temp.getTag();
                 id = temp.getId();
 
                 Intent i = new Intent(getApplicationContext(), dialogue.class);
@@ -86,6 +80,7 @@ public class MeasureList extends AppCompatActivity {
                 i.putExtra("height", height);
                 i.putExtra("unit", unit);
                 i.putExtra("fleximage", fleximage);
+                i.putExtra("tag", tag);
                 i.putExtra("id", id);
 
                 startActivityForResult(i, 100);
@@ -147,7 +142,8 @@ public class MeasureList extends AppCompatActivity {
                 String unit = data.getStringExtra("unit");
                 String fleximage = data.getStringExtra("fleximage");
                 String id = data.getStringExtra("id");
-                measurement m = new measurement("", width, height, fleximage, unit, id);
+                String tag = data.getStringExtra("tag");
+                measurement m = new measurement(tag, width, height, fleximage, unit, id);
 
                 dbRef.child(id).setValue(m);
 
@@ -215,5 +211,13 @@ public class MeasureList extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent i = new Intent(MeasureList.this,TaskDetail.class);
+        i.putExtra("task_id",TaskDetail.task_id);
+        startActivity(i);
+        finish();
 
+    }
 }

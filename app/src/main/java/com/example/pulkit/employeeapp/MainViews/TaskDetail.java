@@ -3,11 +3,9 @@ package com.example.pulkit.employeeapp.MainViews;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -18,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.example.pulkit.employeeapp.adapters.ViewImageAdapter;
 import com.example.pulkit.employeeapp.helper.CompressMe;
+
 import com.example.pulkit.employeeapp.helper.DividerItemDecoration;
 
 import android.support.v7.widget.DefaultItemAnimator;
@@ -44,7 +43,6 @@ import com.example.pulkit.employeeapp.adapters.bigimage_adapter;
 import com.example.pulkit.employeeapp.adapters.measurement_adapter;
 import com.example.pulkit.employeeapp.adapters.taskdetailDescImageAdapter;
 import com.example.pulkit.employeeapp.chat.ChatActivity;
-import com.example.pulkit.employeeapp.helper.FilePath;
 import com.example.pulkit.employeeapp.helper.MarshmallowPermissions;
 import com.example.pulkit.employeeapp.listener.ClickListener;
 import com.example.pulkit.employeeapp.listener.RecyclerTouchListener;
@@ -62,21 +60,15 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
-import com.zfdang.multiple_images_selector.ImagesSelectorActivity;
-import com.zfdang.multiple_images_selector.SelectorSettings;
 
 import java.io.File;
-import java.net.URI;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 
 import droidninja.filepicker.FilePickerBuilder;
 import droidninja.filepicker.FilePickerConst;
@@ -237,6 +229,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(TaskDetail.this, MeasureList.class));
+                finish();
             }
         });
 

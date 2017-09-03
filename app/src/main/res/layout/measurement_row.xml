@@ -49,8 +49,9 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:drawableLeft="@mipmap/ic_arrow_vertical"
                     android:gravity="center_vertical"
-                    android:text="Height : "
+                    android:text=" Height : "
                     android:textColor="@color/black"
                     android:textSize="15dp" />
 
@@ -72,8 +73,9 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:drawableLeft="@mipmap/ic_arrow_horizontal"
                     android:gravity="center_vertical"
-                    android:text="Width : "
+                    android:text=" Width : "
                     android:textColor="@color/black"
                     android:textSize="15dp" />
 
@@ -85,6 +87,29 @@
                     android:textColor="@color/black"
                     android:textSize="15dp" />
             </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="1dp"
+                    android:text="Description : "
+                    android:textColor="@color/black"
+                    android:textSize="15dp" />
+
+                <TextView
+                    android:id="@+id/tag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:inputType="textMultiLine"
+                    android:textColor="@color/black"
+                    android:textSize="15dp" />
+
+            </LinearLayout>
         </LinearLayout>
 
         <de.hdodenhof.circleimageview.CircleImageView
@@ -92,7 +117,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_alignParentRight="true"
-            android:layout_centerInParent="true"
+            android:layout_alignParentTop="true"
             android:src="@drawable/fleximage" />
 
     </RelativeLayout>
