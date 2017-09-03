@@ -14,6 +14,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.example.pulkit.employeeapp.adapters.ViewImageAdapter;
 import com.example.pulkit.employeeapp.helper.CompressMe;
 
@@ -44,6 +45,7 @@ import com.example.pulkit.employeeapp.adapters.measurement_adapter;
 import com.example.pulkit.employeeapp.adapters.taskdetailDescImageAdapter;
 import com.example.pulkit.employeeapp.chat.ChatActivity;
 import com.example.pulkit.employeeapp.helper.MarshmallowPermissions;
+import com.example.pulkit.employeeapp.helper.TouchImageView;
 import com.example.pulkit.employeeapp.listener.ClickListener;
 import com.example.pulkit.employeeapp.listener.RecyclerTouchListener;
 import com.example.pulkit.employeeapp.measurement.MeasureList;
@@ -78,7 +80,7 @@ import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 import static com.example.pulkit.employeeapp.EmployeeApp.sendNotif;
 import static com.example.pulkit.employeeapp.EmployeeApp.simpleDateFormat;
 
-public class TaskDetail extends AppCompatActivity implements taskdetailDescImageAdapter.ImageAdapterListener, bigimage_adapter.bigimage_adapterListener {
+public class TaskDetail extends AppCompatActivity implements taskdetailDescImageAdapter.ImageAdapterListener, bigimage_adapter.bigimage_adapterListener, measurement_adapter.measurement_adapterListener{
 
     private static final int REQUEST_CODE = 101;
     DatabaseReference dbRef, dbTask, dbCompleted, dbAssigned, dbMeasurement, dbDescImages;
@@ -105,14 +107,13 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     taskdetailDescImageAdapter adapter_taskimages;
     bigimage_adapter adapter;
     ViewImageAdapter madapter;
-    private AlertDialog viewSelectedImages, confirmation, viewSelectedImages1;
+    private AlertDialog viewSelectedImages, confirmation, viewSelectedImages1, viewSelectedImages_measure;
     ArrayList<String> DescImages = new ArrayList<>();
     LinearLayoutManager linearLayoutManager;
     EmployeeSession session;
     String dbTablekey, id;
     String num;
     private MarshmallowPermissions marshmallowPermissions;
- //   SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
     private static final int PICK_FILE_REQUEST = 1;
 
     @Override
@@ -178,7 +179,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         rec_measurement.setLayoutManager(new LinearLayoutManager(this));
         rec_measurement.setItemAnimator(new DefaultItemAnimator());
         rec_measurement.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
-        adapter_measurement = new measurement_adapter(measurementList, this);
+        adapter_measurement = new measurement_adapter(measurementList, this, this);
         rec_measurement.setAdapter(adapter_measurement);
 
         rec_DescImages.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -806,8 +807,33 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
 
                 }
             });
-
-
         }
+    }
+
+    @Override
+    public void onImageClicked(int position, measurement_adapter.MyViewHolder holder) {
+        viewSelectedImages_measure = new AlertDialog.Builder(TaskDetail.this)
+                .setView(R.layout.viewmeasureimage).create();
+        viewSelectedImages_measure.show();
+
+        measurement m = measurementList.get(position);
+        String uri = m.getFleximage();
+
+        TouchImageView viewchatimage = (TouchImageView) viewSelectedImages_measure.findViewById(R.id.chatimage);
+        ImageButton backbutton = (ImageButton) viewSelectedImages_measure.findViewById(R.id.back);
+
+        Glide.with(getApplicationContext())
+                .load(Uri.parse(uri))
+                .placeholder(R.color.black)
+                .crossFade()
+                .centerCrop()
+                .into(viewchatimage);
+
+        backbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewSelectedImages_measure.dismiss();
+            }
+        });
     }
 }
