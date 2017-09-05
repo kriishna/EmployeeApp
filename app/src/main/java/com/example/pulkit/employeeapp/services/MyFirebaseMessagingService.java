@@ -215,6 +215,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             }
 
         }
-        return isInForeground;
+        return true;
     }
 }
