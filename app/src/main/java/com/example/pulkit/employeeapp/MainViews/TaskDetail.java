@@ -503,36 +503,42 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                 break;
 
             case R.id.item3:
-                LayoutInflater layoutInflaterAndroid = LayoutInflater.from(this);
-                View mView = layoutInflaterAndroid.inflate(R.layout.options_foruploadquotation, null);
-                AlertDialog.Builder alertDialogBuilderUserInput = new AlertDialog.Builder(this);
-                alertDialogBuilderUserInput.setView(mView);
+                if(desig.equals("Accounts")) {
+                    LayoutInflater layoutInflaterAndroid = LayoutInflater.from(this);
+                    View mView = layoutInflaterAndroid.inflate(R.layout.options_foruploadquotation, null);
+                    AlertDialog.Builder alertDialogBuilderUserInput = new AlertDialog.Builder(this);
+                    alertDialogBuilderUserInput.setView(mView);
 
-                LinearLayout uploadPhoto = (LinearLayout) mView.findViewById(R.id.uploadPhoto);
-                LinearLayout uploadDoc = (LinearLayout) mView.findViewById(R.id.uploadDoc);
+                    LinearLayout uploadPhoto = (LinearLayout) mView.findViewById(R.id.uploadPhoto);
+                    LinearLayout uploadDoc = (LinearLayout) mView.findViewById(R.id.uploadDoc);
 
 
-                alertDialogBuilderUserInput.setCancelable(true);
-                final AlertDialog alertDialogAndroid = alertDialogBuilderUserInput.create();
-                alertDialogAndroid.show();
-                uploadPhoto.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        FilePickerBuilder.getInstance().setMaxCount(10)
-                                .setActivityTheme(R.style.AppTheme)
-                                .pickPhoto(TaskDetail.this);
-                        alertDialogAndroid.dismiss();
-                    }
-                });
-                uploadDoc.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        FilePickerBuilder.getInstance().setMaxCount(1)
-                                .setActivityTheme(R.style.AppTheme)
-                                .pickFile(TaskDetail.this);
-                        alertDialogAndroid.dismiss();
-                    }
-                });
+                    alertDialogBuilderUserInput.setCancelable(true);
+                    final AlertDialog alertDialogAndroid = alertDialogBuilderUserInput.create();
+                    alertDialogAndroid.show();
+                    uploadPhoto.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            FilePickerBuilder.getInstance().setMaxCount(10)
+                                    .setActivityTheme(R.style.AppTheme)
+                                    .pickPhoto(TaskDetail.this);
+                            alertDialogAndroid.dismiss();
+                        }
+                    });
+                    uploadDoc.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            FilePickerBuilder.getInstance().setMaxCount(1)
+                                    .setActivityTheme(R.style.AppTheme)
+                                    .pickFile(TaskDetail.this);
+                            alertDialogAndroid.dismiss();
+                        }
+                    });
+                }
+                else
+                {
+                    Toast.makeText(TaskDetail.this,"You are not authorized to upload quotations",Toast.LENGTH_SHORT).show();
+                }
                 break;
         }
         return true;
