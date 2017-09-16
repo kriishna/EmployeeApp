@@ -79,7 +79,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             Intent intent = new Intent(this, NetWatcher.class);
             intent.setAction("seen_notification");
             intent.putExtra("empname",session.getName());
-            intent.putExtra("id",id);
+            String j = id.substring(8);
+            intent.putExtra("id",j);
             intent.putExtra("senderuid",senderuid);
             intent.putExtra("mykey",session.getUsername());
             contentView.setTextViewText(R.id.title, body);
