@@ -1,5 +1,6 @@
 package com.example.pulkit.employeeapp.CheckInternetConnectivity;
 
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -42,9 +43,13 @@ public class NetWatcher extends BroadcastReceiver {
             String content = arg1.getStringExtra("empname") + " has seen the Job";
             String receiverId = arg1.getStringExtra("senderuid");
             String senderId = arg1.getStringExtra("mykey");
+            String id = arg1.getStringExtra("id");
             EmployeeApp.sendNotif(senderId,receiverId,"seen",content," ");
+            NotificationManager notificationManager =
+                    (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.cancel(Integer.parseInt(id));
+            Toast.makeText(context,"Informing Coordinator",Toast.LENGTH_LONG).show();
             context.startActivity(new Intent(context, NotificationActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-            Toast.makeText(context,"Informing Coordinator",Toast.LENGTH_SHORT).show();
 
         }
     }

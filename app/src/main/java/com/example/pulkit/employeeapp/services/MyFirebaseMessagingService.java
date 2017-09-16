@@ -76,10 +76,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             String senderuid = remoteMessage.getData().get("senderuid");
             String taskId = remoteMessage.getData().get("taskId");
             String id = remoteMessage.getData().get("msgid");
-
             Intent intent = new Intent(this, NetWatcher.class);
             intent.setAction("seen_notification");
             intent.putExtra("empname",session.getName());
+            intent.putExtra("id",id);
             intent.putExtra("senderuid",senderuid);
             intent.putExtra("mykey",session.getUsername());
             contentView.setTextViewText(R.id.title, body);
@@ -87,6 +87,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     intent, 0);
 
             contentView.setOnClickPendingIntent(R.id.seen,pendingSwitchIntent);
+
             if (body != null  && senderuid != null)
                 sendGeneralNotification2(body, senderuid, taskId, id, contentView);
         }
@@ -236,7 +237,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
             }
         });
-        if (isAppIsInForeground(this) == false&& !chatnotifList.contains(msgid)) {
+        if (!chatnotifList.contains(msgid)) {
             DatabaseReference dbOnlineStatus = DBREF.child("Users").child("Usersessions").child(senderuid).getRef();
             dbOnlineStatus.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -264,7 +265,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             });
         }
     }
-
+public String getTimestamp()
+{
+    String timestamp = Calendar.getInstance().getTimeInMillis()+"";
+    return timestamp;
+}
 
     private boolean isAppIsInForeground(Context context) {
         boolean isInForeground = false;
