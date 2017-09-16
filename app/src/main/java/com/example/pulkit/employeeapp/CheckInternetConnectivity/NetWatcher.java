@@ -7,10 +7,14 @@ import android.content.SharedPreferences;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.widget.Toast;
 
 import com.example.pulkit.employeeapp.EmployeeApp;
+import com.example.pulkit.employeeapp.Notification.NotificationActivity;
 import com.example.pulkit.employeeapp.services.LocServ;
 import com.example.pulkit.employeeapp.services.MyFirebaseMessagingService;
+
+import static android.provider.LiveFolders.INTENT;
 
 public class NetWatcher extends BroadcastReceiver {
 
@@ -20,7 +24,7 @@ public class NetWatcher extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent arg1) {
-        if (arg1.getAction() == "android.intent.action.BOOT_COMPLETED") {
+        if (arg1.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
             Intent serviceIntent = new Intent(context, MyFirebaseMessagingService.class);
             context.startService(serviceIntent);
         }
@@ -34,5 +38,14 @@ public class NetWatcher extends BroadcastReceiver {
             }
         }
 
+/*        if (arg1.getAction().equals("seen_notification")) {
+            String content = arg1.getStringExtra("empname") + " has seen the Job";
+            String receiverId = arg1.getStringExtra("senderuid");
+            String senderId = arg1.getStringExtra("mykey");
+            EmployeeApp.sendNotif(senderId,receiverId,"seen",content," ");
+            context.startActivity(new Intent(context, NotificationActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            Toast.makeText(context,"Informing Coordinator",Toast.LENGTH_SHORT).show();
+
+        }*/
     }
 }

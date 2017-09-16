@@ -10,9 +10,13 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.view.View;
+import android.widget.Button;
+import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import com.example.pulkit.employeeapp.BroadcastReceivers.AlarmReceiver;
+import com.example.pulkit.employeeapp.CheckInternetConnectivity.NetWatcher;
+import com.example.pulkit.employeeapp.EmployeeApp;
 import com.example.pulkit.employeeapp.EmployeeLogin.EmployeeSession;
 import com.example.pulkit.employeeapp.Notification.NotificationActivity;
 import com.example.pulkit.employeeapp.R;
@@ -33,6 +37,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
+import static com.example.pulkit.employeeapp.EmployeeApp.sendNotif;
 import static com.example.pulkit.employeeapp.MainViews.TaskDetail.task_id;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
@@ -42,7 +47,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private EmployeeSession session;
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        //TODO get the type of notifiction handle separately for chats, quotation and normal assigned tasks
+        //TODO get the type of notification handle separately for chats, quotation and normal assigned tasks
         session = new EmployeeSession(context);
         String type = remoteMessage.getData().get("type");
         if (type.equals("chat") || type == null) {
@@ -64,6 +69,19 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             String repeatAfter= words[1];
             if (body != null && taskId != null && senderuid != null)
                 sendRepeatedNotification(body, senderuid, taskId, id,repeatAfter);
+        }
+        else if(type.equals("assignJob"))
+        {
+            RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.custom_notification);
+            String body = remoteMessage.getData().get("body");
+            String senderuid = remoteMessage.getData().get("senderuid");
+            String taskId = remoteMessage.getData().get("taskId");
+            String id = remoteMessage.getData().get("msgid");
+
+            contentView.setTextViewText(R.id.title, body);
+
+            if (body != null  && senderuid != null)
+                sendGeneralNotification2(body, senderuid, taskId, id, contentView);
         }
         else {
             String body = remoteMessage.getData().get("body");
@@ -116,6 +134,45 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         final Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
+        DatabaseReference dbOnlineStatus = DBREF.child("Users").child("Usersessions").child(senderuid).getRef();
+        dbOnlineStatus.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    NameAndStatus nameAndStatus = dataSnapshot.getValue(NameAndStatus.class);
+                    NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(MyFirebaseMessagingService.this)
+                            .setSmallIcon(R.mipmap.ic_launcher)
+                            .setContentTitle("New Notification from " + nameAndStatus.getName())
+                            .setContentText(body)
+                            .setAutoCancel(true)
+                            .setSound(defaultSoundUri)
+                            .setContentIntent(pendingIntent);
+                    NotificationManager notificationManager =
+                            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    String notifid = id.substring(8);
+                    notificationManager.notify(Integer.parseInt(notifid) /* ID of notification */, notificationBuilder.build());
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private void sendGeneralNotification2(final String body, String senderuid, String taskId, final String id, final RemoteViews contentView) {
+        String content = session.getName() + " has seen the Job";
+        EmployeeApp.sendNotif(session.getUsername(),senderuid,"seen",content," ");
+        Toast.makeText(context,"Informing Coordinator",Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this, NotificationActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        final PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+                PendingIntent.FLAG_ONE_SHOT);
+
+        final Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
         DatabaseReference dbOnlineStatus = DBREF.child("Users").child("Usersessions").child(senderuid).getRef();
         dbOnlineStatus.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -124,9 +181,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 if (dataSnapshot.exists()) {
                     NameAndStatus nameAndStatus = dataSnapshot.getValue(NameAndStatus.class);
                     NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(MyFirebaseMessagingService.this)
-                            .setSmallIcon(R.mipmap.ic_chat_white)
-                            .setContentTitle("New Notification from " + nameAndStatus.getName())
-                            .setContentText(body)
+                            .setSmallIcon(R.mipmap.ic_launcher)
+                            .setCustomBigContentView(contentView)
                             .setAutoCancel(true)
                             .setSound(defaultSoundUri)
                             .setContentIntent(pendingIntent);
@@ -183,7 +239,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     if (dataSnapshot.exists()) {
                         NameAndStatus nameAndStatus = dataSnapshot.getValue(NameAndStatus.class);
                         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(MyFirebaseMessagingService.this)
-                                .setSmallIcon(R.mipmap.ic_chat_white)
+                                .setSmallIcon(R.mipmap.ic_launcher)
                                 .setContentTitle("New Message from " + nameAndStatus.getName())
                                 .setContentText(msg)
                                 .setAutoCancel(true)

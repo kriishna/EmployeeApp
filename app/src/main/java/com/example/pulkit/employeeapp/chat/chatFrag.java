@@ -4,22 +4,33 @@ import android.content.Intent;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 
+import com.example.pulkit.employeeapp.MyProfile.ContactCoordinator;
 import com.example.pulkit.employeeapp.helper.DividerItemDecoration;
 
+import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.pulkit.employeeapp.EmployeeLogin.EmployeeSession;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.adapters.chatListAdapter;
+import com.example.pulkit.employeeapp.listener.ClickListener;
+import com.example.pulkit.employeeapp.listener.RecyclerTouchListener;
 import com.example.pulkit.employeeapp.model.ChatListModel;
 import com.example.pulkit.employeeapp.model.NameAndStatus;
 import com.google.firebase.database.ChildEventListener;
@@ -36,10 +47,11 @@ import java.util.Iterator;
 
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 
-public class chatFrag extends Fragment implements chatListAdapter.chatListAdapterListener{
+public class chatFrag extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
     private View myFragmentView;
     FragmentManager fmm;
     private ArrayList<ChatListModel> list = new ArrayList<>();
+    private ArrayList<ChatListModel> b = new ArrayList<>();
     private RecyclerView recyclerView;
     private DatabaseReference dbChatList;
     private String mykey;
@@ -47,6 +59,8 @@ public class chatFrag extends Fragment implements chatListAdapter.chatListAdapte
     private HashMap<DatabaseReference,ValueEventListener> dbLastMessageHashMap = new HashMap<>();
     private ChildEventListener dbChatCHE;
     private HashMap<DatabaseReference,ValueEventListener> dbProfileRefHashMap = new HashMap<>();
+    SwipeRefreshLayout swipeLayout;
+    FloatingActionButton chat_add;
 
     public static chatFrag newInstance() {
         chatFrag fragment = new chatFrag();
@@ -71,6 +85,15 @@ public class chatFrag extends Fragment implements chatListAdapter.chatListAdapte
         super.onViewCreated(view, savedInstanceState);
         fmm = getFragmentManager();
 
+        swipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
+        swipeLayout.setOnRefreshListener(this);
+        swipeLayout.setColorScheme(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+
+        chat_add = (FloatingActionButton) getView().findViewById(R.id.add_chat);
+
         EmployeeSession coordinatorSession = new EmployeeSession(getActivity());
         mykey = coordinatorSession.getUsername();
         dbChatList = DBREF.child("Users").child("Userchats").child(mykey).getRef();
@@ -79,9 +102,98 @@ public class chatFrag extends Fragment implements chatListAdapter.chatListAdapte
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
-        mAdapter = new chatListAdapter(list,getActivity(),this);
+        mAdapter = new chatListAdapter(list,getActivity());
         recyclerView.setAdapter(mAdapter);
+        b = list;
         LoadData();
+
+        chat_add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getContext(), ContactCoordinator.class));
+            }
+        });
+
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                final Intent intent = new Intent(getActivity(),ChatActivity.class);
+                ChatListModel topic = b.get(position);
+                intent.putExtra("dbTableKey",topic.getDbTableKey());
+                intent.putExtra("otheruserkey",topic.getUserkey());
+
+                startActivity(intent);
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+
+            }
+        }));
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+
+        final MenuItem item = menu.findItem(R.id.search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText)
+            {
+                if (newText.equals(""))
+                {
+                    mAdapter = new chatListAdapter(list, getActivity());
+                    recyclerView.setAdapter(mAdapter);
+                    b = list;
+                }
+                else
+                {
+                    final ArrayList<ChatListModel> filteredModelList = filter(list, newText);
+                    mAdapter = new chatListAdapter(filteredModelList, getContext());
+                    recyclerView.setAdapter(mAdapter);
+                    b= filteredModelList;
+                }
+
+                return true;
+            }
+        });
+        searchView.onActionViewCollapsed();
+        searchView.setIconifiedByDefault(true);
+        MenuItemCompat.setOnActionExpandListener(item,
+                new MenuItemCompat.OnActionExpandListener() {
+                    @Override
+                    public boolean onMenuItemActionCollapse(MenuItem item) {
+                        // Do something when collapsed
+                        mAdapter.setFilter(list);
+                        return true; // Return true to collapse action view
+                    }
+
+                    @Override
+                    public boolean onMenuItemActionExpand(MenuItem item) {
+                        // Do something when expanded
+                        return true; // Return true to expand action view
+                    }
+                });
+    }
+
+    private ArrayList<ChatListModel> filter(ArrayList<ChatListModel> models, String query) {
+        query = query.toLowerCase();
+        final ArrayList<ChatListModel> filteredModelList = new ArrayList<>();
+        for (ChatListModel model : models) {
+            final String text = model.getName().toLowerCase();
+            if (text.contains(query)) {
+                filteredModelList.add(model);
+            }
+        }
+        return filteredModelList;
     }
 
     private void LoadData()
@@ -217,16 +329,6 @@ public class chatFrag extends Fragment implements chatListAdapter.chatListAdapte
         return returnColor;
     }
 
-    @Override
-    public void onChatRowClicked(int position) {
-        final Intent intent = new Intent(getActivity(),ChatActivity.class);
-        ChatListModel topic = list.get(position);
-        intent.putExtra("dbTableKey",topic.getDbTableKey());
-        intent.putExtra("otheruserkey",topic.getUserkey());
-
-        startActivity(intent);
-
-    }
     private void sortChatList()
     {
         Collections.sort(list, new Comparator<ChatListModel>() {
@@ -235,5 +337,17 @@ public class chatFrag extends Fragment implements chatListAdapter.chatListAdapte
                 return o1.getLastMsg()>o2.getLastMsg()?-1:0;
             }
         });
+    }
+
+    @Override
+    public void onRefresh() {
+        list.clear();
+        LoadData();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                swipeLayout.setRefreshing(false);
+            }
+        }, 2000);
     }
 }

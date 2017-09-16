@@ -476,7 +476,14 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.taskdetail_menu, menu);
+
+        final MenuItem item = menu.findItem(R.id.item3);
+        if(!desig.equals("Accounts")) {
+            item.setVisible(false);
+        }
         return true;
+
+
     }
 
     @Override
@@ -534,10 +541,6 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                             alertDialogAndroid.dismiss();
                         }
                     });
-                }
-                else
-                {
-                    Toast.makeText(TaskDetail.this,"You are not authorized to upload quotations",Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
