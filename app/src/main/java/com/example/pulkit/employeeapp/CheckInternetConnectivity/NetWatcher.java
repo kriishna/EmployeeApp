@@ -38,7 +38,7 @@ public class NetWatcher extends BroadcastReceiver {
             }
         }
 
-/*        if (arg1.getAction().equals("seen_notification")) {
+        if (arg1.getAction().equals("seen_notification")) {
             String content = arg1.getStringExtra("empname") + " has seen the Job";
             String receiverId = arg1.getStringExtra("senderuid");
             String senderId = arg1.getStringExtra("mykey");
@@ -46,6 +46,6 @@ public class NetWatcher extends BroadcastReceiver {
             context.startActivity(new Intent(context, NotificationActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
             Toast.makeText(context,"Informing Coordinator",Toast.LENGTH_SHORT).show();
 
-        }*/
+        }
     }
 }

@@ -16,7 +16,6 @@ import android.widget.Toast;
 
 import com.example.pulkit.employeeapp.BroadcastReceivers.AlarmReceiver;
 import com.example.pulkit.employeeapp.CheckInternetConnectivity.NetWatcher;
-import com.example.pulkit.employeeapp.EmployeeApp;
 import com.example.pulkit.employeeapp.EmployeeLogin.EmployeeSession;
 import com.example.pulkit.employeeapp.Notification.NotificationActivity;
 import com.example.pulkit.employeeapp.R;
@@ -78,8 +77,16 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             String taskId = remoteMessage.getData().get("taskId");
             String id = remoteMessage.getData().get("msgid");
 
+            Intent intent = new Intent(this, NetWatcher.class);
+            intent.setAction("seen_notification");
+            intent.putExtra("empname",session.getName());
+            intent.putExtra("senderuid",senderuid);
+            intent.putExtra("mykey",session.getUsername());
             contentView.setTextViewText(R.id.title, body);
+            PendingIntent pendingSwitchIntent = PendingIntent.getBroadcast(this, 0,
+                    intent, 0);
 
+            contentView.setOnClickPendingIntent(R.id.seen,pendingSwitchIntent);
             if (body != null  && senderuid != null)
                 sendGeneralNotification2(body, senderuid, taskId, id, contentView);
         }
@@ -164,15 +171,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private void sendGeneralNotification2(final String body, String senderuid, String taskId, final String id, final RemoteViews contentView) {
-        String content = session.getName() + " has seen the Job";
-        EmployeeApp.sendNotif(session.getUsername(),senderuid,"seen",content," ");
-        Toast.makeText(context,"Informing Coordinator",Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(this, NotificationActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         final PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
 
         final Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
 
         DatabaseReference dbOnlineStatus = DBREF.child("Users").child("Usersessions").child(senderuid).getRef();
         dbOnlineStatus.addListenerForSingleValueEvent(new ValueEventListener() {
