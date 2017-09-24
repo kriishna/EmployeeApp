@@ -76,21 +76,20 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             String senderuid = remoteMessage.getData().get("senderuid");
             String taskId = remoteMessage.getData().get("taskId");
             String id = remoteMessage.getData().get("msgid");
-            Intent intent = new Intent(this, NetWatcher.class);
+/*            Intent intent = new Intent(this, NetWatcher.class);
             intent.setAction("seen_notification");
             intent.putExtra("empname",session.getName());
-            String j = id.substring(8);
-            intent.putExtra("id",j);
             intent.putExtra("senderuid",senderuid);
             intent.putExtra("mykey",session.getUsername());
-            contentView.setTextViewText(R.id.title, body);
-            PendingIntent pendingSwitchIntent = PendingIntent.getBroadcast(this, 0,
+            String notifid = id.substring(8);
+            intent.putExtra("id",notifid);
+            PendingIntent pendingSwitchIntent = PendingIntent.getBroadcast(MyFirebaseMessagingService.this, 0,
                     intent, 0);
-
             contentView.setOnClickPendingIntent(R.id.seen,pendingSwitchIntent);
+            contentView.setTextViewText(R.id.title, body);*/
 
             if (body != null  && senderuid != null)
-                sendGeneralNotification2(body, senderuid, taskId, id, contentView);
+                sendGeneralNotification2(body, senderuid, taskId, id.substring(8), contentView);
         }
         else {
             String body = remoteMessage.getData().get("body");
@@ -174,12 +173,15 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private void sendGeneralNotification2(final String body, String senderuid, String taskId, final String id, final RemoteViews contentView) {
         Intent intent = new Intent(this, NotificationActivity.class);
+        intent.putExtra("seen","seen");
+        intent.putExtra("senderuid",senderuid);
+        intent.putExtra("taskId",taskId);
+        intent.putExtra("id",id);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        final PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+        final PendingIntent pendingIntent = PendingIntent.getActivity(this, Integer.parseInt(id) /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
 
         final Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
 
         DatabaseReference dbOnlineStatus = DBREF.child("Users").child("Usersessions").child(senderuid).getRef();
         dbOnlineStatus.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -189,14 +191,15 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     NameAndStatus nameAndStatus = dataSnapshot.getValue(NameAndStatus.class);
                     NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(MyFirebaseMessagingService.this)
                             .setSmallIcon(R.mipmap.ic_launcher)
-                            .setCustomBigContentView(contentView)
+                            .setContentTitle("New Notification from " + nameAndStatus.getName())
+                            .setContentText(body)
+                            .setOngoing(true)
                             .setAutoCancel(true)
                             .setSound(defaultSoundUri)
                             .setContentIntent(pendingIntent);
                     NotificationManager notificationManager =
                             (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                    String notifid = id.substring(8);
-                    notificationManager.notify(Integer.parseInt(notifid) /* ID of notification */, notificationBuilder.build());
+                    notificationManager.notify(Integer.parseInt(id) /* ID of notification */, notificationBuilder.build());
 
                 }
             }

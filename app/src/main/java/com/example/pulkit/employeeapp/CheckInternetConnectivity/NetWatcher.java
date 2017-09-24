@@ -39,18 +39,17 @@ public class NetWatcher extends BroadcastReceiver {
             }
         }
 
-        if (arg1.getAction().equals("seen_notification")) {
+       /* if (arg1.getAction().equals("seen_notification")) {
             String content = arg1.getStringExtra("empname") + " has seen the Job";
             String receiverId = arg1.getStringExtra("senderuid");
             String senderId = arg1.getStringExtra("mykey");
             String id = arg1.getStringExtra("id");
             EmployeeApp.sendNotif(senderId,receiverId,"seen",content," ");
-            NotificationManager notificationManager =
-                    (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.cancel(Integer.parseInt(id));
+            NotificationManager notificationManager =(NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            //notificationManager.cancel(Integer.parseInt(id));
             Toast.makeText(context,"Informing Coordinator",Toast.LENGTH_LONG).show();
             context.startActivity(new Intent(context, NotificationActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 
-        }
+        }*/
     }
 }

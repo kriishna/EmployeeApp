@@ -478,9 +478,13 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         getMenuInflater().inflate(R.menu.taskdetail_menu, menu);
 
         final MenuItem item = menu.findItem(R.id.item3);
-        if(!desig.equals("Accounts")) {
+        if(!desig.equals("Accounts"))
             item.setVisible(false);
-        }
+
+            if(desig.equals("Accounts"))
+                item.setVisible(true);
+
+
         return true;
 
 
