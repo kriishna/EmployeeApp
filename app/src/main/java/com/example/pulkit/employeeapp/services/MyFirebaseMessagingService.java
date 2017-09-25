@@ -209,7 +209,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
             }
         });
-
     }
 
     private void sendChatNotification(final String msg, String chatref, final String msgid, final String senderuid) throws NullPointerException {

@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import com.example.pulkit.employeeapp.MainViews.TaskDetail;
+import com.example.pulkit.employeeapp.MainViews.TaskHome;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.helper.CompressMe;
 import com.example.pulkit.employeeapp.model.measurement;
@@ -37,6 +38,7 @@ import droidninja.filepicker.FilePickerBuilder;
 import droidninja.filepicker.FilePickerConst;
 
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
+import static com.example.pulkit.employeeapp.EmployeeApp.sendNotif;
 
 
 public class dialogue extends AppCompatActivity {
@@ -168,6 +170,8 @@ public class dialogue extends AppCompatActivity {
                         fleximage = taskSnapshot.getDownloadUrl().toString();
                         measurement temp = new measurement(temp_tag, temp_width, temp_height, fleximage, temp_unit, id);
                         db.setValue(temp);
+                        DBREF.child("Task").child(TaskDetail.task_id).child("measurementApproved").setValue(Boolean.FALSE);
+                        sendNotif(TaskHome.emp_id,TaskDetail.customer_id,"measurementChanged","Measurement for your task "+TaskDetail.taskname+" has been changed. Please approve it.",TaskDetail.task_id);
                         pd.dismiss();
 
 

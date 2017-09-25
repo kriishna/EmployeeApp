@@ -47,7 +47,7 @@ import java.util.Iterator;
 
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 
-public class chatFrag extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
+public class chatFrag extends Fragment {
     private View myFragmentView;
     FragmentManager fmm;
     private ArrayList<ChatListModel> list = new ArrayList<>();
@@ -56,10 +56,9 @@ public class chatFrag extends Fragment implements SwipeRefreshLayout.OnRefreshLi
     private DatabaseReference dbChatList;
     private String mykey;
     private chatListAdapter mAdapter;
-    private HashMap<DatabaseReference,ValueEventListener> dbLastMessageHashMap = new HashMap<>();
+    private HashMap<DatabaseReference, ValueEventListener> dbLastMessageHashMap = new HashMap<>();
     private ChildEventListener dbChatCHE;
-    private HashMap<DatabaseReference,ValueEventListener> dbProfileRefHashMap = new HashMap<>();
-    SwipeRefreshLayout swipeLayout;
+    private HashMap<DatabaseReference, ValueEventListener> dbProfileRefHashMap = new HashMap<>();
     FloatingActionButton chat_add;
 
     public static chatFrag newInstance() {
@@ -84,14 +83,6 @@ public class chatFrag extends Fragment implements SwipeRefreshLayout.OnRefreshLi
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         fmm = getFragmentManager();
-
-        swipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
-        swipeLayout.setOnRefreshListener(this);
-        swipeLayout.setColorScheme(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
-
         chat_add = (FloatingActionButton) getView().findViewById(R.id.add_chat);
 
         EmployeeSession coordinatorSession = new EmployeeSession(getActivity());
@@ -102,7 +93,7 @@ public class chatFrag extends Fragment implements SwipeRefreshLayout.OnRefreshLi
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
-        mAdapter = new chatListAdapter(list,getActivity());
+        mAdapter = new chatListAdapter(list, getActivity());
         recyclerView.setAdapter(mAdapter);
         b = list;
         LoadData();
@@ -117,10 +108,10 @@ public class chatFrag extends Fragment implements SwipeRefreshLayout.OnRefreshLi
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                final Intent intent = new Intent(getActivity(),ChatActivity.class);
+                final Intent intent = new Intent(getActivity(), ChatActivity.class);
                 ChatListModel topic = b.get(position);
-                intent.putExtra("dbTableKey",topic.getDbTableKey());
-                intent.putExtra("otheruserkey",topic.getUserkey());
+                intent.putExtra("dbTableKey", topic.getDbTableKey());
+                intent.putExtra("otheruserkey", topic.getUserkey());
 
                 startActivity(intent);
             }
@@ -146,20 +137,16 @@ public class chatFrag extends Fragment implements SwipeRefreshLayout.OnRefreshLi
             }
 
             @Override
-            public boolean onQueryTextChange(String newText)
-            {
-                if (newText.equals(""))
-                {
+            public boolean onQueryTextChange(String newText) {
+                if (newText.equals("")) {
                     mAdapter = new chatListAdapter(list, getActivity());
                     recyclerView.setAdapter(mAdapter);
                     b = list;
-                }
-                else
-                {
+                } else {
                     final ArrayList<ChatListModel> filteredModelList = filter(list, newText);
                     mAdapter = new chatListAdapter(filteredModelList, getContext());
                     recyclerView.setAdapter(mAdapter);
-                    b= filteredModelList;
+                    b = filteredModelList;
                 }
 
                 return true;
@@ -196,8 +183,7 @@ public class chatFrag extends Fragment implements SwipeRefreshLayout.OnRefreshLi
         return filteredModelList;
     }
 
-    private void LoadData()
-    {
+    private void LoadData() {
 
         dbChatCHE = dbChatList.addChildEventListener(new ChildEventListener() {
             @Override
@@ -210,23 +196,20 @@ public class chatFrag extends Fragment implements SwipeRefreshLayout.OnRefreshLi
                     ValueEventListener dbLastMsgChildEventListener = dbLastMsg.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            if(dataSnapshot.exists())
-                            {
+                            if (dataSnapshot.exists()) {
                                 boolean alreadyexists = false;
-                                for(ChatListModel chatListModel:list)
-                                {
-                                    if(chatListModel.getDbTableKey().equals(dbTablekey))
-                                    {
+                                for (ChatListModel chatListModel : list) {
+                                    if (chatListModel.getDbTableKey().equals(dbTablekey)) {
                                         list.remove(chatListModel);
                                         chatListModel.setLastMsg(dataSnapshot.getValue(Long.class));
                                         list.add(chatListModel);
                                         sortChatList();
-                                        alreadyexists=true;
+                                        alreadyexists = true;
                                         mAdapter.notifyDataSetChanged();
                                         break;
                                     }
                                 }
-                                if(!alreadyexists) {
+                                if (!alreadyexists) {
                                     final Long lastMsgId = dataSnapshot.getValue(Long.class);
                                     DatabaseReference dbProfileRef = DBREF.child("Users").child("Usersessions").child(otheruserkey).getRef();
 
@@ -237,14 +220,13 @@ public class chatFrag extends Fragment implements SwipeRefreshLayout.OnRefreshLi
                                                 boolean alreadyexists = false;
                                                 NameAndStatus user = dataSnapshot.getValue(NameAndStatus.class);
                                                 for (ChatListModel chatListModel : list) {
-                                                    if(chatListModel.getUserkey().equals(dataSnapshot.getKey())) {
-                                                        alreadyexists=true;
+                                                    if (chatListModel.getUserkey().equals(dataSnapshot.getKey())) {
+                                                        alreadyexists = true;
                                                         break;
                                                     }
 
                                                 }
-                                                if(!alreadyexists)
-                                                {
+                                                if (!alreadyexists) {
                                                     ChatListModel chatListModel = new ChatListModel(user.getName(), otheruserkey, dbTablekey, getRandomMaterialColor("400"), lastMsgId);
                                                     list.add(chatListModel);
                                                     sortChatList();
@@ -270,10 +252,11 @@ public class chatFrag extends Fragment implements SwipeRefreshLayout.OnRefreshLi
 
                         }
                     });
-                    dbLastMessageHashMap.put(dbLastMsg,dbLastMsgChildEventListener);
+                    dbLastMessageHashMap.put(dbLastMsg, dbLastMsgChildEventListener);
 
                 }
             }
+
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
@@ -299,18 +282,18 @@ public class chatFrag extends Fragment implements SwipeRefreshLayout.OnRefreshLi
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Iterator<HashMap.Entry<DatabaseReference,ValueEventListener>> iterator = dbLastMessageHashMap.entrySet().iterator();
+        Iterator<HashMap.Entry<DatabaseReference, ValueEventListener>> iterator = dbLastMessageHashMap.entrySet().iterator();
         while (iterator.hasNext()) {
-            HashMap.Entry<DatabaseReference,ValueEventListener> entry = (HashMap.Entry<DatabaseReference,ValueEventListener>) iterator.next();
-            if(entry.getValue()!=null)
+            HashMap.Entry<DatabaseReference, ValueEventListener> entry = (HashMap.Entry<DatabaseReference, ValueEventListener>) iterator.next();
+            if (entry.getValue() != null)
                 entry.getKey().removeEventListener(entry.getValue());
         }
-        Iterator<HashMap.Entry<DatabaseReference,ValueEventListener>> iterator2 = dbProfileRefHashMap.entrySet().iterator();
+        Iterator<HashMap.Entry<DatabaseReference, ValueEventListener>> iterator2 = dbProfileRefHashMap.entrySet().iterator();
         while (iterator.hasNext()) {
-            HashMap.Entry<DatabaseReference,ValueEventListener> entry = (HashMap.Entry<DatabaseReference,ValueEventListener>) iterator2.next();
-            if(entry.getValue()!=null) entry.getKey().removeEventListener(entry.getValue());
+            HashMap.Entry<DatabaseReference, ValueEventListener> entry = (HashMap.Entry<DatabaseReference, ValueEventListener>) iterator2.next();
+            if (entry.getValue() != null) entry.getKey().removeEventListener(entry.getValue());
         }
-        if(dbChatCHE!=null)
+        if (dbChatCHE != null)
             dbChatList.removeEventListener(dbChatCHE);
         mAdapter.removeListeners();
 
@@ -329,25 +312,13 @@ public class chatFrag extends Fragment implements SwipeRefreshLayout.OnRefreshLi
         return returnColor;
     }
 
-    private void sortChatList()
-    {
+    private void sortChatList() {
         Collections.sort(list, new Comparator<ChatListModel>() {
             @Override
             public int compare(ChatListModel o1, ChatListModel o2) {
-                return o1.getLastMsg()>o2.getLastMsg()?-1:0;
+                return o1.getLastMsg() > o2.getLastMsg() ? -1 : 0;
             }
         });
     }
 
-    @Override
-    public void onRefresh() {
-        list.clear();
-        LoadData();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                swipeLayout.setRefreshing(false);
-            }
-        }, 2000);
-    }
 }
