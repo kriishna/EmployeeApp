@@ -120,7 +120,7 @@ public class MeasureList extends AppCompatActivity {
         DBREF.child("Task").child(TaskDetail.task_id).child("measurementApproved").setValue(Boolean.FALSE);
         EmployeeApp.sendNotif(employeeSession.getUsername(), TaskDetail.customerId, "measurementChanged", "Measurement for your task " + TaskDetail.taskName + " has been changed. Please approve it.", TaskDetail.task_id);
 
-        Toast.makeText(MeasureList.this, "Ask", Toast.LENGTH_SHORT).show();
+        Toast.makeText(MeasureList.this, "Informing the Customer of Changes", Toast.LENGTH_SHORT).show();
 
         listItems.remove(pos);
         adapter.notifyDataSetChanged();
@@ -165,7 +165,7 @@ public class MeasureList extends AppCompatActivity {
                 if(flag_changed == 1){
                     DBREF.child("Task").child(TaskDetail.task_id).child("measurementApproved").setValue(Boolean.FALSE);
                     EmployeeApp.sendNotif(employeeSession.getUsername(), TaskDetail.customerId, "measurementChanged", "Measurement for your task " + TaskDetail.taskName + " has been changed. Please approve it.", TaskDetail.task_id);
-                    Toast.makeText(MeasureList.this, "Ask", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MeasureList.this, "Informing the Customer of Changes", Toast.LENGTH_SHORT).show();
 
                 }
 

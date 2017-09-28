@@ -12,7 +12,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-
 import com.example.pulkit.employeeapp.EmployeeApp;
 import com.example.pulkit.employeeapp.EmployeeLogin.EmployeeSession;
 import com.example.pulkit.employeeapp.MainViews.TaskDetail;
@@ -21,7 +20,6 @@ import com.example.pulkit.employeeapp.helper.CompressMe;
 import com.example.pulkit.employeeapp.model.measurement;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
@@ -29,9 +27,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
-import com.zfdang.multiple_images_selector.ImagesSelectorActivity;
-import com.zfdang.multiple_images_selector.SelectorSettings;
-
 import java.io.File;
 import java.util.ArrayList;
 
@@ -222,7 +217,7 @@ public class dialogue extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(dialogue.this, "Ask", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(dialogue.this, "Informing the Customer of Changes", Toast.LENGTH_SHORT).show();
                     }
                 });
 
