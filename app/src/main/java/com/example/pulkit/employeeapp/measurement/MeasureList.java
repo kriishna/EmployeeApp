@@ -118,7 +118,7 @@ public class MeasureList extends AppCompatActivity {
         db.removeValue();
 
         DBREF.child("Task").child(TaskDetail.task_id).child("measurementApproved").setValue(Boolean.FALSE);
-  //      EmployeeApp.sendNotif(employeeSession.getUsername(), TaskDetail.customerId, "measurementChanged", "Measurement for your task " + TaskDetail.taskName + " has been changed. Please approve it.", TaskDetail.task_id);
+        EmployeeApp.sendNotif(employeeSession.getUsername(), TaskDetail.customerId, "measurementChanged", "Measurement for your task " + TaskDetail.taskName + " has been changed. Please approve it.", TaskDetail.task_id);
 
         Toast.makeText(MeasureList.this, "Ask", Toast.LENGTH_SHORT).show();
 
@@ -164,7 +164,7 @@ public class MeasureList extends AppCompatActivity {
                 // ask for approval only if + in menu is clicked not if row is clicked
                 if(flag_changed == 1){
                     DBREF.child("Task").child(TaskDetail.task_id).child("measurementApproved").setValue(Boolean.FALSE);
-       //             EmployeeApp.sendNotif(employeeSession.getUsername(), TaskDetail.customerId, "measurementChanged", "Measurement for your task " + TaskDetail.taskName + " has been changed. Please approve it.", TaskDetail.task_id);
+                    EmployeeApp.sendNotif(employeeSession.getUsername(), TaskDetail.customerId, "measurementChanged", "Measurement for your task " + TaskDetail.taskName + " has been changed. Please approve it.", TaskDetail.task_id);
                     Toast.makeText(MeasureList.this, "Ask", Toast.LENGTH_SHORT).show();
 
                 }
