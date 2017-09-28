@@ -13,6 +13,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import com.example.pulkit.employeeapp.EmployeeApp;
+import com.example.pulkit.employeeapp.EmployeeLogin.EmployeeSession;
 import com.example.pulkit.employeeapp.MainViews.TaskDetail;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.helper.CompressMe;
@@ -42,8 +44,8 @@ import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 public class dialogue extends AppCompatActivity {
 
     private ArrayList<String> photoPaths = new ArrayList<>();
-    EditText width, height, unit, tag;
-    String fleximage = "", temp_width, temp_height, temp_unit, id = "", temp_tag="";
+    EditText width, height, unit, tag, amount;
+    String fleximage = "", temp_width, temp_height, temp_unit, temp_amount, id = "", temp_tag = "";
     private static final int REQUEST_CODE = 51;
     DatabaseReference dbRef, db;
     StorageReference storageReference, sf;
@@ -51,6 +53,7 @@ public class dialogue extends AppCompatActivity {
     ProgressDialog pd;
     ImageView img;
     String item;
+    EmployeeSession employeeSession;
     CompressMe compressMe;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,11 +67,13 @@ public class dialogue extends AppCompatActivity {
         height = (EditText) findViewById(R.id.height);
         unit = (EditText) findViewById(R.id.unit);
         tag = (EditText) findViewById(R.id.tag);
+        amount = (EditText) findViewById(R.id.amount);
 
         pd = new ProgressDialog(dialogue.this);
         pd.setMessage("Uploading....");
 
         compressMe = new CompressMe(this);
+        employeeSession = new EmployeeSession(this);
 
         if (getIntent().hasExtra("width")) {
             temp_width = getIntent().getStringExtra("width");
@@ -76,15 +81,18 @@ public class dialogue extends AppCompatActivity {
             temp_unit = getIntent().getStringExtra("unit");
             fleximage = getIntent().getStringExtra("fleximage");
             temp_tag = getIntent().getStringExtra("tag");
+            temp_amount = getIntent().getStringExtra("amount");
             id = getIntent().getStringExtra("id");
 
             width.setText(temp_width);
             height.setText(temp_height);
             unit.setText(temp_unit);
             tag.setText(temp_tag);
+            amount.setText(temp_amount);
             if (!fleximage.equals(""))
                 Picasso.with(dialogue.this).load(fleximage).into(img);
         }
+
 
         ImageButton photoButton = (ImageButton) findViewById(R.id.capture);
         photoButton.setOnClickListener(new View.OnClickListener() {
@@ -130,8 +138,9 @@ public class dialogue extends AppCompatActivity {
         temp_height = height.getText().toString();
         temp_unit = unit.getText().toString();
         temp_tag = tag.getText().toString();
+        temp_amount = amount.getText().toString();
 
-        if (temp_width.equals("") || temp_height.equals("") || temp_unit.equals(""))
+        if (temp_width.equals("") || temp_height.equals("") || temp_unit.equals("") ||temp_amount.equals(""))
             Toast.makeText(this, "Enter complete details...", Toast.LENGTH_SHORT).show();
         else
             new net().execute();
@@ -166,12 +175,13 @@ public class dialogue extends AppCompatActivity {
 
                         Toast.makeText(dialogue.this, "Upload successful", Toast.LENGTH_SHORT).show();
                         fleximage = taskSnapshot.getDownloadUrl().toString();
-                        measurement temp = new measurement(temp_tag, temp_width, temp_height, fleximage, temp_unit, id);
+                        measurement temp = new measurement(temp_tag, temp_width, temp_height, fleximage, temp_unit, id,temp_amount);
                         db.setValue(temp);
                         pd.dismiss();
 
 
                         // put the String to pass back into an Intent and close this activity
+
 
                         Intent intent = new Intent();
                         intent.putExtra("width", temp_width);
@@ -179,6 +189,7 @@ public class dialogue extends AppCompatActivity {
                         intent.putExtra("unit", temp_unit);
                         intent.putExtra("fleximage", fleximage);
                         intent.putExtra("tag", temp_tag);
+                        intent.putExtra("amount", temp_amount);
                         intent.putExtra("id", id);
 
                         setResult(RESULT_OK, intent);
@@ -193,17 +204,28 @@ public class dialogue extends AppCompatActivity {
                     }
                 });
 
-            }
-            else{
+            } else {
                 Intent intent = new Intent();
                 intent.putExtra("width", temp_width);
                 intent.putExtra("height", temp_height);
                 intent.putExtra("unit", temp_unit);
                 intent.putExtra("fleximage", fleximage);
+                intent.putExtra("amount", temp_amount);
                 intent.putExtra("tag", temp_tag);
                 intent.putExtra("id", id);
 
                 setResult(RESULT_OK, intent);
+
+                DBREF.child("Task").child(TaskDetail.task_id).child("measurementApproved").setValue(Boolean.FALSE);
+      //          EmployeeApp.sendNotif(employeeSession.getUsername(), TaskDetail.customerId, "measurementChanged", "Measurement for your task " + TaskDetail.taskName + " has been changed. Please approve it.", TaskDetail.task_id);
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(dialogue.this, "Ask", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
                 finish();
 
             }

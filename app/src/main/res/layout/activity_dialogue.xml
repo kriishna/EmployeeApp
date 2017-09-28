@@ -11,6 +11,7 @@
         android:orientation="vertical"
         android:padding="10dp">
 
+
         <EditText
             android:id="@+id/width"
             android:layout_width="match_parent"
@@ -33,19 +34,27 @@
             android:layout_height="wrap_content"
             android:hint="Unit"
             android:singleLine="true" />
+
         <EditText
+            android:id="@+id/tag"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Descrption"
-            android:id="@+id/tag"
-            android:inputType="textMultiLine"/>
+            android:hint="Description"
+            android:inputType="textMultiLine" />
 
+        <EditText
+            android:id="@+id/amount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Amount"
+            android:inputType="numberSigned" />
 
         <RelativeLayout
 
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_marginTop="20dp"
             android:background="@drawable/measurement_bg">
 
             <ImageView
@@ -53,7 +62,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="250dp"
                 android:layout_marginLeft="50dp"
-                android:layout_marginTop="80dp"
                 android:layout_marginRight="40dp"
                 android:background="#cdcdcd"
                 android:minWidth="150dp" />

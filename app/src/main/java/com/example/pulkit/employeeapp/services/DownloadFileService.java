@@ -9,9 +9,12 @@ import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.NotificationCompat;
+import com.example.pulkit.employeeapp.BuildConfig;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -121,13 +124,26 @@ public class DownloadFileService extends IntentService {
         Toast.makeText(this, open, Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(Intent.ACTION_VIEW);
         if (localFile.exists()) {
-            Uri pdfPath = Uri.fromFile(localFile);
+            Uri pdfPath;
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                pdfPath = FileProvider.getUriForFile(DownloadFileService.this,
+                        BuildConfig.APPLICATION_ID +".provider",
+                        localFile);
+            }
+            else{
+                pdfPath = Uri.fromFile(localFile);
+            }
             if (open.equals("application")) {
-                intent.setDataAndType(pdfPath, "application/pdf");
+                intent.setDataAndType(pdfPath, "application/pdf")
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             }
             else {
-                intent.setDataAndType(pdfPath, "image/*");
+                intent.setDataAndType(pdfPath, "image/*")
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             }
+
         }
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
