@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.support.v7.app.NotificationCompat;
 import android.widget.Toast;
 
@@ -69,6 +70,7 @@ EmployeeSession employeeSession;
     {
         PendingIntent notificIntent=PendingIntent.getActivity(context,0,new Intent(context,NotificationActivity.class),0);
         NotificationCompat.Builder mBuilder= (NotificationCompat.Builder) new NotificationCompat.Builder(context)
+                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher))
                 .setSmallIcon(R.drawable.ic_call_me)
                 .setContentTitle(title).setTicker("Reminder").setContentText(msgText);
         mBuilder.setContentIntent(notificIntent);
