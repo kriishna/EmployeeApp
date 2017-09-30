@@ -30,8 +30,6 @@ public class measurement {
         this.unit = unit;
     }
 
-    private String amount;
-
     public String getAmount() {
         return amount;
     }
@@ -39,17 +37,6 @@ public class measurement {
     public void setAmount(String amount) {
         this.amount = amount;
     }
-
-    public measurement(String tag, String width, String height, String fleximage, String unit,String id,String amount) {
-        this.tag = tag;
-        this.width = width;
-        this.height = height;
-        this.fleximage = fleximage;
-        this.unit = unit;
-        this.id = id;
-        this.amount = amount;
-    }
-
 
     public String getTag() {
         return tag;

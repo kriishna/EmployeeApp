@@ -175,7 +175,7 @@ public class dialogue extends AppCompatActivity {
                         measurement temp = new measurement(temp_tag, temp_width, temp_height, fleximage, temp_unit, id,temp_amount);
                         db.setValue(temp);
                         DBREF.child("Task").child(TaskDetail.task_id).child("measurementApproved").setValue(Boolean.FALSE);
-                        sendNotif(TaskHome.emp_id,TaskDetail.customer_id,"measurementChanged","Measurement for your task "+TaskDetail.taskname+" has been changed. Please approve it.",TaskDetail.task_id);
+                        sendNotif(TaskHome.emp_id,TaskDetail.customer_id,"measurementChanged","Measurement for your task "+TaskDetail.taskName+" has been changed. Please approve it.",TaskDetail.task_id);
                         pd.dismiss();
 
 

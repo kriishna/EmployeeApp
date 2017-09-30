@@ -80,15 +80,16 @@ import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 import static com.example.pulkit.employeeapp.EmployeeApp.sendNotif;
 import static com.example.pulkit.employeeapp.EmployeeApp.simpleDateFormat;
 
-public class TaskDetail extends AppCompatActivity implements taskdetailDescImageAdapter.ImageAdapterListener, bigimage_adapter.bigimage_adapterListener, measurement_adapter.measurement_adapterListener{
+public class TaskDetail extends AppCompatActivity implements taskdetailDescImageAdapter.ImageAdapterListener, bigimage_adapter.bigimage_adapterListener, measurement_adapter.measurement_adapterListener {
 
     private static final int REQUEST_CODE = 101;
     DatabaseReference dbRef, dbTask, dbCompleted, dbAssigned, dbMeasurement, dbDescImages;
     ImageButton download;
-    public static String task_id,customerId,taskName;
+    public static String task_id, customerId, taskName;
     public String emp_id, desig;
     private Task task;
     String item;
+    public static String customer_id;
     private ArrayList<String> docPaths = new ArrayList<>(), photoPaths = new ArrayList<>();
     private String customername, mykey;
     EditText startDate, endDate, quantity, description, coordinators_message;
@@ -243,21 +244,16 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                 dbMeasurement.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        if(dataSnapshot.exists())
-                        {
-                            if(task.getMeasurementApproved()!=null) {
-                                if (task.getMeasurementApproved() == Boolean.TRUE)
-                                {
+                        if (dataSnapshot.exists()) {
+                            if (task.getMeasurementApproved() != null) {
+                                if (task.getMeasurementApproved() == Boolean.TRUE) {
                                     measure_and_hideme.setText("Approved By Me: Yes");
-                                }
-                                else
-                                {
+                                } else {
                                     measure_and_hideme.setText("Approved By Me: No");
                                 }
                             }
 
-                        }
-                        else {
+                        } else {
                             measure_and_hideme.setText("No measurement taken for this job");
 
                         }
@@ -270,9 +266,9 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                 });
 
                 getSupportActionBar().setTitle(task.getName());
-                taskName=task.getName();
-                customerId=task.getCustomerId();
-                DatabaseReference dbCustomerName = DBREF.child("Customer").child(customerId).getRef()
+                taskName = task.getName();
+                customerId = task.getCustomerId();
+                DatabaseReference dbCustomerName = DBREF.child("Customer").child(customerId).getRef();
                 dbCustomerName.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -430,7 +426,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
             serviceIntent.putExtra("TaskIdList", taskid_list);
             serviceIntent.putExtra("customerId", customerId);
             serviceIntent.putExtra("selectedFileUri", temp);
-            serviceIntent.putExtra("customerName",customername);
+            serviceIntent.putExtra("customerName", customername);
 
             this.startService(serviceIntent);
         } else {
@@ -445,11 +441,9 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         getMenuInflater().inflate(R.menu.taskdetail_menu, menu);
         final MenuItem item = menu.findItem(R.id.item3);
         String desig = session.getDesig();
-        if(session.getDesig().equals("Accounts"))
-        {
+        if (session.getDesig().equals("Accounts")) {
             item.setVisible(true);
-        }
-        else
+        } else
             item.setVisible(false);
         return true;
 
@@ -480,7 +474,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                 break;
 
             case R.id.item3:
-                if(desig.equals("Accounts")) {
+                if (desig.equals("Accounts")) {
                     LayoutInflater layoutInflaterAndroid = LayoutInflater.from(this);
                     View mView = layoutInflaterAndroid.inflate(R.layout.options_foruploadquotation, null);
                     AlertDialog.Builder alertDialogBuilderUserInput = new AlertDialog.Builder(this);
@@ -490,31 +484,34 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                     LinearLayout uploadDoc = (LinearLayout) mView.findViewById(R.id.uploadDoc);
 
 
-                alertDialogBuilderUserInput.setCancelable(true);
-                final AlertDialog alertDialogAndroid = alertDialogBuilderUserInput.create();
-                alertDialogAndroid.show();
-                uploadPhoto.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        FilePickerBuilder.getInstance().setMaxCount(1)
-                                .setActivityTheme(R.style.AppTheme)
-                                .pickPhoto(TaskDetail.this);
-                        alertDialogAndroid.dismiss();
-                    }
-                });
-                uploadDoc.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        FilePickerBuilder.getInstance().setMaxCount(1)
-                                .setActivityTheme(R.style.AppTheme)
-                                .pickFile(TaskDetail.this);
-                        alertDialogAndroid.dismiss();
-                    }
-                });
-                break;
+                    alertDialogBuilderUserInput.setCancelable(true);
+                    final AlertDialog alertDialogAndroid = alertDialogBuilderUserInput.create();
+                    alertDialogAndroid.show();
+                    uploadPhoto.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            FilePickerBuilder.getInstance().setMaxCount(1)
+                                    .setActivityTheme(R.style.AppTheme)
+                                    .pickPhoto(TaskDetail.this);
+                            alertDialogAndroid.dismiss();
+                        }
+                    });
+                    uploadDoc.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            FilePickerBuilder.getInstance().setMaxCount(1)
+                                    .setActivityTheme(R.style.AppTheme)
+                                    .pickFile(TaskDetail.this);
+                            alertDialogAndroid.dismiss();
+                        }
+                    });
+                    break;
+                }}
+                return true;
         }
-        return true;
-    }
+
+
+
 
     private void checkChatref(final String mykey, final String otheruserkey) {
         DatabaseReference dbChat = DBREF.child("Chats").child(mykey + otheruserkey).getRef();

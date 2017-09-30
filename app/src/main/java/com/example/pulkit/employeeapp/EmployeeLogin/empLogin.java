@@ -83,17 +83,6 @@ public class empLogin extends AppCompatActivity {
         input_password = (TextInputLayout) findViewById(R.id.input_passwordlogin);
         database = DBREF.child("Employee").getRef();
 
-        final CheckBox showPasswordCheckBox = (CheckBox) findViewById(R.id.checkbox);
-        showPasswordCheckBox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (showPasswordCheckBox.isChecked()){
-                    password.setTransformationMethod(null);
-                }else{
-                    password.setTransformationMethod(new PasswordTransformationMethod());
-                }
-            }
-        });
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
