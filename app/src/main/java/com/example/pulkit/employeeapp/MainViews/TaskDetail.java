@@ -85,12 +85,12 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     private static final int REQUEST_CODE = 101;
     DatabaseReference dbRef, dbTask, dbCompleted, dbAssigned, dbMeasurement, dbDescImages;
     ImageButton download;
-    public static String task_id,customer_id,taskname;
+    public static String task_id,customerId,taskName;
     public String emp_id, desig;
     private Task task;
     String item;
     private ArrayList<String> docPaths = new ArrayList<>(), photoPaths = new ArrayList<>();
-    private String customername, custId, mykey;
+    private String customername, mykey;
     EditText startDate, endDate, quantity, description, coordinators_message;
     RecyclerView rec_measurement, rec_DescImages;
     Button forward;
@@ -270,9 +270,9 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                 });
 
                 getSupportActionBar().setTitle(task.getName());
-                taskname = task.getName();
-                custId = task.getCustomerId();
-                DatabaseReference dbCustomerName = DBREF.child("Customer").child(custId).getRef();
+                taskName=task.getName();
+                customerId=task.getCustomerId();
+                DatabaseReference dbCustomerName = DBREF.child("Customer").child(customerId).getRef()
                 dbCustomerName.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -327,7 +327,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
 
                         databaseReference = DBREF.child("Task").child(task_id).child("AssignedTo").child(emp_id);
 
-                        databaseReference.addValueEventListener(new ValueEventListener() {
+                        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 if (dataSnapshot.exists()) {
@@ -398,71 +398,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                 if (resultCode == Activity.RESULT_OK && data != null) {
                     photoPaths = new ArrayList<>();
                     photoPaths.addAll(data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_MEDIA));
-
-                    System.out.println(String.format("Totally %d images selected:", photoPaths.size()));
-                    if (photoPaths.size() > 0) {
-                        viewSelectedImages1 = new AlertDialog.Builder(TaskDetail.this)
-                                .setView(R.layout.activity_view_selected_image).create();
-                        viewSelectedImages1.show();
-
-                        final ImageView ImageViewlarge = (ImageView) viewSelectedImages1.findViewById(R.id.ImageViewlarge);
-                        ImageButton cancel = (ImageButton) viewSelectedImages1.findViewById(R.id.cancel);
-                        ImageButton canceldone = (ImageButton) viewSelectedImages1.findViewById(R.id.canceldone);
-                        ImageButton okdone = (ImageButton) viewSelectedImages1.findViewById(R.id.okdone);
-                        RecyclerView rv = (RecyclerView) viewSelectedImages1.findViewById(R.id.viewImages);
-
-                        linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
-                        rv.setLayoutManager(linearLayoutManager);
-                        rv.setItemAnimator(new DefaultItemAnimator());
-                        rv.addItemDecoration(new DividerItemDecoration(getApplicationContext(), LinearLayoutManager.HORIZONTAL));
-
-                        madapter = new ViewImageAdapter(photoPaths, this);
-                        rv.setAdapter(madapter);
-
-
-                        madapter.notifyDataSetChanged();
-
-                        item = photoPaths.get(0);
-                        ImageViewlarge.setImageURI(Uri.parse(item));
-
-                        rv.performClick();
-
-                        rv.addOnItemTouchListener(new RecyclerTouchListener(this, rv, new ClickListener() {
-                            @Override
-                            public void onClick(View view, int position) {
-                                madapter.selectedPosition = position;
-                                madapter.notifyDataSetChanged();
-                                item = photoPaths.get(position);
-                                ImageViewlarge.setImageURI(Uri.parse(item));
-                            }
-
-                            @Override
-                            public void onLongClick(View view, int position) {
-
-                            }
-                        }));
-
-                        cancel.setVisibility(View.GONE);
-
-                        canceldone.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                photoPaths.clear();
-                                viewSelectedImages1.dismiss();
-                            }
-                        });
-
-                        okdone.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                String l = compressMe.compressImage(photoPaths.get(0), TaskDetail.this);
-                                uploadFile(l, "photo");
-                                viewSelectedImages1.dismiss();
-
-                            }
-                        });
-
-                    }
+                    uploadFile(photoPaths.get(0), "photo");
                 }
                 break;
 
@@ -492,7 +428,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
 
             Intent serviceIntent = new Intent(this, UploadQuotationService.class);
             serviceIntent.putExtra("TaskIdList", taskid_list);
-            serviceIntent.putExtra("customerId", custId);
+            serviceIntent.putExtra("customerId", customerId);
             serviceIntent.putExtra("selectedFileUri", temp);
             serviceIntent.putExtra("customerName",customername);
 
@@ -507,15 +443,14 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.taskdetail_menu, menu);
-
         final MenuItem item = menu.findItem(R.id.item3);
-        if(!desig.equals("Accounts"))
+        String desig = session.getDesig();
+        if(session.getDesig().equals("Accounts"))
+        {
+            item.setVisible(true);
+        }
+        else
             item.setVisible(false);
-
-            if(desig.equals("Accounts"))
-                item.setVisible(true);
-
-
         return true;
 
 
@@ -555,28 +490,27 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                     LinearLayout uploadDoc = (LinearLayout) mView.findViewById(R.id.uploadDoc);
 
 
-                    alertDialogBuilderUserInput.setCancelable(true);
-                    final AlertDialog alertDialogAndroid = alertDialogBuilderUserInput.create();
-                    alertDialogAndroid.show();
-                    uploadPhoto.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            FilePickerBuilder.getInstance().setMaxCount(10)
-                                    .setActivityTheme(R.style.AppTheme)
-                                    .pickPhoto(TaskDetail.this);
-                            alertDialogAndroid.dismiss();
-                        }
-                    });
-                    uploadDoc.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            FilePickerBuilder.getInstance().setMaxCount(1)
-                                    .setActivityTheme(R.style.AppTheme)
-                                    .pickFile(TaskDetail.this);
-                            alertDialogAndroid.dismiss();
-                        }
-                    });
-                }
+                alertDialogBuilderUserInput.setCancelable(true);
+                final AlertDialog alertDialogAndroid = alertDialogBuilderUserInput.create();
+                alertDialogAndroid.show();
+                uploadPhoto.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        FilePickerBuilder.getInstance().setMaxCount(1)
+                                .setActivityTheme(R.style.AppTheme)
+                                .pickPhoto(TaskDetail.this);
+                        alertDialogAndroid.dismiss();
+                    }
+                });
+                uploadDoc.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        FilePickerBuilder.getInstance().setMaxCount(1)
+                                .setActivityTheme(R.style.AppTheme)
+                                .pickFile(TaskDetail.this);
+                        alertDialogAndroid.dismiss();
+                    }
+                });
                 break;
         }
         return true;

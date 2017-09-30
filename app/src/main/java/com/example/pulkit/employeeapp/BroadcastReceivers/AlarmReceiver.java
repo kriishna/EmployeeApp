@@ -68,7 +68,8 @@ EmployeeSession employeeSession;
     public void createNotification(Context context, String title, String msgText, String notifId)
     {
         PendingIntent notificIntent=PendingIntent.getActivity(context,0,new Intent(context,NotificationActivity.class),0);
-        NotificationCompat.Builder mBuilder= (NotificationCompat.Builder) new NotificationCompat.Builder(context).setSmallIcon(R.drawable.ic_call_me)
+        NotificationCompat.Builder mBuilder= (NotificationCompat.Builder) new NotificationCompat.Builder(context)
+                .setSmallIcon(R.drawable.ic_call_me)
                 .setContentTitle(title).setTicker("Reminder").setContentText(msgText);
         mBuilder.setContentIntent(notificIntent);
         mBuilder.setDefaults(NotificationCompat.DEFAULT_SOUND);

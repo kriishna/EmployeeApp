@@ -52,6 +52,18 @@ public class empLogin extends AppCompatActivity {
             editor.commit();
         }
 
+        final CheckBox showPasswordCheckBox = (CheckBox) findViewById(R.id.checkbox);
+        showPasswordCheckBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (showPasswordCheckBox.isChecked()){
+                    password.setTransformationMethod(null);
+                }else{
+                    password.setTransformationMethod(new PasswordTransformationMethod());
+                }
+            }
+        });
+
         session = new EmployeeSession(getApplicationContext());
 
         if (session.isolduser().equals(true)) {

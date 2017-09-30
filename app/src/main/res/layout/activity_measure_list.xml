@@ -15,37 +15,51 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:padding="12dp"
             android:drawableLeft="@mipmap/ic_arrow_horizontal"
+            android:padding="5dp"
             android:text="Width"
-            android:gravity="center_horizontal"/>
+            android:layout_gravity="center"
+            android:gravity="center"/>
 
         <TextView
             android:id="@+id/breadth"
+            android:drawableLeft="@mipmap/ic_arrow_vertical"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:padding="12dp"
+            android:padding="5dp"
             android:text="Height"
-            android:drawableLeft="@mipmap/ic_arrow_vertical"
-            android:gravity="center_horizontal"/>
+            android:layout_gravity="center"
+            android:gravity="center"/>
 
         <TextView
             android:id="@+id/unit"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:padding="12dp"
+            android:padding="5dp"
             android:text="Unit"
-            android:gravity="center_horizontal"/>
+            android:layout_gravity="center"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/amount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="5dp"
+            android:text="Amount"
+            android:layout_gravity="center"
+            android:gravity="center"/>
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:padding="12dp"
+            android:padding="5dp"
             android:text="Image"
-            android:gravity="center_horizontal"/>
+            android:layout_gravity="center"
+            android:gravity="center"/>
 
     </LinearLayout>
 

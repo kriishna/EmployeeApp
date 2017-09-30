@@ -5,12 +5,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.example.pulkit.employeeapp.R;
-import com.example.pulkit.employeeapp.model.measurement;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.pulkit.employeeapp.R;
+import com.example.pulkit.employeeapp.model.measurement;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -50,6 +49,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         holder.width.setText(m.getWidth());
         holder.height.setText(m.getHeight());
         holder.unit.setText(m.getUnit());
+        holder.amount.setText(m.getAmount());
 
         if (!m.getFleximage().equals(""))
             Picasso.with(context).load(m.getFleximage()).placeholder(R.drawable.wait).into(holder.fleximage);
@@ -66,6 +66,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         public TextView width;
         public TextView height;
         public TextView unit;
+        public TextView amount;
         public ImageView fleximage;
         public View view;
 
@@ -73,6 +74,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
             super(itemView);
 
             width = (TextView) itemView.findViewById(R.id.width);
+            amount = (TextView) itemView.findViewById(R.id.amount);
             height = (TextView) itemView.findViewById(R.id.height);
             unit = (TextView) itemView.findViewById(R.id.unit);
             fleximage = (ImageView) itemView.findViewById(R.id.fleximage);

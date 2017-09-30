@@ -83,8 +83,7 @@ public class chatFrag extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         fmm = getFragmentManager();
-        chat_add = (FloatingActionButton) getView().findViewById(R.id.add_chat);
-
+        chat_add = (FloatingActionButton)view.findViewById(R.id.add_chat);
         EmployeeSession coordinatorSession = new EmployeeSession(getActivity());
         mykey = coordinatorSession.getUsername();
         dbChatList = DBREF.child("Users").child("Userchats").child(mykey).getRef();
@@ -95,6 +94,14 @@ public class chatFrag extends Fragment {
         recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
         mAdapter = new chatListAdapter(list, getActivity());
         recyclerView.setAdapter(mAdapter);
+        chat_add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getContext(), ContactCoordinator.class));
+                getActivity().finish();
+            }
+        });
+
         b = list;
         LoadData();
 

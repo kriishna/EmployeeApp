@@ -10,7 +10,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
+import com.example.pulkit.employeeapp.EmployeeApp;
+import com.example.pulkit.employeeapp.EmployeeLogin.EmployeeSession;
 import com.example.pulkit.employeeapp.MainViews.TaskDetail;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.listener.ClickListener;
@@ -36,13 +39,15 @@ public class MeasureList extends AppCompatActivity {
     DatabaseReference dbRef;
     private List<measurement> listItems = new ArrayList<>();
     String task_id, id;
+    EmployeeSession employeeSession;
     ChildEventListener ch;
+    int flag_changed = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_measure_list);
-
+        employeeSession = new EmployeeSession(this);
         task_id = TaskDetail.task_id;
 
         dbRef = DBREF.child("Task").child(task_id).child("Measurement").getRef();
@@ -64,7 +69,7 @@ public class MeasureList extends AppCompatActivity {
                 //Action for on click event
 
 
-                String width, height, unit, fleximage,tag;
+                String width, height, unit, fleximage,tag,amount;
 
 
                 measurement temp = listItems.get(position);
@@ -73,6 +78,7 @@ public class MeasureList extends AppCompatActivity {
                 unit = temp.getUnit();
                 fleximage = temp.getFleximage();
                 tag = temp.getTag();
+                amount = temp.getAmount();
                 id = temp.getId();
 
                 Intent i = new Intent(getApplicationContext(), dialogue.class);
@@ -81,6 +87,7 @@ public class MeasureList extends AppCompatActivity {
                 i.putExtra("unit", unit);
                 i.putExtra("fleximage", fleximage);
                 i.putExtra("tag", tag);
+                i.putExtra("amount", amount);
                 i.putExtra("id", id);
 
                 startActivityForResult(i, 100);
@@ -110,6 +117,11 @@ public class MeasureList extends AppCompatActivity {
         st.delete();
         db.removeValue();
 
+        DBREF.child("Task").child(TaskDetail.task_id).child("measurementApproved").setValue(Boolean.FALSE);
+        EmployeeApp.sendNotif(employeeSession.getUsername(), TaskDetail.customerId, "measurementChanged", "Measurement for your task " + TaskDetail.taskName + " has been changed. Please approve it.", TaskDetail.task_id);
+
+        Toast.makeText(MeasureList.this, "Informing the Customer of Changes", Toast.LENGTH_SHORT).show();
+
         listItems.remove(pos);
         adapter.notifyDataSetChanged();
     }
@@ -124,6 +136,7 @@ public class MeasureList extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent i = new Intent(this, dialogue.class);
         startActivityForResult(i, 100);
+        flag_changed = 1;
         return true;
 
     }
@@ -143,10 +156,20 @@ public class MeasureList extends AppCompatActivity {
                 String fleximage = data.getStringExtra("fleximage");
                 String id = data.getStringExtra("id");
                 String tag = data.getStringExtra("tag");
-                measurement m = new measurement(tag, width, height, fleximage, unit, id);
+                String amount = data.getStringExtra("amount");
+                measurement m = new measurement(tag, width, height, fleximage, unit, id,amount);
 
                 dbRef.child(id).setValue(m);
 
+                // ask for approval only if + in menu is clicked not if row is clicked
+                if(flag_changed == 1){
+                    DBREF.child("Task").child(TaskDetail.task_id).child("measurementApproved").setValue(Boolean.FALSE);
+                    EmployeeApp.sendNotif(employeeSession.getUsername(), TaskDetail.customerId, "measurementChanged", "Measurement for your task " + TaskDetail.taskName + " has been changed. Please approve it.", TaskDetail.task_id);
+                    Toast.makeText(MeasureList.this, "Informing the Customer of Changes", Toast.LENGTH_SHORT).show();
+
+                }
+
+                flag_changed = 0;
             }
         }
     }
