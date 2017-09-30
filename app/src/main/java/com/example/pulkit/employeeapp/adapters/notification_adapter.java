@@ -74,8 +74,8 @@ public class notification_adapter extends  RecyclerView.Adapter<notification_ada
 
                     NameAndStatus nameAndStatus = dataSnapshot.getValue(NameAndStatus.class);
                     holder.notif_sender.setText(nameAndStatus.getName());
-                    String caps = nameAndStatus.getName().toUpperCase();
-                    holder.icon_text.setText(caps.charAt(0)+"");
+           //         String caps = nameAndStatus.getName().toUpperCase();
+             //       holder.icon_text.setText(caps.charAt(0)+"");
                 }
             }
 
@@ -86,7 +86,7 @@ public class notification_adapter extends  RecyclerView.Adapter<notification_ada
         });
 
         holder.notif_message.setText(notif.getContent());
-        applyProfilePicture(holder);
+      //  applyProfilePicture(holder);
 
         String timestamp = simpleDateFormatWithMonthName.format(Calendar.getInstance().getTime());
         String senderTimestamp = notif.getTimestamp().substring(0,11);

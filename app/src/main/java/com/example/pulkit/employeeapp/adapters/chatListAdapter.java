@@ -14,13 +14,13 @@ import com.example.pulkit.employeeapp.EmployeeLogin.EmployeeSession;
 import com.example.pulkit.employeeapp.R;
 import com.example.pulkit.employeeapp.model.ChatListModel;
 import com.example.pulkit.employeeapp.model.ChatMessage;
+import com.example.pulkit.employeeapp.model.Employee;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -32,32 +32,31 @@ import static com.example.pulkit.employeeapp.EmployeeApp.simpleDateFormatWithMon
 public class chatListAdapter extends RecyclerView.Adapter<chatListAdapter.MyViewHolder> {
     ArrayList<ChatListModel> list = new ArrayList<>();
     private Context context;
-    private chatListAdapterListener listener;
-    private HashMap<DatabaseReference,ChildEventListener> hashMapCHE;
-    private HashMap<DatabaseReference,ValueEventListener> hashMapVLE;
-   // private SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
-    private EmployeeSession employeeSession;
+    private HashMap<DatabaseReference, ChildEventListener> hashMapCHE;
+    private HashMap<DatabaseReference, ValueEventListener> hashMapVLE;
+    private EmployeeSession customerSession;
     private String mykey;
+    public ArrayList<ChatListModel> filterlist;
 
-    public chatListAdapter(ArrayList<ChatListModel> list, Context context, chatListAdapterListener listener) {
+    public chatListAdapter(ArrayList<ChatListModel> list, Context context) {
         this.context = context;
         this.list = list;
-        this.listener = listener;
         hashMapCHE = new HashMap<>();
         hashMapVLE = new HashMap<>();
-        employeeSession = new EmployeeSession(context);
-        mykey = employeeSession.getUsername();
+        customerSession = new EmployeeSession(context);
+        mykey = customerSession.getUsername();
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView author, message, timestamp, icon_text,tvunread;
-        ImageView imgProfile,onlineStatus;
+        TextView author, message, timestamp, icon_text, tvunread;
+        ImageView imgProfile, onlineStatus;
         LinearLayout messageContainer;
         RelativeLayout relunread;
 
+
         public MyViewHolder(View itemView) {
             super(itemView);
-            relunread = (RelativeLayout)itemView.findViewById(R.id.relunread);
+            relunread = (RelativeLayout) itemView.findViewById(R.id.relunread);
             author = (TextView) itemView.findViewById(R.id.author);
             message = (TextView) itemView.findViewById(R.id.message);
             timestamp = (TextView) itemView.findViewById(R.id.timestamp);
@@ -66,44 +65,31 @@ public class chatListAdapter extends RecyclerView.Adapter<chatListAdapter.MyView
             imgProfile = (ImageView) itemView.findViewById(R.id.icon_profile);
             messageContainer = (LinearLayout) itemView.findViewById(R.id.message_container);
             onlineStatus = (ImageView) itemView.findViewById(R.id.onlineStatus);
+
         }
+
     }
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_list_row, parent, false);
         return new MyViewHolder(view);
+
     }
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, int position) {
         ChatListModel topic = list.get(position);
         holder.author.setText(topic.getName());
-        applyClickEvents(holder, position);
         applyProfilePicture(holder, topic);
         applyLastMessage(holder, topic);
-        applyOnlineStatus(holder,topic);
-        findunreadmsgs(holder,topic);
+        applyOnlineStatus(holder, topic);
+        findunreadmsgs(holder, topic);
     }
 
     @Override
     public int getItemCount() {
         return list.size();
-    }
-
-    public interface chatListAdapterListener {
-        void onChatRowClicked(int position);
-    }
-
-    private void applyClickEvents(MyViewHolder holder, final int position) {
-
-        holder.messageContainer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                listener.onChatRowClicked(position);
-            }
-        });
-
     }
 
     private void applyProfilePicture(MyViewHolder holder, ChatListModel message) {
@@ -123,29 +109,24 @@ public class chatListAdapter extends RecyclerView.Adapter<chatListAdapter.MyView
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if (dataSnapshot.exists()) {
                     ChatMessage chatMessage = dataSnapshot.getValue(ChatMessage.class);
-                    if(chatMessage.getType().equals("text"))
-                    {
+                    if (chatMessage.getType().equals("text")) {
                         holder.message.setText(chatMessage.getCommentString());
-                    }
-
-                    else if(chatMessage.getType().equals("doc"))
-                    {
+                    } else if (chatMessage.getType().equals("doc")) {
                         holder.message.setText("Sent a Document");
-                    }
-                    else if(chatMessage.getType().equals("photo"))
-                    {
+                    } else if (chatMessage.getType().equals("photo")) {
                         holder.message.setText("Sent an Image");
                     }
 
                     String timestamp = simpleDateFormatWithMonthName.format(Calendar.getInstance().getTime());
-                    String senderTimestamp = chatMessage.getSendertimestamp().substring(0,11);
-                    if(timestamp.equals(senderTimestamp))
+                    String senderTimestamp = chatMessage.getSendertimestamp().substring(0, 11);
+                    if (timestamp.equals(senderTimestamp))
                         senderTimestamp = chatMessage.getSendertimestamp().substring(12).trim();
 
                     holder.timestamp.setText(senderTimestamp);
                 }
 
             }
+
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
@@ -166,25 +147,25 @@ public class chatListAdapter extends RecyclerView.Adapter<chatListAdapter.MyView
 
             }
         });
-        hashMapCHE.put(dbTopicLastComment,childEventListener);
+        hashMapCHE.put(dbTopicLastComment, childEventListener);
 
     }
-    private void applyOnlineStatus(final MyViewHolder holder, ChatListModel chatListModel)
-    {
+    public void setFilter(ArrayList<ChatListModel> countryModels) {
+        filterlist = new ArrayList<>();
+        filterlist.addAll(countryModels);
+        notifyDataSetChanged();
+    }
+    private void applyOnlineStatus(final MyViewHolder holder, ChatListModel chatListModel) {
 
         DatabaseReference dbOnlineStatus = DBREF.child("Users").child("Usersessions").child(chatListModel.getUserkey()).child("online").getRef();
         ValueEventListener valueEventListener = dbOnlineStatus.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists())
-                {
+                if (dataSnapshot.exists()) {
                     boolean online = dataSnapshot.getValue(Boolean.class);
-                    if(online==true)
-                    {
+                    if (online == true) {
                         holder.onlineStatus.setVisibility(View.VISIBLE);
-                    }
-                    else
-                    {
+                    } else {
                         holder.onlineStatus.setVisibility(View.GONE);
                     }
                 }
@@ -195,14 +176,14 @@ public class chatListAdapter extends RecyclerView.Adapter<chatListAdapter.MyView
 
             }
         });
-        hashMapVLE.put(dbOnlineStatus,valueEventListener);
+        hashMapVLE.put(dbOnlineStatus, valueEventListener);
     }
 
 
     private void findunreadmsgs(final MyViewHolder holder, final ChatListModel topic) {
-        String a="nil";
+        String a = "nil";
         DatabaseReference dbTopicLastComment = DBREF.child("Chats").child(topic.getDbTableKey()).child("ChatMessages").getRef();
-        System.out.println(topic.getDbTableKey()+" unreadmsgs called " + dbTopicLastComment);
+        System.out.println(topic.getDbTableKey() + " unreadmsgs called " + dbTopicLastComment);
         final Integer[] countunreadmessages = {0};
         ValueEventListener valueEventListener = dbTopicLastComment.orderByChild("status").equalTo("2").addValueEventListener(new ValueEventListener() {
             @Override
@@ -217,10 +198,13 @@ public class chatListAdapter extends RecyclerView.Adapter<chatListAdapter.MyView
                     if (countunreadmessages[0] != 0) {
                         holder.relunread.setVisibility(View.VISIBLE);
                         holder.tvunread.setText(String.valueOf(countunreadmessages[0]));
-                    } else {
-                        holder.relunread.setVisibility(View.GONE);
-                        countunreadmessages[0] = 0;
                     }
+                    else {
+                        holder.relunread.setVisibility(View.GONE);
+                    }
+                } else {
+                    holder.relunread.setVisibility(View.GONE);
+                    countunreadmessages[0] = 0;
                 }
             }
 
@@ -229,21 +213,20 @@ public class chatListAdapter extends RecyclerView.Adapter<chatListAdapter.MyView
 
             }
         });
-        hashMapVLE.put(dbTopicLastComment,valueEventListener);
+        hashMapVLE.put(dbTopicLastComment, valueEventListener);
     }
 
-    public void removeListeners()
-    {
-        Iterator<HashMap.Entry<DatabaseReference,ChildEventListener>> iterator = hashMapCHE.entrySet().iterator();
+    public void removeListeners() {
+        Iterator<HashMap.Entry<DatabaseReference, ChildEventListener>> iterator = hashMapCHE.entrySet().iterator();
         while (iterator.hasNext()) {
-            HashMap.Entry<DatabaseReference,ChildEventListener> entry = (HashMap.Entry<DatabaseReference,ChildEventListener>) iterator.next();
-            if(entry.getValue()!=null)
+            HashMap.Entry<DatabaseReference, ChildEventListener> entry = (HashMap.Entry<DatabaseReference, ChildEventListener>) iterator.next();
+            if (entry.getValue() != null)
                 entry.getKey().removeEventListener(entry.getValue());
         }
-        Iterator<HashMap.Entry<DatabaseReference,ValueEventListener>> iterator2 = hashMapVLE.entrySet().iterator();
+        Iterator<HashMap.Entry<DatabaseReference, ValueEventListener>> iterator2 = hashMapVLE.entrySet().iterator();
         while (iterator2.hasNext()) {
-            HashMap.Entry<DatabaseReference,ValueEventListener> entry = (HashMap.Entry<DatabaseReference,ValueEventListener>) iterator2.next();
-            if(entry.getValue()!=null) entry.getKey().removeEventListener(entry.getValue());
+            HashMap.Entry<DatabaseReference, ValueEventListener> entry = (HashMap.Entry<DatabaseReference, ValueEventListener>) iterator2.next();
+            if (entry.getValue() != null) entry.getKey().removeEventListener(entry.getValue());
         }
 
     }

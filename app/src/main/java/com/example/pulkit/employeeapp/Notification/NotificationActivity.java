@@ -1,14 +1,17 @@
 package com.example.pulkit.employeeapp.Notification;
 
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import com.example.pulkit.employeeapp.helper.DividerItemDecoration;
 
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.Toast;
 
+import com.example.pulkit.employeeapp.EmployeeApp;
 import com.example.pulkit.employeeapp.EmployeeLogin.EmployeeSession;
 import com.example.pulkit.employeeapp.MainViews.TaskHome;
 import com.example.pulkit.employeeapp.R;
@@ -18,6 +21,7 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,7 +36,7 @@ public class NotificationActivity extends AppCompatActivity {
     notification_adapter adapter;
     List<Notif> list = new ArrayList<>();
     Notif notif = new Notif();
-    String Username;
+    String Username, senderuid, taskId;
     EmployeeSession session;
 
     @Override
@@ -43,10 +47,39 @@ public class NotificationActivity extends AppCompatActivity {
         session = new EmployeeSession(getApplicationContext());
         Username = session.getUsername();
 
+        Intent intent = getIntent();
+        if (intent.hasExtra("seen"))
+        {
+
+            final String notifId = intent.getStringExtra("id");
+            taskId = intent.getStringExtra("taskId");
+            senderuid = intent.getStringExtra("senderuid");
+            //String content = session.getName() + " has seen the Job" + ;
+
+            final String receiverId = senderuid;//notificationManager.cancel(Integer.parseInt(id));
+
+            DBREF.child("Task").child(taskId).child("name").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    String taskname = dataSnapshot.getValue(String.class);
+                    String content = session.getName() + " has seen the Job " + taskname;
+                    EmployeeApp.sendNotif(session.getUsername(),receiverId,"seen",content," ");
+                    Toast.makeText(NotificationActivity.this,"Informing Coordinator",Toast.LENGTH_LONG).show();
+                    NotificationManager notificationManager =(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    notificationManager.cancel(Integer.parseInt(notifId));
+
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+            }
         recview = (RecyclerView) findViewById(R.id.notification_list);
         recview.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         recview.setItemAnimator(new DefaultItemAnimator());
-        recview.addItemDecoration(new DividerItemDecoration(getApplicationContext(), LinearLayoutManager.VERTICAL));
 
         adapter = new notification_adapter(list, getApplicationContext());
         recview.setAdapter(adapter);

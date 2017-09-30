@@ -42,7 +42,7 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.REBOOT" />
                 <action android:name="android.location.PROVIDERS_CHANGED" />
-
+                <action android:name="seen_notification" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>

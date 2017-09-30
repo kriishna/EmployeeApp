@@ -3,10 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <item
-        android:icon="@drawable/ic_account_balance_white_24dp"
+        android:icon="@mipmap/ic_account_info"
         android:title="ADD"
         app:showAsAction="always"
         android:id="@+id/manage_account"/>
-
-
 </menu>

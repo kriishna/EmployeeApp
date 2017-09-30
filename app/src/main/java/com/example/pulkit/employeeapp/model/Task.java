@@ -7,6 +7,17 @@ package com.example.pulkit.employeeapp.model;
 public class Task {
     private String taskId, name, startDate, expEndDate, quotationId, qty, desc, customerId;
     private int color = -1;
+    private Boolean measurementApproved;
+
+
+    public Boolean getMeasurementApproved() {
+        return measurementApproved;
+    }
+
+    public void setMeasurementApproved(Boolean measurementApproved) {
+        this.measurementApproved = measurementApproved;
+    }
+
 
     public Task() {
     }
@@ -20,6 +31,7 @@ public class Task {
         this.desc = desc;
         this.customerId = customerId;
         this.color = color;
+        measurementApproved=false;
     }
 
     public int getColor() {

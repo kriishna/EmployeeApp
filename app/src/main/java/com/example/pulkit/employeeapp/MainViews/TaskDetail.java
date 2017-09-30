@@ -14,6 +14,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.example.pulkit.employeeapp.adapters.ViewImageAdapter;
 import com.example.pulkit.employeeapp.helper.CompressMe;
 
@@ -44,6 +45,7 @@ import com.example.pulkit.employeeapp.adapters.measurement_adapter;
 import com.example.pulkit.employeeapp.adapters.taskdetailDescImageAdapter;
 import com.example.pulkit.employeeapp.chat.ChatActivity;
 import com.example.pulkit.employeeapp.helper.MarshmallowPermissions;
+import com.example.pulkit.employeeapp.helper.TouchImageView;
 import com.example.pulkit.employeeapp.listener.ClickListener;
 import com.example.pulkit.employeeapp.listener.RecyclerTouchListener;
 import com.example.pulkit.employeeapp.measurement.MeasureList;
@@ -78,7 +80,7 @@ import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 import static com.example.pulkit.employeeapp.EmployeeApp.sendNotif;
 import static com.example.pulkit.employeeapp.EmployeeApp.simpleDateFormat;
 
-public class TaskDetail extends AppCompatActivity implements taskdetailDescImageAdapter.ImageAdapterListener, bigimage_adapter.bigimage_adapterListener {
+public class TaskDetail extends AppCompatActivity implements taskdetailDescImageAdapter.ImageAdapterListener, bigimage_adapter.bigimage_adapterListener, measurement_adapter.measurement_adapterListener{
 
     private static final int REQUEST_CODE = 101;
     DatabaseReference dbRef, dbTask, dbCompleted, dbAssigned, dbMeasurement, dbDescImages;
@@ -105,14 +107,13 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
     taskdetailDescImageAdapter adapter_taskimages;
     bigimage_adapter adapter;
     ViewImageAdapter madapter;
-    private AlertDialog viewSelectedImages, confirmation, viewSelectedImages1;
+    private AlertDialog viewSelectedImages, confirmation, viewSelectedImages1, viewSelectedImages_measure;
     ArrayList<String> DescImages = new ArrayList<>();
     LinearLayoutManager linearLayoutManager;
     EmployeeSession session;
     String dbTablekey, id;
     String num;
     private MarshmallowPermissions marshmallowPermissions;
- //   SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
     private static final int PICK_FILE_REQUEST = 1;
 
     @Override
@@ -156,6 +157,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 id = dataSnapshot.getValue(String.class);
+                customer_id = id;
             }
 
             @Override
@@ -178,7 +180,7 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         rec_measurement.setLayoutManager(new LinearLayoutManager(this));
         rec_measurement.setItemAnimator(new DefaultItemAnimator());
         rec_measurement.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
-        adapter_measurement = new measurement_adapter(measurementList, this);
+        adapter_measurement = new measurement_adapter(measurementList, this, this);
         rec_measurement.setAdapter(adapter_measurement);
 
         rec_DescImages.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -238,10 +240,39 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
             public void onDataChange(DataSnapshot dataSnapshot) {
                 task = dataSnapshot.getValue(Task.class);
                 setValue(task);
+                dbMeasurement.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.exists())
+                        {
+                            if(task.getMeasurementApproved()!=null) {
+                                if (task.getMeasurementApproved() == Boolean.TRUE)
+                                {
+                                    measure_and_hideme.setText("Approved By Me: Yes");
+                                }
+                                else
+                                {
+                                    measure_and_hideme.setText("Approved By Me: No");
+                                }
+                            }
+
+                        }
+                        else {
+                            measure_and_hideme.setText("No measurement taken for this job");
+
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
                 getSupportActionBar().setTitle(task.getName());
                 taskName=task.getName();
                 customerId=task.getCustomerId();
-                DatabaseReference dbCustomerName = DBREF.child("Customer").child(customerId).getRef();
+                DatabaseReference dbCustomerName = DBREF.child("Customer").child(customerId).getRef()
                 dbCustomerName.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -421,6 +452,8 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
         else
             item.setVisible(false);
         return true;
+
+
     }
 
     @Override
@@ -447,13 +480,14 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                 break;
 
             case R.id.item3:
-                LayoutInflater layoutInflaterAndroid = LayoutInflater.from(this);
-                View mView = layoutInflaterAndroid.inflate(R.layout.options_foruploadquotation, null);
-                AlertDialog.Builder alertDialogBuilderUserInput = new AlertDialog.Builder(this);
-                alertDialogBuilderUserInput.setView(mView);
+                if(desig.equals("Accounts")) {
+                    LayoutInflater layoutInflaterAndroid = LayoutInflater.from(this);
+                    View mView = layoutInflaterAndroid.inflate(R.layout.options_foruploadquotation, null);
+                    AlertDialog.Builder alertDialogBuilderUserInput = new AlertDialog.Builder(this);
+                    alertDialogBuilderUserInput.setView(mView);
 
-                LinearLayout uploadPhoto = (LinearLayout) mView.findViewById(R.id.uploadPhoto);
-                LinearLayout uploadDoc = (LinearLayout) mView.findViewById(R.id.uploadDoc);
+                    LinearLayout uploadPhoto = (LinearLayout) mView.findViewById(R.id.uploadPhoto);
+                    LinearLayout uploadDoc = (LinearLayout) mView.findViewById(R.id.uploadDoc);
 
 
                 alertDialogBuilderUserInput.setCancelable(true);
@@ -582,12 +616,9 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if (dataSnapshot.exists()) {
-                    measure_and_hideme.setVisibility(View.GONE);
                     measurement item = dataSnapshot.getValue(measurement.class);
                     measurementList.add(item);
                     adapter_measurement.notifyDataSetChanged();
-                } else {
-                    measure_and_hideme.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -751,8 +782,33 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
 
                 }
             });
-
-
         }
+    }
+
+    @Override
+    public void onImageClicked(int position, measurement_adapter.MyViewHolder holder) {
+        viewSelectedImages_measure = new AlertDialog.Builder(TaskDetail.this)
+                .setView(R.layout.viewmeasureimage).create();
+        viewSelectedImages_measure.show();
+
+        measurement m = measurementList.get(position);
+        String uri = m.getFleximage();
+
+        TouchImageView viewchatimage = (TouchImageView) viewSelectedImages_measure.findViewById(R.id.chatimage);
+        ImageButton backbutton = (ImageButton) viewSelectedImages_measure.findViewById(R.id.back);
+
+        Glide.with(getApplicationContext())
+                .load(Uri.parse(uri))
+                .placeholder(R.color.black)
+                .crossFade()
+                .centerCrop()
+                .into(viewchatimage);
+
+        backbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewSelectedImages_measure.dismiss();
+            }
+        });
     }
 }

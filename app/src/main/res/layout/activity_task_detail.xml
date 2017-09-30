@@ -257,15 +257,14 @@
                     <TextView
                         android:id="@+id/measure_and_hideme"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="No measurements taken for this job" />
+                        android:layout_height="wrap_content" />
 
                     <android.support.v7.widget.RecyclerView
                         android:id="@+id/rec_measurement"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"
-                        android:nestedScrollingEnabled="false" />
+                        android:nestedScrollingEnabled="true" />
 
                 </LinearLayout>
             </android.support.v7.widget.CardView>

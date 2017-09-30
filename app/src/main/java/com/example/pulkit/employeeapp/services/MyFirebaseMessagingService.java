@@ -11,9 +11,12 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.view.View;
+import android.widget.Button;
+import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import com.example.pulkit.employeeapp.BroadcastReceivers.AlarmReceiver;
+import com.example.pulkit.employeeapp.CheckInternetConnectivity.NetWatcher;
 import com.example.pulkit.employeeapp.EmployeeLogin.EmployeeSession;
 import com.example.pulkit.employeeapp.Notification.NotificationActivity;
 import com.example.pulkit.employeeapp.R;
@@ -34,6 +37,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
+import static com.example.pulkit.employeeapp.EmployeeApp.sendNotif;
 import static com.example.pulkit.employeeapp.MainViews.TaskDetail.task_id;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
@@ -43,7 +47,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private EmployeeSession session;
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        //TODO get the type of notifiction handle separately for chats, quotation and normal assigned tasks
+        //TODO get the type of notification handle separately for chats, quotation and normal assigned tasks
         session = new EmployeeSession(context);
         String type = remoteMessage.getData().get("type");
         if (type.equals("chat") || type == null) {
@@ -65,6 +69,28 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             String repeatAfter= words[1];
             if (body != null && taskId != null && senderuid != null)
                 sendRepeatedNotification(body, senderuid, taskId, id,repeatAfter);
+        }
+        else if(type.equals("assignJob"))
+        {
+            RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.custom_notification);
+            String body = remoteMessage.getData().get("body");
+            String senderuid = remoteMessage.getData().get("senderuid");
+            String taskId = remoteMessage.getData().get("taskId");
+            String id = remoteMessage.getData().get("msgid");
+/*            Intent intent = new Intent(this, NetWatcher.class);
+            intent.setAction("seen_notification");
+            intent.putExtra("empname",session.getName());
+            intent.putExtra("senderuid",senderuid);
+            intent.putExtra("mykey",session.getUsername());
+            String notifid = id.substring(8);
+            intent.putExtra("id",notifid);
+            PendingIntent pendingSwitchIntent = PendingIntent.getBroadcast(MyFirebaseMessagingService.this, 0,
+                    intent, 0);
+            contentView.setOnClickPendingIntent(R.id.seen,pendingSwitchIntent);
+            contentView.setTextViewText(R.id.title, body);*/
+
+            if (body != null  && senderuid != null)
+                sendGeneralNotification2(body, senderuid, taskId, id.substring(8), contentView);
         }
         else {
             String body = remoteMessage.getData().get("body");
@@ -117,7 +143,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         final Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-
         DatabaseReference dbOnlineStatus = DBREF.child("Users").child("Usersessions").child(senderuid).getRef();
         dbOnlineStatus.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -126,7 +151,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     NameAndStatus nameAndStatus = dataSnapshot.getValue(NameAndStatus.class);
                     NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(MyFirebaseMessagingService.this)
                             .setLargeIcon(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.mipmap.ic_launcher))
-                            .setSmallIcon(R.mipmap.ic_chat_white)
+                            .setSmallIcon(R.mipmap.ic_launcher)
                             .setContentTitle("New Notification from " + nameAndStatus.getName())
                             .setContentText(body)
                             .setAutoCancel(true)
@@ -146,6 +171,46 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             }
         });
 
+    }
+
+    private void sendGeneralNotification2(final String body, String senderuid, String taskId, final String id, final RemoteViews contentView) {
+        Intent intent = new Intent(this, NotificationActivity.class);
+        intent.putExtra("seen","seen");
+        intent.putExtra("senderuid",senderuid);
+        intent.putExtra("taskId",taskId);
+        intent.putExtra("id",id);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        final PendingIntent pendingIntent = PendingIntent.getActivity(this, Integer.parseInt(id) /* Request code */, intent,
+                PendingIntent.FLAG_ONE_SHOT);
+
+        final Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+        DatabaseReference dbOnlineStatus = DBREF.child("Users").child("Usersessions").child(senderuid).getRef();
+        dbOnlineStatus.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    NameAndStatus nameAndStatus = dataSnapshot.getValue(NameAndStatus.class);
+                    NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(MyFirebaseMessagingService.this)
+                            .setSmallIcon(R.mipmap.ic_launcher)
+                            .setContentTitle("New Notification from " + nameAndStatus.getName())
+                            .setContentText(body)
+                            .setOngoing(true)
+                            .setAutoCancel(true)
+                            .setSound(defaultSoundUri)
+                            .setContentIntent(pendingIntent);
+                    NotificationManager notificationManager =
+                            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    notificationManager.notify(Integer.parseInt(id) /* ID of notification */, notificationBuilder.build());
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void sendChatNotification(final String msg, String chatref, final String msgid, final String senderuid) throws NullPointerException {
@@ -185,7 +250,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     if (dataSnapshot.exists()) {
                         NameAndStatus nameAndStatus = dataSnapshot.getValue(NameAndStatus.class);
                         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(MyFirebaseMessagingService.this)
-                                .setSmallIcon(R.mipmap.ic_chat_white)
+                                .setSmallIcon(R.mipmap.ic_launcher)
                                 .setContentTitle("New Message from " + nameAndStatus.getName())
                                 .setContentText(msg)
                                 .setAutoCancel(true)
@@ -205,7 +270,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             });
         }
     }
-
+public String getTimestamp()
+{
+    String timestamp = Calendar.getInstance().getTimeInMillis()+"";
+    return timestamp;
+}
 
     private boolean isAppIsInForeground(Context context) {
         boolean isInForeground = false;
@@ -217,6 +286,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             }
 
         }
-        return isInForeground;
+        return true;
     }
 }
