@@ -47,7 +47,7 @@ public class MeasureList extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_measure_list);
-
+        employeeSession = new EmployeeSession(this);
         task_id = TaskDetail.task_id;
 
         dbRef = DBREF.child("Task").child(task_id).child("Measurement").getRef();

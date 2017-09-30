@@ -5,9 +5,11 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 
+import com.example.pulkit.employeeapp.MyProfile.ContactCoordinator;
 import com.example.pulkit.employeeapp.helper.DividerItemDecoration;
 
 import android.support.v7.widget.DefaultItemAnimator;
@@ -47,6 +49,7 @@ public class chatFrag extends Fragment implements chatListAdapter.chatListAdapte
     private HashMap<DatabaseReference,ValueEventListener> dbLastMessageHashMap = new HashMap<>();
     private ChildEventListener dbChatCHE;
     private HashMap<DatabaseReference,ValueEventListener> dbProfileRefHashMap = new HashMap<>();
+    FloatingActionButton chat_add;
 
     public static chatFrag newInstance() {
         chatFrag fragment = new chatFrag();
@@ -70,7 +73,7 @@ public class chatFrag extends Fragment implements chatListAdapter.chatListAdapte
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         fmm = getFragmentManager();
-
+        chat_add = (FloatingActionButton)view.findViewById(R.id.add_chat);
         EmployeeSession coordinatorSession = new EmployeeSession(getActivity());
         mykey = coordinatorSession.getUsername();
         dbChatList = DBREF.child("Users").child("Userchats").child(mykey).getRef();
@@ -81,6 +84,14 @@ public class chatFrag extends Fragment implements chatListAdapter.chatListAdapte
         recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
         mAdapter = new chatListAdapter(list,getActivity(),this);
         recyclerView.setAdapter(mAdapter);
+        chat_add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getContext(), ContactCoordinator.class));
+                getActivity().finish();
+            }
+        });
+
         LoadData();
     }
 

@@ -40,7 +40,7 @@ public class dialogue extends AppCompatActivity {
 
     private ArrayList<String> photoPaths = new ArrayList<>();
     EditText width, height, unit, tag, amount;
-    String fleximage = "", temp_width, temp_height, temp_unit, temp_amount, id = "", temp_tag = "";
+    String fleximage = "", temp_width="", temp_height="", temp_unit="", temp_amount="", id = "", temp_tag = "";
     private static final int REQUEST_CODE = 51;
     DatabaseReference dbRef, db;
     StorageReference storageReference, sf;
@@ -135,9 +135,9 @@ public class dialogue extends AppCompatActivity {
         temp_tag = tag.getText().toString();
         temp_amount = amount.getText().toString();
 
-        if (temp_width.equals("") || temp_height.equals("") || temp_unit.equals("") ||temp_amount.equals(""))
+       /* if (temp_width.equals("") || temp_height.equals("") || temp_unit.equals("") ||temp_amount.equals(""))
             Toast.makeText(this, "Enter complete details...", Toast.LENGTH_SHORT).show();
-        else
+        else*/
             new net().execute();
 
 

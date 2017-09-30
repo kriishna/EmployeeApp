@@ -84,7 +84,6 @@ public class UploadQuotationService extends IntentService
     private void saveQuotationtoFirebase(final ArrayList<String> TaskIdList)
     {
 
-        Toast.makeText(getBaseContext(),"Uploading Quotation in Background", Toast.LENGTH_SHORT).show();
         long timestamp = Calendar.getInstance().getTimeInMillis();
         timestamp = 9999999999999L-timestamp;
         sendNotif(emp_id,customerId,"uploadQuotation","Quotation for your tasks has been uploaded","noId");
