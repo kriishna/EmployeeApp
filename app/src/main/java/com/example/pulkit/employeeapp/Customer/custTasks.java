@@ -472,21 +472,25 @@ public class custTasks extends AppCompatActivity implements taskAdapter.TaskAdap
                         CustomerAccount customerAccount = new CustomerAccount();
                         String totalString =total.getText().toString().trim();
                         String advanceTotal = advance.getText().toString().trim();
-                        if(totalString!=null&&advanceTotal!=null) {
+                        if(totalString!=null&&advanceTotal!=null&&!totalString.equals("")&&!advanceTotal.equals("")) {
                             Integer total_amount = Integer.parseInt(totalString);
                             customerAccount.setTotal(total_amount);
                             Integer advance_amount = Integer.parseInt(advanceTotal);
                             customerAccount.setAdvance(advance_amount);
+                            if(total_amount<advance_amount){
+                                Toast.makeText(getApplicationContext(),"Invalid amount entered",Toast.LENGTH_SHORT).show();
+                            }
+                            else{
                             dbaccountinfo.setValue(customerAccount);
                             total.setEnabled(false);
                             advance.setEnabled(false);
                             balanceLayout.setVisibility(View.VISIBLE);
                             submit.setVisibility(View.GONE);
                             edit.setVisibility(View.VISIBLE);
-                            sendNotif(emp_id, custId, "accountReset", "You modified the account details of " + customerName, custId);
+                            sendNotif(emp_id, emp_id, "accountReset", "You modified the account details of " + customerName+".", custId);
                             sendNotif(emp_id, custId, "accountReset", "Your advance deposited is Rs." + advance_amount + " and balance left is Rs." + (total_amount - advance_amount), custId);
-                            sendNotifToAllCoordinators(emp_id, "accountReset", customerName + " advance deposited is Rs." + advance_amount + " and balance left is Rs." + (total_amount - advance_amount), custId);
-                        }
+                            sendNotifToAllCoordinators(emp_id, "accountReset",session.getName()+" modified account details of "+ customerName + ". Advance deposited is Rs." + advance_amount + " and balance left is Rs." + (total_amount - advance_amount), custId);
+                        }}
                         else
                         {
                             Toast.makeText(getApplicationContext(),"Invalid amount entered",Toast.LENGTH_SHORT).show();

@@ -19,4 +19,9 @@
         android:icon="@drawable/ic_upload_white"
         android:title="Edit"
         app:showAsAction="always" />
+    <item
+        android:icon="@mipmap/ic_account_info"
+        android:title="ADD"
+        app:showAsAction="always"
+        android:id="@+id/manage_account"/>
 </menu>

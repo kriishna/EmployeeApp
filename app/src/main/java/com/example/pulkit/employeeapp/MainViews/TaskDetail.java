@@ -51,6 +51,7 @@ import com.example.pulkit.employeeapp.listener.RecyclerTouchListener;
 import com.example.pulkit.employeeapp.measurement.MeasureList;
 import com.example.pulkit.employeeapp.model.CompletedBy;
 import com.example.pulkit.employeeapp.model.CompletedJob;
+import com.example.pulkit.employeeapp.model.CustomerAccount;
 import com.example.pulkit.employeeapp.model.Quotation;
 import com.example.pulkit.employeeapp.model.Task;
 import com.example.pulkit.employeeapp.model.measurement;
@@ -78,6 +79,7 @@ import droidninja.filepicker.FilePickerConst;
 import static com.example.pulkit.employeeapp.EmployeeApp.AppName;
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 import static com.example.pulkit.employeeapp.EmployeeApp.sendNotif;
+import static com.example.pulkit.employeeapp.EmployeeApp.sendNotifToAllCoordinators;
 import static com.example.pulkit.employeeapp.EmployeeApp.simpleDateFormat;
 
 public class TaskDetail extends AppCompatActivity implements taskdetailDescImageAdapter.ImageAdapterListener, bigimage_adapter.bigimage_adapterListener, measurement_adapter.measurement_adapterListener {
@@ -473,6 +475,82 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                 checkChatref(mykey, id);
                 break;
 
+            case R.id.manage_account:
+                AlertDialog customerAccountDialog = new AlertDialog.Builder(this)
+                        .setView(R.layout.account_info_layout)
+                        .create();
+                customerAccountDialog.show();
+                final Button edit, submit;
+                final EditText total, advance, balance;
+                final LinearLayout balanceLayout;
+                total = (EditText) customerAccountDialog.findViewById(R.id.total);
+                advance = (EditText) customerAccountDialog.findViewById(R.id.advance);
+                balance = (EditText) customerAccountDialog.findViewById(R.id.balance);
+                edit = (Button) customerAccountDialog.findViewById(R.id.edit);
+                submit = (Button) customerAccountDialog.findViewById(R.id.submit);
+                balanceLayout = (LinearLayout) customerAccountDialog.findViewById(R.id.balanceLayout);
+                final DatabaseReference dbaccountinfo = DBREF.child("Customer").child(customerId).child("Account").getRef();
+                ValueEventListener dbaccountlistener = dbaccountinfo.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            CustomerAccount customerAccount = dataSnapshot.getValue(CustomerAccount.class);
+                            total.setText(customerAccount.getTotal() + "");
+                            advance.setText(customerAccount.getAdvance() + "");
+                            balance.setText((customerAccount.getTotal() - customerAccount.getAdvance()) + "");
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+                edit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        total.setEnabled(true);
+                        advance.setEnabled(true);
+                        balanceLayout.setVisibility(View.GONE);
+                        submit.setVisibility(View.VISIBLE);
+                        edit.setVisibility(View.GONE);
+                    }
+                });
+
+                submit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        CustomerAccount customerAccount = new CustomerAccount();
+                        String totalString =total.getText().toString().trim();
+                        String advanceTotal = advance.getText().toString().trim();
+                        if(totalString!=null&&advanceTotal!=null&&!totalString.equals("")&&!advanceTotal.equals("")) {
+                            Integer total_amount = Integer.parseInt(totalString);
+                            customerAccount.setTotal(total_amount);
+                            Integer advance_amount = Integer.parseInt(advanceTotal);
+                            customerAccount.setAdvance(advance_amount);
+                            if(total_amount<advance_amount){
+                                Toast.makeText(getApplicationContext(),"Invalid amount entered",Toast.LENGTH_SHORT).show();
+                            }
+                            else{
+                                dbaccountinfo.setValue(customerAccount);
+                                total.setEnabled(false);
+                                advance.setEnabled(false);
+                                balanceLayout.setVisibility(View.VISIBLE);
+                                submit.setVisibility(View.GONE);
+                                edit.setVisibility(View.VISIBLE);
+                                sendNotif(emp_id, emp_id, "accountReset", "You modified the account details of " + customername, customer_id);
+                                sendNotif(emp_id, customerId, "accountReset", "Your advance deposited is Rs." + advance_amount + " and balance left is Rs." + (total_amount - advance_amount), customerId);
+                                sendNotifToAllCoordinators(emp_id, "accountReset",session.getName()+" modified account details of "+ customername + ". Advance deposited is Rs." + advance_amount + " and balance left is Rs." + (total_amount - advance_amount), customerId);
+                            }}
+                        else
+                        {
+                            Toast.makeText(getApplicationContext(),"Invalid amount entered",Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+                });
+
             case R.id.item3:
                 if (desig.equals("Accounts")) {
                     LayoutInflater layoutInflaterAndroid = LayoutInflater.from(this);
@@ -807,5 +885,10 @@ public class TaskDetail extends AppCompatActivity implements taskdetailDescImage
                 viewSelectedImages_measure.dismiss();
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

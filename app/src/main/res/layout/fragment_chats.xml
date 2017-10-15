@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/white"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -21,11 +21,18 @@
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="true" />
 
-            <android.support.v4.widget.Space
+            <TextView
                 android:id="@+id/space"
                 android:layout_width="match_parent"
-                android:layout_height="70dp"
-                android:layout_alignParentBottom="true" />
+                android:layout_height="100dp"
+                android:layout_alignParentBottom="true"
+                android:paddingTop="5dp"
+                android:paddingRight="25dp"
+                android:paddingLeft="25dp"
+                android:text="Tap the Add icon at the bottom-right of the screen to chat with other coordinators. Swipe right for more options."
+                android:textAlignment="center"
+                android:textSize="15dp"
+                android:textStyle="bold" />
         </LinearLayout>
     </ScrollView>
 
@@ -41,4 +48,4 @@
         app:elevation="4dp"
         app:fabSize="normal" />
 
-    </RelativeLayout>
+</RelativeLayout>
