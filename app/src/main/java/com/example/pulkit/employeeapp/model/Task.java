@@ -5,7 +5,7 @@ package com.example.pulkit.employeeapp.model;
  */
 
 public class Task {
-    private String taskId, name, startDate, expEndDate, quotationId, qty, desc, customerId;
+    private String taskId="", name, startDate, expEndDate, quotationId, qty, desc, customerId="";
     private int color = -1;
     private Boolean measurementApproved;
 
