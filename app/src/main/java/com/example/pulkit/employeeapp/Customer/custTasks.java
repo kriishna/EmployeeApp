@@ -27,6 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.pulkit.employeeapp.EmployeeLogin.EmployeeSession;
+import com.example.pulkit.employeeapp.EmployeeLogin.empLogin;
 import com.example.pulkit.employeeapp.MainViews.TaskDetail;
 import com.example.pulkit.employeeapp.MainViews.TaskHome;
 import com.example.pulkit.employeeapp.MainViews.taskFrag;
@@ -306,12 +307,15 @@ public class custTasks extends AppCompatActivity implements taskAdapter.TaskAdap
         } else {
 
             Intent intent = new Intent(this, TaskDetail.class);
-            if(position>=0 ) {
+            if(TaskList.size()>0 ) {
                 Task task = TaskList.get(position);
                 if(!task.getTaskId().equals("") && !task.getCustomerId().equals("")) {
                     intent.putExtra("customerId", task.getCustomerId());
                     intent.putExtra("task_id", task.getTaskId());
                     startActivity(intent);
+                }
+                else{
+                    startActivity(new Intent(custTasks.this,empLogin.class));
                 }
             }
         }

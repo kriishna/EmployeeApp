@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
+import com.example.pulkit.employeeapp.EmployeeLogin.empLogin;
 import com.example.pulkit.employeeapp.adapters.EmployeeTask_Adapter;
 import com.example.pulkit.employeeapp.helper.DividerItemDecoration;
 
@@ -98,6 +99,9 @@ public class taskFrag extends Fragment implements EmployeeTask_Adapter.EmployeeT
         if ( listoftasks.size()>0 && !listoftasks.get(position).equals("")) {
             intent.putExtra("task_id", listoftasks.get(position));
             startActivity(intent);
+        }
+        else{
+            startActivity(new Intent(getContext(),empLogin.class));
         }
     }
 
