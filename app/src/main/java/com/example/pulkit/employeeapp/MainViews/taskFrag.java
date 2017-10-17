@@ -37,7 +37,7 @@ import java.util.List;
 
 import static com.example.pulkit.employeeapp.EmployeeApp.DBREF;
 
-public class taskFrag extends Fragment implements EmployeeTask_Adapter.EmployeeTask_AdapterListener{
+public class taskFrag extends Fragment implements EmployeeTask_Adapter.EmployeeTask_AdapterListener {
 
     RecyclerView task_list;
     DatabaseReference dbTask;
@@ -94,10 +94,11 @@ public class taskFrag extends Fragment implements EmployeeTask_Adapter.EmployeeT
     @Override
     public void onRowClick(int position, EmployeeTask_Adapter.MyViewHolder holder) {
 
-            Intent intent = new Intent(getContext(), TaskDetail.class);
+        Intent intent = new Intent(getContext(), TaskDetail.class);
+        if ( listoftasks.size()>0) {
             intent.putExtra("task_id", listoftasks.get(position));
             startActivity(intent);
-
+        }
     }
 
 
@@ -122,8 +123,8 @@ public class taskFrag extends Fragment implements EmployeeTask_Adapter.EmployeeT
                     listoftasks.clear();
                     if (dataSnapshot.exists()) {
                         for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
-                           if(childSnapshot.getValue().toString().equals("pending"))
-                               listoftasks.add(childSnapshot.getKey());
+                            if (childSnapshot.getValue().toString().equals("pending"))
+                                listoftasks.add(childSnapshot.getKey());
                         }
                         mAdapter = new EmployeeTask_Adapter(listoftasks, getActivity(), emp_id, listener);
                         task_list.setAdapter(mAdapter);

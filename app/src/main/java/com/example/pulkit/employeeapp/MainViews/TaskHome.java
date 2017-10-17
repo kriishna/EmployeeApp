@@ -27,7 +27,7 @@ import java.util.List;
 public class TaskHome extends drawer {
     private TabLayout tabLayout;
     private ViewPager viewPager;
-    public static String emp_id, desig;
+    public static String emp_id="", desig="";
     EmployeeSession session;
     private MarshmallowPermissions marshmallowPermissions;
 
@@ -53,6 +53,7 @@ public class TaskHome extends drawer {
         {
             createShortCut();
         }
+
         if (getIntent().hasExtra("emp_id")) {
             emp_id = getIntent().getStringExtra("emp_id");
             desig = getIntent().getStringExtra("desig");
