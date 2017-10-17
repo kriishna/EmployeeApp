@@ -95,7 +95,7 @@ public class taskFrag extends Fragment implements EmployeeTask_Adapter.EmployeeT
     public void onRowClick(int position, EmployeeTask_Adapter.MyViewHolder holder) {
 
         Intent intent = new Intent(getContext(), TaskDetail.class);
-        if ( listoftasks.size()>0) {
+        if ( listoftasks.size()>0 && !listoftasks.get(position).equals("")) {
             intent.putExtra("task_id", listoftasks.get(position));
             startActivity(intent);
         }

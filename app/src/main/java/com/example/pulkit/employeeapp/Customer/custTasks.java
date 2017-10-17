@@ -306,10 +306,14 @@ public class custTasks extends AppCompatActivity implements taskAdapter.TaskAdap
         } else {
 
             Intent intent = new Intent(this, TaskDetail.class);
-            Task task = TaskList.get(position);
-            intent.putExtra("customerId", task.getCustomerId());
-            intent.putExtra("task_id", task.getTaskId());
-            startActivity(intent);
+            if(position>=0 ) {
+                Task task = TaskList.get(position);
+                if(!task.getTaskId().equals("") && !task.getCustomerId().equals("")) {
+                    intent.putExtra("customerId", task.getCustomerId());
+                    intent.putExtra("task_id", task.getTaskId());
+                    startActivity(intent);
+                }
+            }
         }
     }
 
